@@ -5,7 +5,7 @@ export default defineNuxtConfig({
     modules: ['@nuxtjs/tailwindcss', '@nuxt/eslint', '@nuxtjs/supabase'],
     supabase: {
         redirectOptions: {
-            login: '/login',
+            login: '/',
             callback: '/confirm',
             include: undefined, // undefined = include all
             exclude: ['/'], // exclude routes like ['/foo', '/bar/*']
