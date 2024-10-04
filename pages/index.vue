@@ -6,21 +6,7 @@ useSeoMeta({
   description: "A fun music quiz game"
 })
 
-const supabase = useSupabaseClient()
 const session = useSupabaseSession()
-
-async function signInWithSpotify() {
-  console.log("click")
-  const {error} = await supabase.auth.signInWithOAuth({
-    provider: 'spotify',
-    options: {
-      redirectTo: 'http://localhost:3000/confirm',
-    },
-  });
-  if (error) {
-    console.error('Error:', error.message);
-  }
-}
 
 </script>
 
@@ -32,11 +18,8 @@ async function signInWithSpotify() {
       <template #content/>
 
       <template #bottom>
-        <!-- TODO: create component -->
-        <div class="flex justify-center w-3/4 mb-6 border p-3 rounded-full ">
-          <button @click="signInWithSpotify">
-            Sign In with Spotify
-          </button>
+        <div class="w-3/4 mb-6">
+          <LoginProviderButton provider="spotify" name="Spotify"/> <!-- class="mb-4" for consecutive providers -->
         </div>
       </template>
     </SplitView>
