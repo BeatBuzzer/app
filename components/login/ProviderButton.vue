@@ -12,6 +12,8 @@ const props = defineProps({
   }
 });
 
+const imgSrc = `icons/${props.provider}.svg`
+
 async function signIn() {
   console.log("click")
   const {error} = await supabase.auth.signInWithOAuth({
@@ -27,11 +29,12 @@ async function signIn() {
 </script>
 
 <template>
-  <div class="flex justify-center border p-3 rounded-full ">
-    <button @click="signIn">
-      Sign In with {{ props.name }}
-    </button>
-  </div>
+  <button @click="signIn">
+    <div class="flex items-center border px-3 rounded-full bg-[#1DB954] h-16 max-h-16">
+        <NuxtImg :src="imgSrc" :alt="props.provider" class="h-3/4"/>
+        <span class="flex-grow">Sign in with {{ props.name }}</span>
+    </div>
+  </button>
 </template>
 
 <style scoped>

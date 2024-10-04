@@ -19,7 +19,7 @@ const session = useSupabaseSession()
 
       <template #bottom>
         <div class="w-3/4 mb-6">
-          <LoginProviderButton provider="spotify" name="Spotify"/> <!-- class="mb-4" for consecutive providers -->
+          <LoginProviderButton provider="spotify" name="Spotify" class="w-full"/> <!-- class="mb-2" for consecutive providers -->
         </div>
       </template>
     </SplitView>
