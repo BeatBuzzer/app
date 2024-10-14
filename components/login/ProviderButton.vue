@@ -19,7 +19,7 @@ async function signIn() {
   const {error} = await supabase.auth.signInWithOAuth({
     provider: props.provider,
     options: {
-      redirectTo: 'http://localhost:3000/confirm',
+      redirectTo: `http://${window.location.host}/confirm`,
     },
   });
   if (error) {
@@ -30,7 +30,7 @@ async function signIn() {
 
 <template>
   <button @click="signIn">
-    <div class="flex items-center border px-3 rounded-full bg-[#1DB954] h-16 max-h-16">
+    <div class="flex items-center px-3 rounded-full bg-[#1DB954] h-16 max-h-16">
         <NuxtImg :src="imgSrc" :alt="props.provider" class="h-3/4"/>
         <span class="flex-grow">Sign in with {{ props.name }}</span>
     </div>

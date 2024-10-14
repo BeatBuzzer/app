@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import SplitView from "~/layouts/SplitView.vue";
 
 useSeoMeta({
   title: "BeatBuzzer",
@@ -7,26 +6,10 @@ useSeoMeta({
 })
 
 const session = useSupabaseSession()
-
 </script>
 
 <template>
-  <div>
-
-    <SplitView v-if="!session">
-      <template #header/>
-      <template #content/>
-
-      <template #bottom>
-        <div class="w-3/4 mb-6">
-          <LoginProviderButton provider="spotify" name="Spotify" class="w-full"/> <!-- class="mb-2" for consecutive providers -->
-        </div>
-      </template>
-    </SplitView>
-
-    <div v-if="session">
-      Hi, {{ session.user.email }}!
-    </div>
+  <div class="h-screen bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500">
 
   </div>
 </template>

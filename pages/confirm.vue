@@ -17,11 +17,11 @@ watch(user, () => {
 }, { immediate: true })
 </script>
 <template>
-  <div>
+  <div class="h-screen bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500">
     <div>Waiting for login...</div>
 
     <div>
-      If you are stuck here login <a href="/">here</a>
+      <a href="/">If you are stuck here login <span class="text-semibold">here</span></a>
     </div>
   </div>
 </template>
