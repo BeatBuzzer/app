@@ -14,16 +14,15 @@ useSeoMeta({
   <div class="h-screen bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500">
     <DashboardView>
       <template #header>
-        <div class="flex basis-1/2">
-          <div class="mr-3">
-            1A
-            <input type="range" name="test" id="">
-          </div>
+        <div>
+          1A
+        </div>
 
-          <div>
-            2B
-            <input type="range" name="test" id="">
-          </div>
+        <div>
+          2B
+        </div>
+        <div>
+          3C
         </div>
       </template>
       <template #footer>
