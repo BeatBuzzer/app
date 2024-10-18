@@ -11,7 +11,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="h-screen bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500">
+  <div class="bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500">
     <DashboardView>
       <template #header>
         <div>
