@@ -1,5 +1,5 @@
 <template>
-  <div class="flex basis-1/3 flex-col h-screen max-h-screen max-w-screen-sm">
+  <div class="flex basis-1/3 flex-col h-screen max-h-screen">
 
     <div class="h-1/6">
       <!-- possible Title and nav -->

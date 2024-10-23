@@ -4,7 +4,8 @@ import DashboardView from "~/layouts/HeaderFooterView.vue";
 
 useSeoMeta({
   title: "BeatBuzzer",
-  description: "A fun music quiz game"
+  description: "A fun music quiz game",
+  viewport: "width=device-width, initial-scale=1.0",
 })
 
 //const session = useSupabaseSession()

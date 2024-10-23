@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <div class="flex flex-col h-screen max-h-screen max-w-full">
+  <div class="flex flex-col h-screen max-h-screen">
 
     <div class="basis-24 content-center border rounded-b-3xl">
       <div class="flex justify-around">
