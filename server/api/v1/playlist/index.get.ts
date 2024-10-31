@@ -1,21 +1,12 @@
 import {serverSupabaseServiceRole, serverSupabaseUser} from "#supabase/server";
 
-
 /**
- * Endpoint to get a playlist by id
- * @returns {Object} - Playlist object
- * @throws {400} - Invalid playlistId
+ * Endpoint to get all playlists
  * @throws {401} - Unauthenticated
  * @throws {500} - Internal Server Error
+ * @returns {Array} - Array of playlists
  */
 export default defineEventHandler(async (event) => {
-    const playlistId = getRouterParam(event, 'uid')
-
-    // check regex playlistId
-    if (!playlistId || !isValidSpotifyID(playlistId!)) {
-        setResponseStatus(event, 400);
-        return {error: 'invalid playlistId'};
-    }
 
     // Require user to be authenticated
     const user = await serverSupabaseUser(event);
@@ -25,7 +16,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const client = serverSupabaseServiceRole(event);
-    const {data, error} = await client.from('playlists').select('*').eq('id', playlistId).single();
+    const {data, error} = await client.from('playlists').select();
 
     if (error) {
         setResponseStatus(event, 500);

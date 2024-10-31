@@ -1,0 +1,36 @@
+@baseUrl = http://localhost:3000/api/v1
+@authCookie =
+
+### Get all Playlists
+GET {{baseUrl}}/playlist
+Cookie: {{authCookie}}
+
+
+### Get specific Playlist
+@playlistId = 37i9dQZF1EIYE32WUF6sxN
+
+GET {{baseUrl}}/playlist/{{playlistId}}
+Cookie: {{authCookie}}
+
+
+### Add a Spotify Playlist to our system
+POST {{baseUrl}}/playlist
+
+{
+"id": "37i9dQZF1EIYE32WUF6sxN",
+"name": "Hardstyle Popular",
+"spotifyId": "37i9dQZF1EIYE32WUF6sxN",
+"categories": ["hardstyle", "remix"]
+}
+
+### Add a Disabled Spotify Playlist to our system
+POST {{baseUrl}}/playlist
+
+{
+"id": "4DC0uhUb7itYVuVVF3goSN",
+"name": "Memes",
+"spotifyId": "4DC0uhUb7itYVuVVF3goSN",
+"categories": ["meme"],
+"enabled": false
+}
+
