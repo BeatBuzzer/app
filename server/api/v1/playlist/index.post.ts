@@ -9,7 +9,7 @@ const schema = z.object({
     name: z.string(),
     spotifyId: z.string().regex(spotifyIDRegex),
     categories: z.array(z.string()),
-    enabled: z.boolean().optional()
+    enabled: z.boolean().optional().default(true)
 })
 
 

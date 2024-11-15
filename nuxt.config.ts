@@ -13,6 +13,11 @@ export default defineNuxtConfig({
         },
         cookieOptions: {
             secure: false, //TODO: set to true when deploying
+        },
+        clientOptions: {
+            db: {
+                schema: 'beatbuzzer',
+            }
         }
     },
     devServer: {
