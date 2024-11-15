@@ -17,20 +17,20 @@ Cookie: {{authCookie}}
 POST {{baseUrl}}/playlist
 
 {
-"id": "37i9dQZF1EIYE32WUF6sxN",
-"name": "Hardstyle Popular",
-"spotifyId": "37i9dQZF1EIYE32WUF6sxN",
-"categories": ["hardstyle", "remix"]
+"id": "37i9dQZF1DX2CtuHQcongT",
+"name": "This is SEGA SOUND TEAM",
+"spotifyId": "37i9dQZF1DX2CtuHQcongT",
+"categories": ["sega"]
 }
 
 ### Add a Disabled Spotify Playlist to our system
 POST {{baseUrl}}/playlist
 
 {
-"id": "4DC0uhUb7itYVuVVF3goSN",
-"name": "Memes",
-"spotifyId": "4DC0uhUb7itYVuVVF3goSN",
-"categories": ["meme"],
+"id": "37i9dQZF1DX2CtuHQcongT",
+"name": "This is SEGA SOUND TEAM",
+"spotifyId": "37i9dQZF1DX2CtuHQcongT",
+"categories": ["sega"]
 "enabled": false
 }
 
