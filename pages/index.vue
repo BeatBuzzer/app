@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import DashboardView from "~/layouts/HeaderFooterView.vue";
+import HeaderFooterView from "~/layouts/HeaderFooterView.vue";
 
 useSeoMeta({
   title: "BeatBuzzer",
@@ -8,17 +8,15 @@ useSeoMeta({
   viewport: "width=device-width, initial-scale=1.0",
 })
 
-//const session = useSupabaseSession()
 </script>
 
 <template>
   <div class="bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500">
-    <DashboardView>
+    <HeaderFooterView>
       <template #header>
         <div>
           1A
         </div>
-
         <div>
           2B
         </div>
@@ -31,6 +29,6 @@ useSeoMeta({
         <div class="text-4xl">B</div>
         <div class="text-4xl">C</div>
       </template>
-    </DashboardView>
+    </HeaderFooterView>
   </div>
 </template>

@@ -3,25 +3,30 @@
 </script>
 
 <template>
-  <div class="flex flex-col h-screen max-h-screen">
+  <div class="flex flex-col h-screen max-h-screen items-center">
+    <!-- Wrapper div für die Breiten-Kontrolle -->
+    <div class="w-full xl:w-1/2 2xl:w-1/4 flex flex-col h-full">
 
-    <div class="basis-24 content-center border rounded-b-3xl">
-      <div class="flex justify-around">
-        <slot name="header"/>
+      <!-- Header -->
+      <div class="basis-24 border rounded-b-3xl">
+        <div class="flex justify-around items-center h-full">
+          <slot name="header"/>
+        </div>
       </div>
-    </div>
 
-    <div class="flex-1">
-      <slot name="content"/>
-    </div>
-
-    <div class="basis-24 content-center border rounded-t-3xl">
-      <div class="flex justify-around">
-        <slot name="footer"/>
+      <!-- Content -->
+      <div class="flex-1">
+        <slot name="content"/>
       </div>
+
+      <!-- Footer -->
+      <div class="basis-24 border rounded-t-3xl">
+        <div class="flex justify-around items-center h-full">
+          <slot name="footer"/>
+        </div>
+      </div>
+
     </div>
-
-
   </div>
 </template>
 
