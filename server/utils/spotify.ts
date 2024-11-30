@@ -38,9 +38,10 @@ export async function getSpotifyToken() {
 export async function getPlaylistCover(token: string | null, playlistId: string): Promise<string | undefined> {
     if (!token) return undefined;
 
-    const res = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}?fields=images`, {
+    const res = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/images`, {
         headers: {'Authorization': `Bearer ${token}`}
     })
     const data = await res.json()
-    return data.images[0].url;
+    // console.log(data)
+    return data[0].url;
 }
