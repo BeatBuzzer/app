@@ -44,15 +44,15 @@ export default defineEventHandler(async (event) => {
     }));
 
     const client = serverSupabaseServiceRole(event);
-    const {data, error} = await client.from('playlists').insert(playlistInsert as never).select().single(); //todo: fix type error!
+    const {data: playlistData, error: playlistError} = await client.from('playlists').insert(playlistInsert as never).select().single(); //todo: fix type error!
 
 
-    if (error) {
+    if (playlistError) {
         setResponseStatus(event, 400);
-        if (error.code === UNIQUE_VIOLATION)
+        if (playlistError.code === UNIQUE_VIOLATION)
             return {error: 'Playlist with this ID already exists'};
         setResponseStatus(event, 500);
-        return {error: error.message};
+        return {error: playlistError.message};
     }
 
     const { data: categoriesData, error: categoriesError } = await client
@@ -66,5 +66,5 @@ export default defineEventHandler(async (event) => {
 
 
     setResponseStatus(event, 201);
-    return data;
+    return { playlist: playlistData, categories: categoriesData };
 })
