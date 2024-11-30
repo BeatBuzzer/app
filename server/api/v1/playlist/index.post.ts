@@ -21,6 +21,7 @@ const schema = z.object({
  * @returns {Object} - Created playlist
  */
 export default defineEventHandler(async (event) => {
+    // fix coverUrl and delete test.vue
     const result = await readValidatedBody(event, body => schema.safeParse(body))
 
     if (!result.success) {
@@ -36,10 +37,17 @@ export default defineEventHandler(async (event) => {
         name: result.data.name,
         spotifyId: result.data.spotifyId,
         cover: coverUrl
+        //cover: "https://i.scdn.co/image/ab67706f000000024d183558628c25f8cb314eea"
     }
 
-    const client = serverSupabaseServiceRole(event)
+    const categoriesInsert = result.data.categories.map((category) => ({
+        playlistId: result.data.id,
+        name: category,
+    }));
+
+    const client = serverSupabaseServiceRole(event);
     const {data, error} = await client.from('playlists').insert(playlistInsert as never).select().single(); //todo: fix type error!
+
 
     if (error) {
         setResponseStatus(event, 400);
@@ -47,6 +55,15 @@ export default defineEventHandler(async (event) => {
             return {error: 'Playlist with this ID already exists'};
         setResponseStatus(event, 500);
         return {error: error.message};
+    }
+
+    const { data: categoriesData, error: categoriesError } = await client
+    .from('categories')
+    .insert(categoriesInsert as never);
+
+    if (categoriesError) {
+    setResponseStatus(event, 500);
+    return { error: `Error inserting categories: ${categoriesError.message}` };
     }
 
 
