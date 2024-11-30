@@ -21,7 +21,6 @@ const schema = z.object({
  * @returns {Object} - Created playlist
  */
 export default defineEventHandler(async (event) => {
-    // fix coverUrl and delete test.vue
     const result = await readValidatedBody(event, body => schema.safeParse(body))
 
     if (!result.success) {
@@ -37,7 +36,6 @@ export default defineEventHandler(async (event) => {
         name: result.data.name,
         spotifyId: result.data.spotifyId,
         cover: coverUrl
-        //cover: "https://i.scdn.co/image/ab67706f000000024d183558628c25f8cb314eea"
     }
 
     const categoriesInsert = result.data.categories.map((category) => ({
