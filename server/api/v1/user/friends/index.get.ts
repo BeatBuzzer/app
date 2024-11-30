@@ -1,0 +1,1 @@
+// Not relative to userid because you should always only be able to see your own friends
