@@ -1,4 +1,4 @@
-CREATE TYPE friendship_status AS ENUM ('pending', 'accepted', 'declined', 'blocked');
+CREATE TYPE friendship_status AS ENUM ('pending', 'accepted', 'declined');
 
 CREATE TABLE friendships
 (
@@ -33,7 +33,7 @@ BEGIN
     NEW.updated_at = now();
     RETURN NEW;
 END;
-$$;
+$$ LANGUAGE plpgsql;
 
 CREATE TRIGGER update_friendships_timestamp
     BEFORE UPDATE
@@ -116,7 +116,24 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+CREATE OR REPLACE FUNCTION decline_friend_request_by_id(friendship_id_param BIGINT)
+    RETURNS void AS
+$$
+BEGIN
+    UPDATE friendships
+    SET status = 'declined'
+    WHERE friendship_id = friendship_id_param
+      AND status = 'pending';
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'No pending friend request found with this ID';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
 -- examples
-SELECT *
-FROM get_incoming_friend_requests('d2e6a9a3-a0be-45ce-ae39-676c6a88c53a');
-SELECT accept_friend_request_by_id(4::bigint);
+SELECT send_friend_request('sender', 'receiver');
+SELECT * FROM get_incoming_friend_requests('d2e6a9a3-a0be-45ce-ae39-676c6a88c53a');
+SELECT accept_friend_request_by_id(4);
+SELECT decline_friend_request_by_id(4);
