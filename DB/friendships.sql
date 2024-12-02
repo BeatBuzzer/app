@@ -1,6 +1,13 @@
-CREATE TYPE friendship_status AS ENUM ('pending', 'accepted', 'declined');
+DO
+$$
+    BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'friendship_status') THEN
+            CREATE TYPE friendship_status AS ENUM ('pending', 'accepted', 'declined');
+        END IF;
+    END
+$$;
 
-CREATE TABLE friendships
+CREATE TABLE IF NOT EXISTS friendships
 (
     friendship_id  BIGSERIAL PRIMARY KEY,
     user1_id       UUID                     NOT NULL,
@@ -20,8 +27,8 @@ CREATE TABLE friendships
     CONSTRAINT fk_action_user FOREIGN KEY (action_user_id) REFERENCES users (id)
 );
 
-CREATE INDEX idx_friendship_user1 ON friendships (user1_id, status);
-CREATE INDEX idx_friendship_user2 ON friendships (user2_id, status);
+CREATE INDEX IF NOT EXISTS idx_friendship_user1 ON friendships (user1_id, status);
+CREATE INDEX IF NOT EXISTS idx_friendship_user2 ON friendships (user2_id, status);
 
 -- Functions
 
@@ -35,7 +42,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER update_friendships_timestamp
+CREATE OR REPLACE TRIGGER update_friendships_timestamp
     BEFORE UPDATE
     ON friendships
     FOR EACH ROW
@@ -66,37 +73,6 @@ BEGIN
                                  ELSE friendships.status
             END,
             action_user_id = sender_id;
-END;
-$$ LANGUAGE plpgsql;
-
--- retrieve incoming friend requests
-CREATE OR REPLACE FUNCTION get_incoming_friend_requests(user_id UUID)
-    RETURNS TABLE
-            (
-                friendship_id BIGINT,
-                sender_id     UUID,
-                receiver_id   UUID,
-                status        friendship_status,
-                created_at    TIMESTAMP WITH TIME ZONE,
-                updated_at    TIMESTAMP WITH TIME ZONE
-            )
-AS
-$$
-BEGIN
-    RETURN QUERY
-        SELECT f.friendship_id,
-               CASE
-                   WHEN f.user1_id = user_id THEN f.user2_id
-                   ELSE f.user1_id
-                   END AS sender_id,
-               user_id AS receiver_id,
-               f.status,
-               f.created_at,
-               f.updated_at
-        FROM friendships f
-        WHERE (f.user1_id = user_id OR f.user2_id = user_id)
-          AND f.status = 'pending'
-          AND f.action_user_id != user_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -133,35 +109,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
--- retrieve accepted friendships aswell as pending friendships where the user is the action_user
-CREATE OR REPLACE FUNCTION get_friends(user_id UUID)
-    RETURNS TABLE
-            (
-                friendship_id BIGINT,
-                friend_id     UUID,
-                created_at    TIMESTAMP WITH TIME ZONE,
-                updated_at    TIMESTAMP WITH TIME ZONE,
-                status        friendship_status
-            )
-AS
-$$
-BEGIN
-    RETURN QUERY
-        SELECT f.friendship_id,
-               CASE
-                   WHEN f.user1_id = user_id THEN f.user2_id
-                   ELSE f.user1_id
-                   END AS friend_id,
-               f.created_at,
-               f.updated_at,
-               f.status
-        FROM friendships f
-        WHERE (f.user1_id = user_id OR f.user2_id = user_id)
-          AND (f.status = 'accepted' OR (f.status = 'pending' AND f.action_user_id = user_id));
-END;
-$$ LANGUAGE plpgsql;
-
 -- delete friendship
 CREATE OR REPLACE FUNCTION remove_friend(user_id UUID, friend_id UUID) RETURNS void AS
 $$
@@ -190,10 +137,40 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+-- retrieve all friends, incoming and outgoing friend requests
+CREATE OR REPLACE FUNCTION get_friends(user_id UUID)
+    RETURNS TABLE
+            (
+                friendship_id  BIGINT,
+                friend_id      UUID,
+                status         friendship_status,
+                action_user_id UUID,
+                created_at     TIMESTAMP WITH TIME ZONE,
+                updated_at     TIMESTAMP WITH TIME ZONE
+            )
+AS
+$$
+BEGIN
+    RETURN QUERY
+        SELECT f.friendship_id,
+               CASE
+                   WHEN f.user1_id = user_id THEN f.user2_id
+                   ELSE f.user1_id
+                   END AS friend_id,
+               f.status,
+               f.action_user_id,
+               f.created_at,
+               f.updated_at
+        FROM friendships f
+        WHERE (f.user1_id = user_id OR f.user2_id = user_id)
+          AND (f.status != 'declined');
+END;
+$$ LANGUAGE plpgsql;
+
 -- examples
 -- SELECT send_friend_request('sender', 'receiver');
--- SELECT * FROM get_incoming_friend_requests('user_id');
 -- SELECT accept_friend_request_by_id(4);
 -- SELECT decline_friend_request_by_id(4);
--- SELECT * FROM get_friends('user_id');
 -- SELECT remove_friend('friend_user');
+-- SELECT * FROM get_friends('user_id');
