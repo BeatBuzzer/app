@@ -3,6 +3,7 @@ export interface GetFriendsResponse {
     friend_id: string,
     created_at: string
     updated_at: string
+    status: "pending" | "accepted"
 }
 
 export interface FriendError {

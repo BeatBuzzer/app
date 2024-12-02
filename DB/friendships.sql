@@ -134,14 +134,15 @@ END;
 $$ LANGUAGE plpgsql;
 
 
--- retrieve accepted friendships
+-- retrieve accepted friendships aswell as pending friendships where the user is the action_user
 CREATE OR REPLACE FUNCTION get_friends(user_id UUID)
     RETURNS TABLE
             (
                 friendship_id BIGINT,
                 friend_id     UUID,
                 created_at    TIMESTAMP WITH TIME ZONE,
-                updated_at    TIMESTAMP WITH TIME ZONE
+                updated_at    TIMESTAMP WITH TIME ZONE,
+                status        friendship_status
             )
 AS
 $$
@@ -153,10 +154,11 @@ BEGIN
                    ELSE f.user1_id
                    END AS friend_id,
                f.created_at,
-               f.updated_at
+               f.updated_at,
+               f.status
         FROM friendships f
         WHERE (f.user1_id = user_id OR f.user2_id = user_id)
-          AND f.status = 'accepted';
+          AND (f.status = 'accepted' OR (f.status = 'pending' AND f.action_user_id = user_id));
 END;
 $$ LANGUAGE plpgsql;
 
