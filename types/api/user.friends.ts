@@ -13,3 +13,8 @@ export interface FriendError {
 export interface GetFriendParam {
     user_id: string
 }
+
+export interface SendFriendRequestParam {
+    sender_id: string,
+    receiver_id: string
+}

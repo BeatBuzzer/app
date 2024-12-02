@@ -1,5 +1,5 @@
 import {serverSupabaseServiceRole, serverSupabaseUser} from "#supabase/server";
-import type {FriendError, GetFriendParam, GetFriendsResponse} from "~/types/api/responses/user.friends.response";
+import type {FriendError, GetFriendParam, GetFriendsResponse} from "~/types/api/user.friends";
 
 // Not relative to userid because you should always only be able to see your own friends
 // User id can be grabbed from the access token
