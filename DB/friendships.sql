@@ -156,37 +156,39 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION get_friends(user_id UUID)
     RETURNS TABLE
             (
-                friendship_id  INT,
-                friend_id      UUID,
-                status         friendship_status,
-                action_user_id UUID,
-                created_at     TIMESTAMP WITH TIME ZONE,
-                updated_at     TIMESTAMP WITH TIME ZONE,
-                request_type   TEXT
+                friendship_id             INT,
+                friend_id                 UUID,
+                friend_username           TEXT,
+                friend_avatar             TEXT,
+                friend_spotify_id         TEXT,
+                friend_spotify_visibility BOOLEAN,
+                status                    friendship_status,
+                action_user_id            UUID,
+                created_at                TIMESTAMP WITH TIME ZONE,
+                updated_at                TIMESTAMP WITH TIME ZONE,
+                request_type              TEXT
             )
 AS
 $$
 BEGIN
     RETURN QUERY
         SELECT f.friendship_id,
-               CASE
-                   WHEN f.user1_id = user_id THEN f.user2_id
-                   ELSE f.user1_id
-                   END AS friend_id,
+               CASE WHEN f.user1_id = user_id THEN f.user2_id ELSE f.user1_id END       AS friend_id,
+               u.username                                                               AS friend_username,
+               u.avatar_url                                                             AS friend_avatar,
+               u.spotify_id                                                             AS friend_spotify_id,
+               u.spotify_visibility                                                     AS friend_spotify_visibility,
                f.status,
                f.action_user_id,
                f.created_at,
                f.updated_at,
-               CASE
-                   WHEN f.action_user_id = user_id THEN 'outgoing'
-                   ELSE 'incoming'
-                   END AS request_type
-        FROM friendships f
+               CASE WHEN f.action_user_id = user_id THEN 'outgoing' ELSE 'incoming' END AS request_type
+        FROM friendships f, users u
         WHERE (f.user1_id = user_id OR f.user2_id = user_id)
-          AND (f.status != 'declined');
+          AND (f.status != 'declined')
+          AND (CASE WHEN f.user1_id = user_id THEN f.user2_id ELSE f.user1_id END = u.id);
 END;
 $$ LANGUAGE plpgsql;
-
 -- examples
 -- SELECT send_friend_request('sender', 'receiver');
 -- SELECT accept_friend_request_by_id(4);
