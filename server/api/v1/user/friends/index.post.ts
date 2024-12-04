@@ -5,7 +5,7 @@ import type {SendFriendRequestParam} from "~/types/api/user.friends";
 
 const userSchema = z.object({
     receiver_id: z.string().uuid()
-})
+}).readonly()
 
 export default defineEventHandler(async (event) => {
     // validate post-request body

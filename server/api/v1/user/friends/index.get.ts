@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     const param: GetFriendParam = {user_id: user.id};
 
     const {data, error}: {
-        data: GetFriendsResponse | null,
+        data: GetFriendsResponse[] | null,
         error: FriendError | null
     } = await client.rpc('get_friends', param as never);
 
