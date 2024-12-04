@@ -9,7 +9,7 @@ $$;
 
 CREATE TABLE IF NOT EXISTS friendships
 (
-    friendship_id  BIGSERIAL PRIMARY KEY,
+    friendship_id  SERIAL PRIMARY KEY,
     user1_id       UUID                     NOT NULL,
     user2_id       UUID                     NOT NULL,
     status         friendship_status        NOT NULL,
@@ -77,7 +77,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- accept friendship request
-CREATE OR REPLACE FUNCTION accept_friend_request_by_id(friendship_id_param BIGINT)
+CREATE OR REPLACE FUNCTION accept_friend_request_by_id(friendship_id_param INT)
     RETURNS void AS
 $$
 BEGIN
@@ -94,7 +94,7 @@ $$ LANGUAGE plpgsql;
 
 
 -- decline friendship request
-CREATE OR REPLACE FUNCTION decline_friend_request_by_id(friendship_id_param BIGINT)
+CREATE OR REPLACE FUNCTION decline_friend_request_by_id(friendship_id_param INT)
     RETURNS void AS
 $$
 BEGIN
@@ -142,7 +142,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION get_friends(user_id UUID)
     RETURNS TABLE
             (
-                friendship_id  BIGINT,
+                friendship_id  INT,
                 friend_id      UUID,
                 status         friendship_status,
                 action_user_id UUID,

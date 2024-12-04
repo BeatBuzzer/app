@@ -13,24 +13,30 @@ export interface SendFriendRequestParam {
 }
 
 export interface FriendActionParam {
-    friendship_id: bigint,
+    friendship_id_param: number,
 }
 
 // ----- For API Consumer -----
 export interface GetFriendsResponse {
-    friendship_id: bigint,
+    friendship_id: number,
     friend_id: string,
     created_at: string
     updated_at: string
     status: "pending" | "accepted"
 }
 
-export enum FriendAction {
+export enum FriendshipAction {
     ACCEPT = "accept",
     DECLINE = "decline"
 }
 
+export enum FriendshipStatus {
+    PENDING= "pending",
+    ACCEPTED= "accepted",
+    DECLINED= "declined"
+}
+
 export interface FriendActionRequest {
-    action: FriendAction,
-    friendship_id: bigint
+    action: FriendshipAction,
+    friendship_id: number
 }
