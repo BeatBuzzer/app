@@ -15,8 +15,8 @@
       </div>
 
       <!-- Content -->
-      <div class="flex-1">
-        <slot name="content"/>
+      <div class="flex-1 border rounded-3xl">
+          <slot name="content"/>
       </div>
 
       <!-- Footer -->
