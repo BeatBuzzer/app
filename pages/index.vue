@@ -24,6 +24,13 @@ useSeoMeta({
           3C
         </div>
       </template>
+      <template #content>
+        <div class="flex flex-col h-full p-3">
+          <HomeTurnsUser></HomeTurnsUser>
+          <HomeTurnsOpponent></HomeTurnsOpponent>
+          <HomeControlsGameButtons></HomeControlsGameButtons>
+        </div>
+      </template>
       <template #footer>
         <div class="text-4xl">A</div>
         <div class="text-4xl">B</div>
