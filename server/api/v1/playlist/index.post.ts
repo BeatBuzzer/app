@@ -38,18 +38,33 @@ export default defineEventHandler(async (event) => {
         cover: coverUrl
     }
 
-    const client = serverSupabaseServiceRole(event)
-    const {data, error} = await client.from('playlists').insert(playlistInsert as never).select().single(); //todo: fix type error!
+    const categoriesInsert = result.data.categories.map((category) => ({
+        playlistId: result.data.id,
+        name: category,
+    }));
 
-    if (error) {
+    const client = serverSupabaseServiceRole(event);
+    const {data: playlistData, error: playlistError} = await client.from('playlists').insert(playlistInsert as never).select().single(); //todo: fix type error!
+
+
+    if (playlistError) {
         setResponseStatus(event, 400);
-        if (error.code === UNIQUE_VIOLATION)
+        if (playlistError.code === UNIQUE_VIOLATION)
             return {error: 'Playlist with this ID already exists'};
         setResponseStatus(event, 500);
-        return {error: error.message};
+        return {error: playlistError.message};
+    }
+
+    const { data: categoriesData, error: categoriesError } = await client
+    .from('categories')
+    .insert(categoriesInsert as never);
+
+    if (categoriesError) {
+    setResponseStatus(event, 500);
+    return { error: `Error inserting categories: ${categoriesError.message}` };
     }
 
 
     setResponseStatus(event, 201);
-    return data;
+    return { playlist: playlistData, categories: categoriesData };
 })

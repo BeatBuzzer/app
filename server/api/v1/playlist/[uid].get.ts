@@ -25,12 +25,16 @@ export default defineEventHandler(async (event) => {
     }
 
     const client = serverSupabaseServiceRole(event);
-    const {data, error} = await client.from('playlists').select('*').eq('id', playlistId).single();
+    const {data, error} = await client.from('playlists').select('*, categories (name)').eq('id', playlistId).single();
 
     if (error) {
         setResponseStatus(event, 500);
         return {error: error.message};
+    } else {
+        const transformedData = {
+            ...data,
+            categories: data.categories.map(category => category.name)
+          };
+        return transformedData;
     }
-
-    return data;
 })
