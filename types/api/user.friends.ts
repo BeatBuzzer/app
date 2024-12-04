@@ -22,18 +22,25 @@ export interface GetFriendsResponse {
     friend_id: string,
     created_at: string
     updated_at: string
-    status: "pending" | "accepted"
+    status: FriendshipStatus,
+    request_type: FriendshipType
 }
 
 export enum FriendshipAction {
     ACCEPT = "accept",
-    DECLINE = "decline"
+    DECLINE = "decline",
+    REMOVE = "remove"
 }
 
 export enum FriendshipStatus {
-    PENDING= "pending",
-    ACCEPTED= "accepted",
-    DECLINED= "declined"
+    PENDING = "pending",
+    ACCEPTED = "accepted",
+    DECLINED = "declined"
+}
+
+export enum FriendshipType {
+    OUTGOING = "outgoing",
+    INCOMING = "incoming"
 }
 
 export interface FriendActionRequest {

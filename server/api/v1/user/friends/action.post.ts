@@ -1,7 +1,7 @@
 import {z} from "zod";
-import {FriendshipAction, GetFriendsResponse} from "~/types/api/user.friends";
-import {serverSupabaseServiceRole, serverSupabaseUser} from "#supabase/server";
 import type {FriendActionParam} from "~/types/api/user.friends";
+import {FriendshipAction} from "~/types/api/user.friends";
+import {serverSupabaseServiceRole, serverSupabaseUser} from "#supabase/server";
 import type {PostgrestError} from "@supabase/postgrest-js";
 
 const friendActionSchema = z.object({
@@ -40,11 +40,19 @@ export default defineEventHandler(async (event) => {
             error = declineErr;
             break;
         }
+        case FriendshipAction.REMOVE: {
+            const {error: declineErr} = await client.rpc('remove_friend_by_id', param as never);
+            error = declineErr;
+            break;
+        }
     }
 
     // Handle errors
     if (error) {
-        setResponseStatus(event, 500);
+        if (error.code === 'P0001') {
+            setResponseStatus(event, 400)
+        } else setResponseStatus(event, 500);
+
         return {error: error.message};
     }
 

@@ -137,6 +137,20 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- 2nd version with id
+CREATE OR REPLACE FUNCTION remove_friend_by_id(friendship_id_param INT) RETURNS void AS
+$$
+BEGIN
+    DELETE
+    FROM friendships
+    WHERE friendship_id = friendship_id_param
+      AND status = 'accepted';
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'No active friendship found with this ID';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
 
 -- retrieve all friends, incoming and outgoing friend requests
 CREATE OR REPLACE FUNCTION get_friends(user_id UUID)
@@ -147,7 +161,8 @@ CREATE OR REPLACE FUNCTION get_friends(user_id UUID)
                 status         friendship_status,
                 action_user_id UUID,
                 created_at     TIMESTAMP WITH TIME ZONE,
-                updated_at     TIMESTAMP WITH TIME ZONE
+                updated_at     TIMESTAMP WITH TIME ZONE,
+                request_type   TEXT
             )
 AS
 $$
@@ -161,7 +176,11 @@ BEGIN
                f.status,
                f.action_user_id,
                f.created_at,
-               f.updated_at
+               f.updated_at,
+               CASE
+                   WHEN f.action_user_id = user_id THEN 'outgoing'
+                   ELSE 'incoming'
+                   END AS request_type
         FROM friendships f
         WHERE (f.user1_id = user_id OR f.user2_id = user_id)
           AND (f.status != 'declined');
