@@ -11,19 +11,19 @@ const requests: Ref<GetFriendsResponse[]> = useState("incoming_friendships", ()=
 const friends: Ref<GetFriendsResponse[]> = useState("accepted_friendships", () => [])
 
 const session = useSupabaseSession()
+
 onMounted(async () => {
-    if (session.value) {
-        await getFriendships();
-        console.log(friends.value)
-    }
+  if (session.value) {
+    await getFriendships()
+  }
 })
 
 async function getFriendships() {
-    $fetch<GetFriendsResponse[]>('http://localhost:3000/api/v1/user/friends')
-        .then((data) => {
-            requests.value = data.filter((item) => item.request_type == FriendshipType.INCOMING && item.status === FriendshipStatus.PENDING)
-            friends.value = data.filter((item) => item.status === FriendshipStatus.ACCEPTED)
-        });
+  $fetch<GetFriendsResponse[]>('http://localhost:3000/api/v1/user/friends')
+      .then((data) => {
+        requests.value = data.filter((item) =>item.request_type == FriendshipType.INCOMING && item.status === FriendshipStatus.PENDING)
+        friends.value = data.filter((item) => item.status === FriendshipStatus.ACCEPTED)
+      });
 }
 
 </script>
@@ -40,5 +40,5 @@ async function getFriendships() {
 
     <div v-for="item in friends" :key="item.friend_id"  class="bg-white p-4 m-4 text-center rounded-lg">
         {{ item.friend_id }}
-        </div>
+    </div>
 </template>
