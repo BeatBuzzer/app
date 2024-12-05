@@ -1,12 +1,5 @@
 <script setup lang="ts">
-
 import HeaderFooterView from "~/layouts/HeaderFooterView.vue";
-
-useSeoMeta({
-  title: "BeatBuzzer",
-  description: "A fun music quiz game",
-  viewport: "width=device-width, initial-scale=1.0",
-})
 
 </script>
 

@@ -1,0 +1,20 @@
+{
+  "entryPoints": ["./"],
+  "entryPointStrategy": "expand",
+  "exclude": [
+    "node_modules/**/*",
+    "dist/**/*",
+    ".nuxt/**/*",
+    ".output/**/*"
+  ],
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeExternals": true,
+  "includeVersion": true,
+  "out": "docs",
+  "plugin": [],
+  "readme": "README.md",
+  "theme": "default",
+  "tsconfig": "./tsconfig.json",
+  "hideGenerator": true
+}
