@@ -1,12 +1,5 @@
 <script setup lang="ts">
-
 import HeaderFooterView from "~/layouts/HeaderFooterView.vue";
-
-useSeoMeta({
-  title: "BeatBuzzer",
-  description: "A fun music quiz game",
-  viewport: "width=device-width, initial-scale=1.0",
-})
 
 </script>
 
@@ -22,6 +15,13 @@ useSeoMeta({
         </div>
         <div>
           3C
+        </div>
+      </template>
+      <template #content>
+        <div class="flex flex-col h-full p-3">
+          <HomeTurnsUser/>
+          <HomeTurnsOpponent/>
+          <HomeControlsGameButtons/>
         </div>
       </template>
       <template #footer>
