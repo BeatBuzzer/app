@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     compatibilityDate: '2024-04-03',
-    devtools: {enabled: false},
+    devtools: {enabled: true},
     modules: ['@nuxtjs/tailwindcss', '@nuxt/eslint', '@nuxtjs/supabase', '@nuxt/image'],
     supabase: {
         redirectOptions: {
@@ -13,6 +13,11 @@ export default defineNuxtConfig({
         },
         cookieOptions: {
             secure: false, //TODO: set to true when deploying
+        },
+        clientOptions: {
+            db: {
+                schema: 'beatbuzzer',
+            }
         }
     },
     devServer: {

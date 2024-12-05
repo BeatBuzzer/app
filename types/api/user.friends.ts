@@ -1,4 +1,5 @@
 // ----- Internal Types -----
+import type * as url from "node:url";
 export interface FriendError {
     message: string
 }
@@ -20,6 +21,10 @@ export interface FriendActionParam {
 export interface GetFriendsResponse {
     friendship_id: number,
     friend_id: string,
+    friend_username: string,
+    friend_avatar: url.URL | null,
+    friend_spotify_id: string,
+    friend_spotify_visibility: boolean,
     created_at: string
     updated_at: string
     status: FriendshipStatus,
