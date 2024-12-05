@@ -32,10 +32,8 @@ async function getFriendships() {
         <p class="my-1 ">Friends</p>
         <div class="flex space-x-3 overflow-x-auto">
             <HomeUsersUserBox 
-            v-for="item in friends" :key="item.friend_id" :name="item.friend_id" :user-turn="false"
+            v-for="item in friends" :key="item.friend_id" :profile-picture="item.friend_avatar" :name="item.friend_id" :user-turn="false"
                 class="shrink-0 w-[calc(33.33%-1rem)]" />
         </div>
-
-
     </div>
 </template>

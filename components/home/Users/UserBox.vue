@@ -2,7 +2,7 @@
     const props = defineProps({
     profilePicture: {
         type: String,
-        default: 'https://i.scdn.co/image/ab6775700000ee855d4c281804e8773208248312'
+        default: 'https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg'
     },
     name: {
         type: String,
