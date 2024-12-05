@@ -1,6 +1,5 @@
 // ----- Internal Types -----
 import type * as url from "node:url";
-
 export interface FriendError {
     message: string
 }
