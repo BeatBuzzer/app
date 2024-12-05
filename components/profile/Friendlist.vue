@@ -72,7 +72,7 @@ async function getFriendships() {
 
 function addFriend() {
     const newFriend = {
-        friend_id: "123123",
+        friend_username: "sfsdf",
     }
     friends.value.push(newFriend)
     newFriendId.value = ''
@@ -85,12 +85,12 @@ function addFriend() {
         <p class="my-1">Friends</p>
         <div :class="['flex space-x-3', friends.length > 3 ? 'overflow-x-auto' : '']">
             <HomeUsersUserBox 
-                v-for="item in friends" :key="item.friend_id" :profile-picture="item.friend_avatar" :name="item.friend_username" :user-turn="false"
+                v-for="item in friends" :key="item.friend_id" :profile-picture="item.friend_avatar?.toString()" :name="item.friend_username" :user-turn="false"
                 :class="friends.length > 3 ? 'shrink-0' : ''"
                 />
         </div>
         <div class="mt-3">
-            <button @click="addFriend" class="p-2 bg-blue-500 text-white rounded ml-2">Add Friend</button>
+            <button  class="p-2 bg-blue-500 text-white rounded ml-2" @click="addFriend">Add Friend</button>
         </div>
     </div>
 </template>
