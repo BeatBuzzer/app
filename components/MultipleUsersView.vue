@@ -41,7 +41,8 @@ const users = [
 
         <!-- User Boxes -->
         <div :class="userBoxContainerClasses">
-            <HomeUsersUserBox v-for="user in users" :key="user.name" :name="user.name"
+            <HomeUsersUserBox 
+            v-for="user in users" :key="user.name" :name="user.name"
                 :user-turn="viewType === UserViewType.USERTURN" />
         </div>
     </div>
