@@ -1,41 +1,27 @@
 <script setup lang="ts">
-
-/*const props = defineProps({
-    profilePicture: {
-        type: String,
-        default: 'https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg'
-    },
-    username: {
-        type: String,
-        default: 'Username'
-    },
-});*/
+import type {
+    GetProfileResponse
+} from "@/types/api/user";
 
 const username = ref('Username');
 const profilePicture = ref('https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg');
-
 
 const session = useSupabaseSession()
 
 onMounted(async () => {
     if (session.value) {
-        await getProfileInformation(session.value.user.id)
+        await getProfileInformation()
     }
 })
 
-// write type for user data
-async function getProfileInformation(userId: string) {
-    try {
-        const data = await $fetch('http://localhost:3000/api/v1/user/' + userId);
-        if (data.username) {
-            username.value = data.username;
+async function getProfileInformation() {
+    $fetch<GetProfileResponse>('http://localhost:3000/api/v1/user/' + session.value?.user.id)
+      .then((data) => {
+        username.value = data.username
+        if (data.user_avatar) {
+            profilePicture.value = data.user_avatar;
         }
-        if (data.avatar_url) {
-            profilePicture.value = data.avatar_url;
-        }
-    } catch (error) {
-        console.error('Error fetching profile information:', error);
-    }
+      });
 }
 </script>
 

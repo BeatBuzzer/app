@@ -6,7 +6,7 @@
     },
     name: {
         type: String,
-        default: 'Opponent'
+        default: 'User'
     },
     userTurn: {
         type: Boolean,
