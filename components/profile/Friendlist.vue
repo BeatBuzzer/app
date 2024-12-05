@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import {
-    type FriendActionRequest,
-    FriendshipAction,
     FriendshipStatus,
     FriendshipType,
     type GetFriendsResponse
@@ -33,7 +31,8 @@ async function getFriendships() {
     <div class="w-full bg-gray-200 p-3 mt-auto rounded-3xl my-3">
         <p class="my-1 ">Friends</p>
         <div class="flex space-x-3 overflow-x-auto">
-            <HomeUsersUserBox v-for="item in friends" :key="item.friend_id" :name="item.friend_id" :user-turn="false"
+            <HomeUsersUserBox 
+            v-for="item in friends" :key="item.friend_id" :name="item.friend_id" :user-turn="false"
                 class="shrink-0 w-[calc(33.33%-1rem)]" />
         </div>
 
