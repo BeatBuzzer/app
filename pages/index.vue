@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import HeaderFooterView from "~/layouts/HeaderFooterView.vue";
+import { UserViewType } from "@/types/components/users.view"
 
 </script>
 
@@ -19,9 +20,11 @@ import HeaderFooterView from "~/layouts/HeaderFooterView.vue";
       </template>
       <template #content>
         <div class="flex flex-col h-full p-3">
-          <HomeTurnsUser/>
-          <HomeTurnsOpponent/>
-          <HomeControlsGameButtons/>
+          <MultipleUsersView :view-type="UserViewType.USERTURN" class="h-3/6"/>
+          <MultipleUsersView :view-type="UserViewType.OPPONENTTURN"class="h-2/6"/>
+          <!--HomeTurnsUser/>
+          <HomeTurnsOpponent/-->
+          <HomeControlsGameButtons class="h-1/6"/>
         </div>
       </template>
       <template #footer>
