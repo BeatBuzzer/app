@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {FriendshipStatus, FriendshipType, type GetFriendsResponse} from "@/types/api/user.friends";
+import { UserViewType } from "@/types/components/users.view";
 
 const requests: Ref<GetFriendsResponse[]> = useState("incoming_friendships", () => [])
 const friends: Ref<GetFriendsResponse[]> = useState("accepted_friendships", () => [])
@@ -27,12 +28,11 @@ function addFriend() {
   }
   friends.value.push(newFriend)
 }
-
-
-// :class="['flex gap-3', friends.length > 3 ? 'overflow-x-auto pb-2' : '']"
 </script>
 
 <template>
+  <UsersView :view-type="UserViewType.FRIENDS"/>
+
   <div class="w-full bg-gray-200 p-3 mt-auto rounded-3xl my-3">
     <p class="my-1">Friends</p>
     <div class="relative">
