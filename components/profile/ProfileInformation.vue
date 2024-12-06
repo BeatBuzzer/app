@@ -15,7 +15,7 @@ onMounted(async () => {
 })
 
 async function getProfileInformation() {
-    $fetch<GetProfileResponse>('http://localhost:3000/api/v1/user/' + session.value?.user.id)
+    $fetch<GetProfileResponse>('http://localhost:3000/api/v1/user/' + session.value?.user.id) //TODO: change after implementing diffrent user endpoint. also add as global state wit useState named 'user'
       .then((data) => {
         username.value = data.username
         if (data.user_avatar) {

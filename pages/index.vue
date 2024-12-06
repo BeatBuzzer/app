@@ -28,9 +28,15 @@ import { UserViewType } from "@/types/components/users.view"
         </div>
       </template>
       <template #footer>
-        <div class="text-4xl">A</div>
-        <div class="text-4xl">B</div>
-        <div class="text-4xl">C</div>
+        <NuxtLink to="/playlists" class="inline-flex items-center text-5xl rounded-xl py-5">
+          <Icon name="mdi:album" class="text-white"/>
+        </NuxtLink>
+        <NuxtLink to="/" class="inline-flex items-center bg-blue-500 text-6xl rounded-full p-1.5">
+          <Icon name="mdi:home" class="text-white"/>
+        </NuxtLink>
+        <NuxtLink to="/profile" class="inline-flex items-center text-5xl rounded-xl py-5">
+          <Icon name="mdi:account-details" class="text-white"/>
+        </NuxtLink>
       </template>
     </HeaderFooterView>
   </div>
