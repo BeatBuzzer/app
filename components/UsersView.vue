@@ -1,12 +1,17 @@
 <script setup lang="ts">
+import { type GetFriendsResponse } from "@/types/api/user.friends";
 import { UserViewType } from "@/types/components/users.view";
 
 // Props
 const props = defineProps({
     viewType: {
-        type: Number, // Matches UserViewType enum
+        type: Number,
         required: true,
     },
+    users: {
+        type: Array as PropType<GetFriendsResponse[]>,
+        required: true,
+    }
 });
 
 // Computed Classes
@@ -23,14 +28,6 @@ const userBoxContainerClasses = computed(() =>
         ? 'flex flex-col space-y-3'
         : 'flex gap-3 overflow-x-auto pb-2'
 );
-
-// Example Users
-const users = [
-    { name: 'test1' },
-    { name: 'test2' },
-    { name: 'test3' },
-    { name: 'test3' },
-];
 </script>
 
 <template>
@@ -43,7 +40,9 @@ const users = [
         <!-- User Boxes -->
         <div :class="userBoxContainerClasses">
             <HomeUsersUserBox 
-            v-for="user in users" :key="user.name" :name="user.name"
+            v-for="user in props.users" :key="user.friend_id"
+                :profile-picture="user.friend_avatar?.toString()" 
+                :name="user.friend_username"
                 :user-turn="viewType === UserViewType.USERTURN"
                 :class="[
                             ( viewType === UserViewType.FRIENDS || viewType === UserViewType.OPPONENTTURN ) ?

@@ -31,29 +31,9 @@ function addFriend() {
 </script>
 
 <template>
-  <UsersView :view-type="UserViewType.FRIENDS"/>
+  <UsersView :view-type="UserViewType.FRIENDS" :users="friends"/>
 
-  <div class="w-full bg-gray-200 p-3 mt-auto rounded-3xl my-3">
-    <p class="my-1">Friends</p>
-    <div class="relative">
-      <div
-          :class="['flex gap-3 overflow-x-auto pb-2']">
-        <HomeUsersUserBox
-            v-for="item in friends"
-            :key="item.friend_id"
-            :profile-picture="item.friend_avatar?.toString()"
-            :name="item.friend_username"
-            :user-turn="false"
-            :class="[
-                        friends.length > 3 ? 'w-[calc(33.33%-1rem)] flex-shrink-0' :
-                        friends.length === 3 ? 'w-1/3' :
-                        friends.length === 2 ? 'w-1/2' : 'w-full'
-                    ]"
-        />
-      </div>
-    </div>
-    <div class="mt-3">
+  <div class="mt-3">
       <button class="p-2 bg-blue-500 text-white rounded ml-2" @click="addFriend">Add Friend</button>
-    </div>
   </div>
 </template>
