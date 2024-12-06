@@ -20,10 +20,8 @@ import { UserViewType } from "@/types/components/users.view"
       </template>
       <template #content>
         <div class="flex flex-col h-full p-3">
-          <MultipleUsersView :view-type="UserViewType.USERTURN" class="h-3/6"/>
-          <MultipleUsersView :view-type="UserViewType.OPPONENTTURN" class="h-2/6"/>
-          <!--HomeTurnsUser/>
-          <HomeTurnsOpponent/-->
+          <UsersView :view-type="UserViewType.USERTURN" class="h-3/6"/>
+          <UsersView :view-type="UserViewType.OPPONENTTURN" class="h-2/6"/>
           <HomeControlsGameButtons class="h-1/6"/>
         </div>
       </template>
