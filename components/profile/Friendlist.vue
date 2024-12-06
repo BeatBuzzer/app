@@ -27,6 +27,9 @@ function addFriend() {
   }
   friends.value.push(newFriend)
 }
+
+
+// :class="['flex gap-3', friends.length > 3 ? 'overflow-x-auto pb-2' : '']"
 </script>
 
 <template>
@@ -34,7 +37,7 @@ function addFriend() {
     <p class="my-1">Friends</p>
     <div class="relative">
       <div
-          :class="['flex gap-3', friends.length > 3 ? 'overflow-x-auto pb-2' : '']">
+          :class="['flex gap-3 overflow-x-auto pb-2']">
         <HomeUsersUserBox
             v-for="item in friends"
             :key="item.friend_id"
@@ -42,7 +45,7 @@ function addFriend() {
             :name="item.friend_username"
             :user-turn="false"
             :class="[
-                        friends.length > 3 ? 'w-[calc(33.33%-0.67rem)] flex-shrink-0' :
+                        friends.length > 3 ? 'w-[calc(33.33%-1rem)] flex-shrink-0' :
                         friends.length === 3 ? 'w-1/3' :
                         friends.length === 2 ? 'w-1/2' : 'w-full'
                     ]"
