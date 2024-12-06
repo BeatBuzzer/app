@@ -14,13 +14,14 @@ const containerClasses = computed(() => {
     const baseClasses = 'w-full bg-gray-200 p-3 mt-auto rounded-3xl my-3';
     if (props.viewType === UserViewType.USERTURN) return `${baseClasses} h-full overflow-y-auto`;
     if (props.viewType === UserViewType.OPPONENTTURN) return `${baseClasses}`;
+    if (props.viewType === UserViewType.FRIENDS) return `${baseClasses}`;
     return '';
 });
 
 const userBoxContainerClasses = computed(() =>
     props.viewType === UserViewType.USERTURN
         ? 'flex flex-col space-y-3'
-        : 'flex space-x-3'
+        : 'flex gap-3 overflow-x-auto pb-2'
 );
 
 // Example Users
@@ -43,7 +44,15 @@ const users = [
         <div :class="userBoxContainerClasses">
             <HomeUsersUserBox 
             v-for="user in users" :key="user.name" :name="user.name"
-                :user-turn="viewType === UserViewType.USERTURN" />
+                :user-turn="viewType === UserViewType.USERTURN"
+                :class="[
+                            ( viewType === UserViewType.FRIENDS || viewType === UserViewType.OPPONENTTURN ) ?
+                                users.length > 3 ? 'w-[calc(33.33%-.99rem)] flex-shrink-0' :
+                                users.length === 3 ? 'w-1/3' :
+                                users.length === 2 ? 'w-1/2' : 'w-full'
+                            : ''
+                        ]"
+            />
         </div>
     </div>
 </template>
