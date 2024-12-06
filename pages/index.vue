@@ -20,8 +20,46 @@ import { UserViewType } from "@/types/components/users.view"
       </template>
       <template #content>
         <div class="flex flex-col h-full p-3">
-          <UsersView :view-type="UserViewType.USERTURN" class="h-3/6"/>
-          <UsersView :view-type="UserViewType.OPPONENTTURN" class="h-2/6"/>
+          <UsersView :view-type="UserViewType.USERTURN" class="h-3/6" :users="[
+            { user_id: 1,
+              user_avatar: null,
+              username: 'Test1'
+            },
+            { user_id: 1,
+              user_avatar: null,
+              username: 'Test1'
+            },
+            { user_id: 1,
+              user_avatar: null,
+              username: 'Test1'
+            },
+            { user_id: 1,
+              user_avatar: null,
+              username: 'Test1'
+            },
+            { user_id: 1,
+              user_avatar: null,
+              username: 'Test1'
+            },            
+          ]"/>
+          <UsersView :view-type="UserViewType.OPPONENTTURN" class="h-2/6" :users="[
+            { user_id: 1,
+              user_avatar: null,
+              username: 'Test1'
+            },
+            { user_id: 2,
+              user_avatar: null,
+              username: 'Test2'
+            },
+            { user_id: 3,
+              user_avatar: null,
+              username: 'Test3'
+            },
+            { user_id: 4,
+              user_avatar: null,
+              username: 'Test4'
+            },
+          ]"/>
           <HomeControlsGameButtons class="h-1/6"/>
         </div>
       </template>
