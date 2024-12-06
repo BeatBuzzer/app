@@ -9,7 +9,7 @@ const session = useSupabaseSession()
 onMounted(async () => {
   if (session.value) {
     await getFriendships()
-    friends.value.push(friends.value[0])
+    //friends.value.push(friends.value[0]) unexpected behavior on initial page load
   }
 })
 
