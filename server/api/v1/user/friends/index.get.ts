@@ -27,5 +27,15 @@ export default defineEventHandler(async (event) => {
         return {error: error.message};
     }
 
+    if(data === null) return [];
+
+    // Hide spotify id if not visible
+    // Yes this works even when the IDE marks it as an error
+    data!.forEach(friend => {
+        if (!friend.friend_spotify_visibility) {
+            delete friend.friend_spotify_id;
+        }
+    });
+
     return data;
 });

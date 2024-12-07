@@ -23,7 +23,7 @@ export interface GetFriendsResponse {
     friend_id: string,
     friend_username: string,
     friend_avatar: url.URL | null,
-    friend_spotify_id: string,
+    friend_spotify_id?: string,
     friend_spotify_visibility: boolean,
     created_at: string
     updated_at: string
