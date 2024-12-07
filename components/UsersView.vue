@@ -17,17 +17,16 @@ const props = defineProps({
 
 // Computed Classes
 const containerClasses = computed(() => {
-    const baseClasses = 'w-full bg-gray-200 p-3 mt-auto rounded-3xl my-3';
-    if (props.viewType === UserViewType.USERTURN) return `${baseClasses} h-full overflow-y-auto flex-grow-0`;
-    if (props.viewType === UserViewType.OPPONENTTURN) return `${baseClasses}`;
-    if (props.viewType === UserViewType.FRIENDS) return `${baseClasses}`;
+    const baseClasses = 'w-full bg-gray-200 px-3 pb-1 mt-auto rounded-3xl mb-3';
+    if (props.viewType === UserViewType.USERTURN) return `${baseClasses} h-full overflow-y-hidden overflow-x-auto flex-grow-0`;
+    if (props.viewType === UserViewType.OPPONENTTURN || props.viewType === UserViewType.FRIENDS) return `${baseClasses} overflow-y-hidden`;
     return '';
 });
 
 const userBoxContainerClasses = computed(() =>
     props.viewType === UserViewType.USERTURN
-        ? 'flex flex-col space-y-3'
-        : 'flex gap-3 overflow-x-auto'
+        ? 'flex flex-col space-y-1 md:space-y-3 h-full overflow-y-auto'
+        : 'flex gap-1 md:gap-3 mt-6 md:mt-9'
 );
 
 
@@ -42,11 +41,10 @@ function isUserInformation(user: any): user is UserInformation {
 // Map users conditionally depending on their type
 const mappedUsers = computed(() => {
     return props.users.map(user => {
-        console.log()
         if (isGetFriendsResponse(user)) {
             return {
                 userId: user.friend_id,
-                userName: user.friend_username,
+                username: user.friend_username,
                 userAvatar: user.friend_avatar,
                 spotifyId: user.friend_spotify_id,
                 status: user.status,
@@ -57,7 +55,7 @@ const mappedUsers = computed(() => {
         } else if (isUserInformation(user)) {
             return {
                 userId: user.user_id,
-                userName: user.username,
+                username: user.username,
                 userAvatar: user.user_avatar,
             };
         }
@@ -67,27 +65,56 @@ const mappedUsers = computed(() => {
 </script>
 
 <template>
-    <div :class="containerClasses">
-        <!-- Conditional Header -->
-        <p v-if="viewType === UserViewType.USERTURN" class="my-1">Your Turn</p>
-        <p v-else-if="viewType === UserViewType.OPPONENTTURN" class="my-1">Opponent's Turn</p>
-        <p v-else-if="viewType === UserViewType.FRIENDS" class="my-1">Friends</p>
+    <div :class="[
+                    containerClasses,
+                    ((viewType === UserViewType.FRIENDS || viewType === UserViewType.OPPONENTTURN) && users.length > 3) ? 'pr-0' : ''
+                ]"
+    >
+        <!-- Fixed Conditional Header -->
+        <div class="mb-1 text-xs md:text-base bg-gray-200 mt-2">
+            <p v-if="viewType === UserViewType.USERTURN">
+                Your Turn
+            </p>
+            <p v-else-if="viewType === UserViewType.OPPONENTTURN" class="fixed">
+                Opponent's Turn
+            </p>
+            <p v-else-if="viewType === UserViewType.FRIENDS" class="fixed">
+                Friends
+            </p>
+        </div>
 
-        <!-- User Boxes -->
-        <div :class="userBoxContainerClasses">
+        <!-- Scrollable User Boxes -->
+        <div 
+            :class="userBoxContainerClasses"
+        >
             <HomeUsersUserBox 
-            v-for="user in mappedUsers" :key="user.userId"
+                v-for="user in mappedUsers" 
+                :key="user.userId"
                 :profile-picture="user.userAvatar?.toString()" 
-                :name="user.userName"
+                :name="user.username"
                 :user-turn="viewType === UserViewType.USERTURN"
                 :class="[
-                            ( viewType === UserViewType.FRIENDS || viewType === UserViewType.OPPONENTTURN ) ?
-                                users.length === 3 ? 'w-1/3' :
-                                users.length === 2 ? 'w-1/2' : 'w-full'
-                            : ''
-                        ]"
-                :style="users.length > 3 ? { width: 'calc(33.33% - .98rem)', flexShrink: 0 } : {}"
+                    (viewType === UserViewType.FRIENDS || viewType === UserViewType.OPPONENTTURN) 
+                        ? users.length === 3 ? 'w-1/3' 
+                        : users.length === 2 ? 'w-1/2' 
+                        : 'w-full'
+                        : ''
+                ]"
+                :style="(viewType === UserViewType.FRIENDS || viewType === UserViewType.OPPONENTTURN) 
+                    ? users.length > 3 
+                        ? { width: 'calc(33.33% - .98rem)', flexShrink: 0 } 
+                        : {} 
+                    : {}"
             />
+            <HomeUsersUserBox v-if="users.length > 3" :class="['invisible', viewType === UserViewType.USERTURN ? 'h-1' : 'w-1']"/>
         </div>
     </div>
 </template>
+
+<style>
+.fixed-header {
+  position: sticky;
+  top: 0;
+  background-color: black;
+}
+</style>

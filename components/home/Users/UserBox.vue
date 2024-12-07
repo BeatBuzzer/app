@@ -19,25 +19,25 @@
 <template>
     <div
       :class="[
-        'bg-blue-600 rounded-3xl p-3 w-full', 
+        'bg-blue-600 rounded-3xl px-3 w-full', 
         props.userTurn
           ? 'flex items-center'
-          : 'flex flex-col items-center justify-center h-full'
+          : 'flex flex-col items-center justify-center mb-3 py-2'
       ]"
     >
       <!-- Profile Picture -->
       <NuxtImg
         :class="[
           'rounded-full', 
-          'w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16',
-          props.userTurn ? 'mr-3' : 'mb-2'
+          'w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14',
+          props.userTurn ? 'mr-3' : 'mb-0'
         ]"
         :src="props.profilePicture.toString()"
         :alt="name"
       />
       
       <!-- User Name -->
-      <p class="text-white text-sm sm:text-base md:text-lg lg:text-xl">
+      <p class="text-white text-sm sm:text-base md:text-lg">
         {{ props.name }}
       </p>
       
