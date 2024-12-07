@@ -82,11 +82,11 @@ const mappedUsers = computed(() => {
                 :user-turn="viewType === UserViewType.USERTURN"
                 :class="[
                             ( viewType === UserViewType.FRIENDS || viewType === UserViewType.OPPONENTTURN ) ?
-                                users.length > 3 ? 'w-[calc(33.33%-.98rem)] flex-shrink-0' :
                                 users.length === 3 ? 'w-1/3' :
                                 users.length === 2 ? 'w-1/2' : 'w-full'
                             : ''
                         ]"
+                :style="users.length > 3 ? { width: 'calc(33.33% - .98rem)', flexShrink: 0 } : {}"
             />
         </div>
     </div>
