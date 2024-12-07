@@ -1,50 +1,41 @@
-import {
-  serverSupabaseServiceRole,
-  serverSupabaseUser,
-} from "#supabase/server";
+import {isValidUUID} from "~/server/utils/data-validation";
+import {serverSupabaseServiceRole, serverSupabaseUser} from "#supabase/server";
+import type {GetUserResponse} from "~/types/api/users";
 
-import type {
-  ProfileError,
-  GetProfileParam,
-  GetProfileResponse,
-} from "~/types/api/user";
-
-/**
- * Endpoint to get a user by id
- * @returns {Object} - User object
- * @throws {400} - Invalid userId
- * @throws {401} - Unauthenticated
- * @throws {500} - Internal Server Error
- */
-
-// check regex userId
-/*if (!userId || !isValidSpotifyID(userId!)) {
-        setResponseStatus(event, 400);
-        return {error: 'invalid userId'};
-    }*/
 export default defineEventHandler(async (event) => {
-  const user = await serverSupabaseUser(event);
-  if (!user?.id) {
-    setResponseStatus(event, 401);
-    return { error: "unauthenticated" };
-  }
+    const userId = getRouterParam(event, 'uid')
 
-  const client = serverSupabaseServiceRole(event);
-  const param: GetProfileParam = { userid: user.id };
+    // Require user to be authenticated
+    const user = await serverSupabaseUser(event);
+    if (!user?.id) {
+        setResponseStatus(event, 401);
+        return {error: 'unauthenticated'};
+    }
 
-  const {
-    data,
-    error,
-  }: {
-    data: GetProfileResponse | null;
-    error: ProfileError | null;
-  } = await client.rpc("get_profile_information", param as never);
+    if (!userId || !isValidUUID(userId)) {
+        setResponseStatus(event, 400);
+        return {error: 'Invalid user ID'};
+    }
 
-  if (error) {
-    setResponseStatus(event, 500);
-    return { error: error.message };
-  }
+    // Send request
+    const client = serverSupabaseServiceRole(event);
+    const {data, error}:{ data: GetUserResponse|null, error: any} = await client.from('users').select('*').eq('id', userId).maybeSingle();
 
-  console.log(data)
-  return data;
-});
+    if (!data) {
+        setResponseStatus(event, 404);
+        return {error: 'User not found'};
+    }
+
+    // Handle errors
+    if (error) {
+        setResponseStatus(event, 500);
+        return {error: error.message};
+    }
+
+    // Hide spotify id if not visible
+    if (!data.spotify_visibility) {
+        delete data.spotify_id;
+    }
+
+    return data;
+})
