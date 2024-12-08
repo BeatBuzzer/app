@@ -20,7 +20,7 @@
       </div>
 
       <!-- Footer -->
-      <div class="h-1/6 border rounded-t-3xl">
+      <div class="bg-yellow-500 text-red-600 rounded-t-3xl">
         <div class="flex justify-around items-center h-full">
           <slot name="footer" />
         </div>

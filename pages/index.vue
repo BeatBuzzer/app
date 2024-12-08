@@ -5,7 +5,7 @@ import { UserViewType } from "@/types/components/users.view"
 </script>
 
 <template>
-  <div class="bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500">
+  <div class="bg-gradient-to-b from-indigo-500 to-purple-500">
     <HeaderFooterView>
       <template #header>
         <div>
@@ -64,14 +64,14 @@ import { UserViewType } from "@/types/components/users.view"
         </div>
       </template>
       <template #footer>
-        <NuxtLink to="/playlists" class="inline-flex items-center text-5xl rounded-xl py-5">
-          <Icon name="mdi:album" class="text-white"/>
+        <NuxtLink to="/playlists" class="inline-flex items-center text-5xl rounded-xl">
+          <Icon name="mdi:album" class=""/>
         </NuxtLink>
-        <NuxtLink to="/" class="inline-flex items-center bg-blue-500 text-6xl rounded-full p-1.5">
+        <NuxtLink to="/" class="inline-flex items-center text-6xl rounded-full p-1.5">
           <Icon name="mdi:home" class="text-white"/>
         </NuxtLink>
-        <NuxtLink to="/profile" class="inline-flex items-center text-5xl rounded-xl py-5">
-          <Icon name="mdi:account-details" class="text-white"/>
+        <NuxtLink to="/profile" class="inline-flex items-center text-5xl rounded-xl">
+          <Icon name="mdi:account-details" class=""/>
         </NuxtLink>
       </template>
     </HeaderFooterView>

@@ -10,13 +10,13 @@ import HeaderFooterView from "~/layouts/FooterView.vue";
       </template>
 
       <template #footer>
-        <NuxtLink to="/playlists" class="inline-flex items-center text-5xl rounded-xl py-5">
-          <Icon name="mdi:album" class="text-white"/>
+        <NuxtLink to="/playlists" class="inline-flex items-center text-5xl rounded-xl">
+          <Icon name="mdi:album" class=""/>
         </NuxtLink>
-        <NuxtLink to="/" class="inline-flex items-center bg-blue-500 text-6xl rounded-full p-1.5">
-          <Icon name="mdi:home" class="text-white"/>
+        <NuxtLink to="/" class="inline-flex items-center text-6xl rounded-full p-1.5">
+          <Icon name="mdi:home" class=""/>
         </NuxtLink>
-        <NuxtLink to="/profile" class="inline-flex items-center text-5xl rounded-xl py-5">
+        <NuxtLink to="/profile" class="inline-flex items-center text-5xl rounded-xl">
           <Icon name="mdi:account-details" class="text-white"/>
         </NuxtLink>
       </template>
