@@ -16,6 +16,7 @@
     "@nuxt/image": "^1.8.1",
     "@nuxtjs/supabase": "v1.2.2",
     "@nuxtjs/tailwindcss": "^6.12.1",
+    "jsonpath": "^1.1.1",
     "nuxt": "^3.13.0",
     "vue": "latest",
     "vue-router": "latest",
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "@nuxt/eslint": "^0.5.7",
+    "@types/jsonpath": "^0.2.4",
     "@types/node": "^22.8.5",
     "eslint": "^9.11.1",
     "typedoc": "^0.26.10"

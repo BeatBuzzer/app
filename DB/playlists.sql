@@ -12,6 +12,6 @@ CREATE UNIQUE INDEX enabled_playlist_unique_name ON playlists (name) WHERE enabl
 create table categories
 (
     name         text not null,
-    "playlistId" text not null references playlists,
+    "playlistId" text not null references playlists (id) on delete cascade,
     primary key (name, "playlistId")
 );
