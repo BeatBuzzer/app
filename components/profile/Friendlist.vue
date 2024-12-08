@@ -22,18 +22,18 @@ async function getFriendships() {
       });
 }
 
-function addFriend() {
+/*function addFriend() {
   const newFriend = {
     friend_username: "sfsdf",
   }
   friends.value.push(newFriend)
-}
+}*/
 </script>
 
 <template>
   <UsersView :view-type="UserViewType.FRIENDS" :users="friends"/>
 
-  <div class="mt-3">
+  <!--div class="mt-3">
       <button class="p-2 bg-blue-500 text-white rounded ml-2" @click="addFriend">Add Friend</button>
-  </div>
+  </div-->
 </template>
