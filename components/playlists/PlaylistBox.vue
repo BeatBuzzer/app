@@ -13,25 +13,66 @@
 </script>
 
 <template>
-    <div
-      :class="[
-        'bg-blue-600 rounded-3xl p-3 mr-3 mb-3 inline-block'
+  <div
+    :class="[
+      'bg-blue-600 rounded-3xl p-3 mr-3 mb-3 inline-block overflow-hidden'
+    ]"
+  >
+    <!-- Playlist Cover -->
+    <NuxtImg
+      :class="[ 
+        'w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-2xl cover-image'
       ]"
-    >
-      <!-- Playlist Cover -->
-      <NuxtImg
-        :class="[ 
-          'w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-2xl'
-        ]"
-        :src="props.cover.toString()"
-        :alt="name"
-      />
-      
-      <!-- Playlist Name -->
-      <p class="text-white text-sm sm:text-base md:text-lg text-center">
-        {{ props.name }}
-      </p>
+      :src="props.cover.toString()"
+      :alt="props.name"
+    />
+    
+    <!-- Horizontally Scrolling Text -->
+    <div class="text-container">
+      <p :class="['text-center', props.name.length > 5 ? 'scrolling-text' : '']">{{ props.name }}</p>
     </div>
-  </template>
+  </div>
+</template>
+
+<style scoped>
+.playlist-container {
+  max-width: 150px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.cover-image {
+  max-width: 100%;
+  display: block;
+}
+
+.text-container {
+  overflow: hidden;
+  white-space: nowrap; 
+  position: relative;
+  width: 100%;
+}
+
+.scrolling-text {
+  display: inline-block;
+  animation: scrollText 10s linear infinite; /* Adjust speed with '10s' */
+  white-space: nowrap;
+}
+
+/* Scroll animation keyframe */
+@keyframes scrollText {
+  0% {
+    transform: translateX(0%); /* Start outside the box */
+  }
+  100% {
+    transform: translateX(-100%); /* Scroll completely to the left */
+  }
+}
+</style>
+
   
   
