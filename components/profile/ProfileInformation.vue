@@ -6,7 +6,6 @@ const {user, loading, error, fetchUser} = useUser()
 onMounted(async () => {
   if (session.value) {
     await fetchUser()
-    console.log(user.value)
   }
 })
 
