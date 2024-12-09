@@ -15,7 +15,7 @@
 <template>
   <div
     :class="[
-      'bg-blue-600 rounded-3xl p-3 mr-3 mb-3 inline-block overflow-hidden'
+      'bg-blue-600 rounded-3xl p-3 mr-3 mb-3 inline-block w-20 md:w-24'
     ]"
   >
     <!-- Playlist Cover -->
@@ -29,7 +29,7 @@
     
     <!-- Horizontally Scrolling Text -->
     <div class="text-container">
-      <p :class="['text-center', props.name.length > 5 ? 'scrolling-text' : '']">{{ props.name }}</p>
+      <p :class="['text-center', props.name.length > 8 ? 'scrolling-text' : '']">{{ props.name }}</p>
     </div>
   </div>
 </template>
@@ -59,7 +59,7 @@
 
 .scrolling-text {
   display: inline-block;
-  animation: scrollText 10s linear infinite; /* Adjust speed with '10s' */
+  animation: scrollText 5s linear infinite; /* Adjust speed with '10s' */
   white-space: nowrap;
 }
 
