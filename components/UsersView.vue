@@ -15,6 +15,8 @@ const props = defineProps({
   }
 });
 
+const default_avatar = ref('https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg');
+
 // Computed Classes
 const containerClasses = computed(() => {
   const baseClasses = 'w-full bg-gray-200 px-3 pb-1 mt-auto rounded-3xl mb-3';
@@ -31,7 +33,7 @@ const userBoxContainerClasses = computed(() =>
 
 
 function isGetFriendsResponse(user: GetFriendsResponse | GetUserResponse): user is GetFriendsResponse {
-  return 'friend_id' in user && 'friend_username' in user && 'friend_spotify_id' in user;
+  return 'friend_id' in user;
 }
 
 function isUserInformation(user: GetFriendsResponse | GetUserResponse): user is GetUserResponse {
@@ -39,25 +41,12 @@ function isUserInformation(user: GetFriendsResponse | GetUserResponse): user is 
 }
 
 // Map users conditionally depending on their type
-const mappedUsers = computed(() => {
+const mappedUsers: Array<GetUserResponse> = computed(() => {
   return props.users.map(user => {
     if (isGetFriendsResponse(user)) {
-      return {
-        userId: user.friend_id,
-        username: user.friend_username,
-        userAvatar: user.friend_avatar,
-        spotifyId: user.friend_spotify_id,
-        status: user.status,
-        requestType: user.request_type,
-        createdAt: user.created_at,
-        updatedAt: user.updated_at,
-      };
+      return user.user;
     } else if (isUserInformation(user)) {
-      return {
-        userId: user.id,
-        username: user.username,
-        userAvatar: user.avatar_url,
-      };
+      return user;
     }
     return {};
   });
@@ -86,12 +75,13 @@ const mappedUsers = computed(() => {
 
     <!-- Scrollable User Boxes -->
     <div
+        v-if="users.length != 0"
         :class="userBoxContainerClasses"
     >
       <HomeUsersUserBox
           v-for="user in mappedUsers"
-          :key="user.userId"
-          :profile-picture="user.userAvatar?.toString()"
+          :key="user.id"
+          :profile-picture="user?.avatar_url ? user.avatar_url : default_avatar"
           :name="user.username"
           :user-turn="viewType === UserViewType.USERTURN"
           :class="[
@@ -107,9 +97,8 @@ const mappedUsers = computed(() => {
                         : {} 
                     : {}"
       />
-      <HomeUsersUserBox
-          v-if="users.length > 3"
-          :class="['invisible', viewType === UserViewType.USERTURN ? 'h-1' : 'w-1']"/>
+      <!-- Placeholder for scrolling -->
+      <div v-if="users.length > 3" class="px-1 py-4"/>
     </div>
   </div>
 </template>

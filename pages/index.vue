@@ -2,6 +2,8 @@
 import HeaderFooterView from "~/layouts/HeaderFooterView.vue";
 import { UserViewType } from "@/types/components/users.view"
 
+useUser().fetchUser(); // loading user state just in case
+
 </script>
 
 <template>

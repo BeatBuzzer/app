@@ -1,5 +1,6 @@
 // ----- Internal Types -----
 import type * as url from "node:url";
+import type {GetUserResponse} from "@/types/api/users";
 export interface FriendError {
     message: string
 }
@@ -21,14 +22,11 @@ export interface FriendActionParam {
 export interface GetFriendsResponse {
     friendship_id: number,
     friend_id: string,
-    friend_username: string,
-    friend_avatar: url.URL | null,
-    friend_spotify_id?: string,
-    friend_spotify_visibility: boolean,
     created_at: string
     updated_at: string
     status: FriendshipStatus,
-    request_type: FriendshipType
+    request_type: FriendshipType,
+    user: GetUserResponse
 }
 
 export enum FriendshipAction {

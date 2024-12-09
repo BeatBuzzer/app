@@ -33,13 +33,11 @@
           props.userTurn ? 'mr-3' : 'mb-0'
         ]"
         :src="props.profilePicture.toString()"
-        :alt="name"
+        :alt="props.name"
       />
       
       <!-- User Name -->
-      <p class="text-white text-sm sm:text-base md:text-lg">
-        {{ props.name }}
-      </p>
+      <p class="text-white text-sm sm:text-base md:text-lg" v-text="props.name"/>
       
       <!-- Play Button -->
       <button
