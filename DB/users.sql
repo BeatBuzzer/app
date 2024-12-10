@@ -15,5 +15,5 @@ ALTER TABLE users
     ADD CONSTRAINT unique_username UNIQUE (username),
     ADD CONSTRAINT valid_username check (username <> '' AND length(trim(username)) >= 4 AND
                                          username ~ '^[a-zA-Z0-9_]+$');
-
-CREATE INDEX idx_username ON users (username);
+                                         
+CREATE INDEX idx_username ON users(username);

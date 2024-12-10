@@ -1,12 +1,13 @@
 <script setup lang="ts">
+
     const props = defineProps({
     profilePicture: {
         type: String,
-        default: 'https://i.scdn.co/image/ab6775700000ee855d4c281804e8773208248312'
+        default: 'https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg'
     },
     name: {
         type: String,
-        default: 'Opponent'
+        default: 'User'
     },
     userTurn: {
         type: Boolean,
@@ -16,11 +17,36 @@
 </script>
 
 <template>
-    <div :class="['bg-blue-600', props.userTurn ? 'flex items-center h-30 w-full rounded-3xl p-3' : 'flex flex-col items-center justify-center h-30 w-full rounded-3xl p-3']">
-        <img :class="['rounded-full w-12 h-12 sm:w-16 sm:h-16 md:w-16 md:h-16 lg:w-16 lg:h-16', props.userTurn ? 'mr-3' : 'mb-2']" :src="props.profilePicture" :alt="name">
-        <p class="text-white">{{ props.name }}</p>
-        <button v-if="props.userTurn" class="ml-auto p-2 sm:p-3 md:p-4 lg:p-5" @click="console.log(props.name)">
-            <NuxtImg src="icons/playButton.svg" alt="Play" class="w-12 h-12 sm:w-16 sm:h-16 md:w-16 md:h-16 lg:w-16 lg:h-16 hover:bg-black"/>
-        </button>
+    <div
+      :class="[
+        'bg-blue-600 rounded-3xl px-3 w-full', 
+        props.userTurn
+          ? 'flex items-center'
+          : 'flex flex-col items-center justify-center mb-3 py-2'
+      ]"
+    >
+      <!-- Profile Picture -->
+      <NuxtImg
+        :class="[
+          'rounded-full', 
+          'w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14',
+          props.userTurn ? 'mr-3' : 'mb-0'
+        ]"
+        :src="props.profilePicture.toString()"
+        :alt="props.name"
+      />
+      
+      <!-- User Name -->
+      <p class="text-white text-sm sm:text-base md:text-lg" v-text="props.name"/>
+      
+      <!-- Play Button -->
+      <button
+        v-if="props.userTurn"
+        class="ml-auto p-2 sm:p-3 md:p-4 lg:p-5"
+        @click="console.log(props.name)"
+      >
+      <Icon name="mdi:play" class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-white"/>
+      </button>
     </div>
-</template>
+  </template>
+  
