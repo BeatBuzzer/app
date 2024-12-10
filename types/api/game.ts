@@ -72,5 +72,6 @@ export interface GameInitRequest {
 
 export interface GetGameResponse {
     active: Game[];
+    waiting: Game[];
     past: Game[];
 }

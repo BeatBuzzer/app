@@ -8,7 +8,7 @@
             Start Game
         </button>
         <button class="bg-[#22a9fb] hover:bg-blue-700 text-white font-bold h-full rounded-3xl text-lg w-full">
-            Start Round
+            Quick Game
         </button>
     </div>
 </template>

@@ -1,8 +1,15 @@
 <script setup lang="ts">
 import HeaderFooterView from "~/layouts/HeaderFooterView.vue";
-import { UserViewType } from "@/types/components/users.view"
+import {UserViewType} from "@/types/components/users.view"
+import {useGame} from "@/composables/useGames";
 
 useUser().fetchUser(); // loading user state just in case
+
+const {games, loading, error, fetchGames} = useGame();
+
+onMounted(() => {
+  fetchGames();
+});
 
 </script>
 
@@ -22,46 +29,8 @@ useUser().fetchUser(); // loading user state just in case
       </template>
       <template #content>
         <div class="flex flex-col h-full p-3">
-          <UsersView :view-type="UserViewType.USERTURN" class="h-3/6" :users="[
-            { user_id: 1,
-              user_avatar: null,
-              username: 'Test1'
-            },
-            { user_id: 1,
-              user_avatar: null,
-              username: 'Test1'
-            },
-            { user_id: 1,
-              user_avatar: null,
-              username: 'Test1'
-            },
-            { user_id: 1,
-              user_avatar: null,
-              username: 'Test1'
-            },
-            { user_id: 1,
-              user_avatar: null,
-              username: 'Test1'
-            },            
-          ]"/>
-          <UsersView :view-type="UserViewType.OPPONENTTURN" class="h-2/6" :users="[
-            { user_id: 1,
-              user_avatar: null,
-              username: 'Test1'
-            },
-            { user_id: 2,
-              user_avatar: null,
-              username: 'Test2'
-            },
-            { user_id: 3,
-              user_avatar: null,
-              username: 'Test3'
-            },
-            { user_id: 4,
-              user_avatar: null,
-              username: 'Test4'
-            },
-          ]"/>
+          <UsersView :view-type="UserViewType.USERTURN" class="h-3/6" :users="games?.active.map(game=>game.opponents[0])"/>
+          <UsersView :view-type="UserViewType.OPPONENTTURN" class="h-2/6" :users="games?.waiting ? games?.waiting.map(game=>game.opponents[0]) : []"/>
           <HomeControlsGameButtons class="h-1/6"/>
         </div>
       </template>
