@@ -7,7 +7,12 @@
     },
     name: {
         type: String,
-        default: 'Playlist'
+        default: 'Playlist',
+        required: true
+    },
+    controlElement: {
+      type: String,
+      default: null
     }
     });
 </script>
@@ -15,58 +20,43 @@
 <template>
   <div
     :class="[
-      'bg-blue-600 rounded-3xl p-3 mr-3 mb-3 inline-block w-20 md:w-24'
+      'bg-blue-600 rounded-3xl p-3 mr-3 mb-3 inline-block w-24 md:w-28'
     ]"
   >
     <!-- Playlist Cover -->
-    <NuxtImg
+    <div class="flex flex-col items-center justify-center">
+    <Icon
+      v-if="controlElement"  :name="props.controlElement" :class="[ 
+        'w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-2xl text-white'
+      ]"/>
+    <NuxtImg 
+      v-else
       :class="[ 
-        'w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-2xl cover-image'
+        'w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-2xl'
       ]"
       :src="props.cover.toString()"
       :alt="props.name"
     />
+  </div>
     
     <!-- Horizontally Scrolling Text -->
-    <div class="text-container">
-      <p :class="['text-center', props.name.length > 8 ? 'scrolling-text' : '']">{{ props.name }}</p>
+    <div class="overflow-hidden">
+      <p :class="['text-center text-sm md:text-base', props.name.length > 12 ? 'scrolling-text' : '']">{{ props.name }}</p>
     </div>
   </div>
 </template>
 
 <style scoped>
-.playlist-container {
-  max-width: 150px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  position: relative;
-}
-
-.cover-image {
-  max-width: 100%;
-  display: block;
-}
-
-.text-container {
-  overflow: hidden;
-  white-space: nowrap; 
-  position: relative;
-  width: 100%;
-}
-
 .scrolling-text {
   display: inline-block;
-  animation: scrollText 5s linear infinite; /* Adjust speed with '10s' */
+  animation: scrollText 5s linear infinite;
   white-space: nowrap;
 }
 
 /* Scroll animation keyframe */
 @keyframes scrollText {
   0% {
-    transform: translateX(0%); /* Start outside the box */
+    transform: translateX(0%); /* Start at beginning */
   }
   100% {
     transform: translateX(-100%); /* Scroll completely to the left */
