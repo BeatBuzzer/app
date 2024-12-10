@@ -3,13 +3,22 @@ import HeaderFooterView from "~/layouts/HeaderFooterView.vue";
 import {UserViewType} from "@/types/components/users.view"
 import {useGame} from "@/composables/useGames";
 
-useUser().fetchUser(); // loading user state just in case
+const { user } = useUser()
 
+useUser().fetchUser(); // loading user state just in case
 const {games, loading, error, fetchGames} = useGame();
 
 onMounted(() => {
   fetchGames();
 });
+
+function setLevelbar(newValue: number) {
+  const levelbar = document.getElementById('levelbar')
+  if (levelbar) {
+    levelbar.style.width = newValue + "%"
+  }
+}
+
 
 </script>
 
@@ -17,15 +26,18 @@ onMounted(() => {
   <div class="bg-gradient-to-b from-indigo-500 to-purple-500">
     <HeaderFooterView>
       <template #header>
-        <div>
-          1A
+        <div class="m-3 w-full flex items-center justify-center">
+          <Icon name="mdi:fire" class="text-red-600 text-4xl mr-2" />
+          <p class="text-xl font-bold">Streak: {{ user?.daily_streak }}</p>
         </div>
-        <div>
-          2B
+        <div class="m-3 w-full flex items-center justify-center">
+          <Icon name="mdi:star" class="text-red-600 text-5xl  mr-2" />
+          <div class="w-full bg-gray-700 rounded-full h-2.5">
+            <div id="levelbar" class="bg-red-600 h-2.5 rounded-full" style="width: 50%" />
+          </div>
         </div>
-        <div>
-          3C
-        </div>
+
+
       </template>
       <template #content>
         <div class="flex flex-col h-full p-3">
@@ -36,13 +48,13 @@ onMounted(() => {
       </template>
       <template #footer>
         <NuxtLink to="/playlists" class="inline-flex items-center text-5xl rounded-xl">
-          <Icon name="mdi:album" class=""/>
+          <Icon name="mdi:album" class="" />
         </NuxtLink>
         <NuxtLink to="/" class="inline-flex items-center text-6xl rounded-full p-1.5">
-          <Icon name="mdi:home" class="text-white"/>
+          <Icon name="mdi:home" class="text-white" />
         </NuxtLink>
         <NuxtLink to="/profile" class="inline-flex items-center text-5xl rounded-xl">
-          <Icon name="mdi:account-details" class=""/>
+          <Icon name="mdi:account-details" class="" />
         </NuxtLink>
       </template>
     </HeaderFooterView>
