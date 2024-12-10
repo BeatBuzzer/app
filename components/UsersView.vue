@@ -21,7 +21,7 @@ const default_avatar = ref('https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970
 const containerClasses = computed(() => {
   const baseClasses = 'w-full bg-gray-200 px-3 pb-1 mt-auto rounded-3xl mb-3';
   if (props.viewType === UserViewType.USERTURN) return `${baseClasses} h-full overflow-y-hidden overflow-x-auto flex-grow-0`;
-  if (props.viewType === UserViewType.OPPONENTTURN || props.viewType === UserViewType.FRIENDS) return `${baseClasses} overflow-y-hidden`;
+  if (props.viewType === UserViewType.OPPONENTTURN || props.viewType === UserViewType.FRIENDS || props.viewType === UserViewType.REQUESTS) return `${baseClasses} overflow-y-hidden`;
   return '';
 });
 
@@ -59,7 +59,7 @@ const mappedUsers: Array<GetUserResponse> = computed(() => {
   <div
       :class="[
                     containerClasses,
-                    ((viewType === UserViewType.FRIENDS || viewType === UserViewType.OPPONENTTURN) && users.length > 3) ? 'pr-0' : ''
+                    ((viewType === UserViewType.FRIENDS || viewType === UserViewType.OPPONENTTURN || viewType === UserViewType.REQUESTS) && users.length > 3) ? 'pr-0' : ''
                 ]"
   >
     <!-- Fixed Conditional Header -->
@@ -72,6 +72,9 @@ const mappedUsers: Array<GetUserResponse> = computed(() => {
       </p>
       <p v-else-if="viewType === UserViewType.FRIENDS" class="fixed">
         Friends
+      </p>
+      <p v-else-if="viewType === UserViewType.REQUESTS" class="fixed">
+        Friend Requests
       </p>
     </div>
 
@@ -87,17 +90,18 @@ const mappedUsers: Array<GetUserResponse> = computed(() => {
           :name="user.username"
           :user-turn="viewType === UserViewType.USERTURN"
           :class="[
-                    (viewType === UserViewType.FRIENDS || viewType === UserViewType.OPPONENTTURN) 
+                    (viewType === UserViewType.FRIENDS || viewType === UserViewType.OPPONENTTURN || viewType === UserViewType.REQUESTS) 
                         ? users.length === 3 ? 'w-1/3' 
                         : users.length === 2 ? 'w-1/2' 
                         : 'w-full'
                         : ''
                 ]"
-          :style="(viewType === UserViewType.FRIENDS || viewType === UserViewType.OPPONENTTURN)
+          :style="(viewType === UserViewType.FRIENDS || viewType === UserViewType.OPPONENTTURN || viewType === UserViewType.REQUESTS)
                     ? users.length > 3 
                         ? { width: 'calc(33.33% - .98rem)', flexShrink: 0 } 
                         : {} 
                     : {}"
+          :friend-request="viewType === UserViewType.REQUESTS"
       />
       <!-- Placeholder for scrolling -->
       <div v-if="users.length > 3" class="px-1 py-4"/>

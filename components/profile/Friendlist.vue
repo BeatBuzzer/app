@@ -7,6 +7,8 @@ const friends: Ref<GetFriendsResponse[]> = useState("accepted_friendships", () =
 
 const session = useSupabaseSession()
 
+const newFriend = ref('')
+
 onMounted(async () => {
   if (session.value) {
     await getFriendships()
@@ -22,18 +24,40 @@ async function getFriendships() {
       });
 }
 
-function addFriend() {
-  const newFriend = {
-    friend_username: "sfsdf",
+const addFriend = async () => {
+  console.log(newFriend.value)
+  try {
+    await useFetch('/api/v1/user/', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  } catch (err) {
+    console.error('Unexpected error:', err);
   }
-  friends.value.push(newFriend)
-}
+
+
+  try {
+    await useFetch('/api/v1/user/friends', {
+      method: 'POST',
+      body: JSON.stringify({ receiver_id: newFriend.value }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  } catch (err) {
+    console.error('Unexpected error:', err);
+  }
+};
 </script>
 
 <template>
-  <UsersView :view-type="UserViewType.FRIENDS" :users="friends"/>
+  <UsersView v-if="friends.length > 0" :view-type="UserViewType.FRIENDS" :users="friends"/>
+  <UsersView v-if="requests.length > 0" :view-type="UserViewType.REQUESTS" :users="requests"/>
 
   <div class="mt-3">
       <button class="p-2 bg-blue-500 text-white rounded ml-2" @click="addFriend">Add Friend</button>
+      <input v-model="newFriend">
   </div>
 </template>
