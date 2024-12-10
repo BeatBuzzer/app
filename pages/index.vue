@@ -26,15 +26,17 @@ function setLevelbar(newValue: number) {
   <div class="bg-gradient-to-b from-indigo-500 to-purple-500">
     <HeaderFooterView>
       <template #header>
+
         <div class="m-3 w-full flex items-center justify-center">
-          <Icon name="mdi:fire" class="text-red-600 text-4xl mr-2" />
-          <p class="text-xl font-bold">Streak: {{ user?.daily_streak }}</p>
-        </div>
-        <div class="m-3 w-full flex items-center justify-center">
-          <Icon name="mdi:star" class="text-red-600 text-5xl  mr-2" />
+          <Icon name="mdi:star" class="text-red-600 text-6xl  mr-2 -my-1" />
           <div class="w-full bg-gray-700 rounded-full h-2.5">
             <div id="levelbar" class="bg-red-600 h-2.5 rounded-full" style="width: 50%" />
           </div>
+        </div>
+
+        <div class="m-3 w-full flex items-center justify-center">
+          <Icon name="mdi:fire" class="text-red-600 text-4xl mr-2" />
+          <p class="text-xl font-bold">Streak: {{ user?.daily_streak }}</p>
         </div>
 
 
