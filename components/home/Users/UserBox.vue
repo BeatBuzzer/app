@@ -45,11 +45,7 @@
         class="ml-auto p-2 sm:p-3 md:p-4 lg:p-5"
         @click="console.log(props.name)"
       >
-        <NuxtImg
-          src="icons/playButton.svg"
-          alt="Play"
-          class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14"
-        />
+      <Icon name="mdi:play" class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-white"/>
       </button>
     </div>
   </template>
