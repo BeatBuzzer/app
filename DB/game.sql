@@ -97,12 +97,18 @@ CREATE OR REPLACE FUNCTION init_game(
     playlist_id_input TEXT,
     player_ids UUID[],
     song_data game_song_input[]
-) RETURNS TABLE(game_id INTEGER, created_at TIMESTAMP WITH TIME ZONE) AS
+)
+    RETURNS TABLE
+            (
+                game_id    INTEGER,
+                created_at TIMESTAMP WITH TIME ZONE
+            )
+AS
 $$
 DECLARE
-    new_game_id INTEGER;
+    new_game_id    INTEGER;
     new_created_at TIMESTAMP WITH TIME ZONE;
-    player_id   UUID;
+    player_id      UUID;
 BEGIN
     -- Create game
     INSERT INTO games (playlist_id, status)
@@ -118,7 +124,8 @@ BEGIN
 
     UPDATE game_players
     SET is_creator = true
-    WHERE game_players.game_id = new_game_id AND game_players.user_id = player_ids[1];
+    WHERE game_players.game_id = new_game_id
+      AND game_players.user_id = player_ids[1];
 
     -- Insert songs (assuming the songs already exist in the songs table)
     INSERT INTO game_rounds (game_id,
@@ -127,17 +134,110 @@ BEGIN
                              wrong_option_1,
                              wrong_option_2,
                              wrong_option_3)
-    SELECT
-        new_game_id,
-        row_number() OVER (ORDER BY song.spotify_song_id),  -- Added ORDER BY
-        song.spotify_song_id,
-        song.wrong_option_1,
-        song.wrong_option_2,
-        song.wrong_option_3
+    SELECT new_game_id,
+           row_number() OVER (ORDER BY song.spotify_song_id), -- Added ORDER BY
+           song.spotify_song_id,
+           song.wrong_option_1,
+           song.wrong_option_2,
+           song.wrong_option_3
     FROM unnest(song_data) song;
 
     RETURN QUERY
         SELECT new_game_id AS game_id, new_created_at AS created_at;
 
+END;
+$$ LANGUAGE plpgsql;
+
+-- Get all games for a user
+CREATE OR REPLACE FUNCTION get_player_games(p_user_id UUID)
+    RETURNS TABLE
+            (
+                -- Game basic info
+                game_id                          INTEGER,
+                status                           game_status,
+                playlist_id                      TEXT,
+                playlist_cover                   TEXT,
+                playlist_name                    TEXT,
+                created_at                       TIMESTAMPTZ,
+                creator_id                       UUID,
+                -- Opponent info (renamed from player_ to opponent_)
+                opponent_user_id                 UUID,
+                opponent_avatar_url              TEXT,
+                opponent_username                TEXT,
+                opponent_spotify_id              TEXT,
+                opponent_spotify_visibility      BOOLEAN,
+                opponent_daily_streak            INTEGER,
+                opponent_daily_streak_updated_at TIMESTAMPTZ,
+                -- Round info
+                round_number                     INTEGER,
+                correct_song_id                  TEXT,
+                correct_song_name                TEXT,
+                correct_song_artist              TEXT,
+                correct_song_preview_url         TEXT,
+                wrong_song_1_id                  TEXT,
+                wrong_song_1_name                TEXT,
+                wrong_song_1_artist              TEXT,
+                wrong_song_1_preview_url         TEXT,
+                wrong_song_2_id                  TEXT,
+                wrong_song_2_name                TEXT,
+                wrong_song_2_artist              TEXT,
+                wrong_song_2_preview_url         TEXT,
+                wrong_song_3_id                  TEXT,
+                wrong_song_3_name                TEXT,
+                wrong_song_3_artist              TEXT,
+                wrong_song_3_preview_url         TEXT
+            )
+AS
+$$
+BEGIN
+    RETURN QUERY
+        SELECT g.game_id,
+               g.status,
+               g.playlist_id,
+               p.cover,
+               p.name,
+               g.created_at,
+               gp_creator.user_id,
+
+               -- Opponent information
+               u.id,
+               u.avatar_url,
+               u.username,
+               u.spotify_id,
+               u.spotify_visibility,
+               u.daily_streak,
+               u.daily_streak_updated_at,
+               -- Round information
+               gr.song_order,
+               cs.spotify_song_id,
+               cs.song_name,
+               cs.artist_name,
+               cs.preview_url,
+               w1.spotify_song_id,
+               w1.song_name,
+               w1.artist_name,
+               w1.preview_url,
+               w2.spotify_song_id,
+               w2.song_name,
+               w2.artist_name,
+               w2.preview_url,
+               w3.spotify_song_id,
+               w3.song_name,
+               w3.artist_name,
+               w3.preview_url
+        FROM games g
+                 -- Join to get current user's games
+                 JOIN game_players gp_current ON g.game_id = gp_current.game_id AND gp_current.user_id = p_user_id
+            -- Join to get opponent's info
+                 JOIN game_players gp_opponent ON g.game_id = gp_opponent.game_id AND gp_opponent.user_id != p_user_id
+                 LEFT JOIN game_players gp_creator ON g.game_id = gp_creator.game_id AND gp_creator.is_creator = true
+                 JOIN users u ON gp_opponent.user_id = u.id
+                 JOIN game_rounds gr ON g.game_id = gr.game_id
+                 JOIN songs cs ON gr.song_id = cs.spotify_song_id
+                 JOIN songs w1 ON gr.wrong_option_1 = w1.spotify_song_id
+                 JOIN songs w2 ON gr.wrong_option_2 = w2.spotify_song_id
+                 JOIN songs w3 ON gr.wrong_option_3 = w3.spotify_song_id
+                 JOIN playlists p ON g.playlist_id = p.id
+        ORDER BY g.created_at DESC, gr.song_order ASC;
 END;
 $$ LANGUAGE plpgsql;
