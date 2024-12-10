@@ -1,3 +1,4 @@
+
 export interface GetUserResponse {
     id: string,
     avatar_url?: string,
