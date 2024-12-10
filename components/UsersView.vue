@@ -42,6 +42,8 @@ function isUserInformation(user: GetFriendsResponse | GetUserResponse): user is 
 
 // Map users conditionally depending on their type
 const mappedUsers: Array<GetUserResponse> = computed(() => {
+  if(!props.users || props.users.length < 1) return [];
+
   return props.users.map(user => {
     if (isGetFriendsResponse(user)) {
       return user.user;
@@ -75,7 +77,7 @@ const mappedUsers: Array<GetUserResponse> = computed(() => {
 
     <!-- Scrollable User Boxes -->
     <div
-        v-if="users.length != 0"
+        v-if="users"
         :class="userBoxContainerClasses"
     >
       <HomeUsersUserBox
