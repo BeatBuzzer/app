@@ -25,23 +25,10 @@ async function getFriendships() {
 }
 
 const addFriend = async () => {
-  console.log(newFriend.value)
-  try {
-    await useFetch('/api/v1/user/', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-  } catch (err) {
-    console.error('Unexpected error:', err);
-  }
-
-
   try {
     await useFetch('/api/v1/user/friends', {
       method: 'POST',
-      body: JSON.stringify({ receiver_id: newFriend.value }),
+      body: JSON.stringify({ receiver_name: newFriend.value }),
       headers: {
         'Content-Type': 'application/json'
       }

@@ -1,10 +1,10 @@
 // send friend invite
 import {z} from 'zod'
 import {serverSupabaseServiceRole, serverSupabaseUser} from "#supabase/server";
-import type {SendFriendRequestParam} from "~/types/api/user.friends";
+import type {SendFriendRequestNameParam} from "~/types/api/user.friends";
 
 const userSchema = z.object({
-    receiver_id: z.string().uuid()
+    receiver_name: z.string()
 }).readonly()
 
 export default defineEventHandler(async (event) => {
@@ -24,8 +24,8 @@ export default defineEventHandler(async (event) => {
 
     // Send request
     const client = serverSupabaseServiceRole(event);
-    const param: SendFriendRequestParam = {sender_id: user.id, receiver_id: result.data.receiver_id};
-    const {error} = await client.rpc('send_friend_request', param as never);
+    const param: SendFriendRequestNameParam = {sender_id: user.id, receiver_name: result.data.receiver_name};
+    const {error} = await client.rpc('send_friend_request_by_name', param as never);
 
     // Handle errors
     if (error) {

@@ -14,6 +14,11 @@ export interface SendFriendRequestParam {
     receiver_id: string
 }
 
+export interface SendFriendRequestNameParam {
+    sender_id: string,
+    receiver_name: string
+}
+
 export interface FriendActionParam {
     friendship_id_param: number,
 }
