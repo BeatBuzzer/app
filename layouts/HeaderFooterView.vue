@@ -8,7 +8,7 @@
     <div class="w-full xl:w-1/2 2xl:w-1/4 flex flex-col h-full">
 
       <!-- Header -->
-      <div class="h-1/6 border rounded-b-3xl">
+      <div class="bg-yellow-500 h-1/6 border rounded-b-3xl">
         <div class="flex justify-around items-center h-full">
           <slot name="header" />
         </div>
