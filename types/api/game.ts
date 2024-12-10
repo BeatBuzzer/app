@@ -1,3 +1,5 @@
+import type {GetUserResponse} from "@/types/api/users";
+
 export interface SpotifySong {
     track: Song;
 }
@@ -23,11 +25,22 @@ export interface GameRound {
 
 export interface Game {
     game_id: number;
-    playlist_id: string;
-    player_ids: string[];
+    status: GameStatus;
+    creator_id: string; // who created the game and thus already played its turn
+    playlist: {
+        id: string;
+        name: string;
+        cover?: string;
+    };
+    opponents: GetUserResponse[];
     songs: GameRound[];
     created_at: string;
     stats?: GameStats[];
+}
+
+export enum GameStatus {
+    PLAYING = 'playing',
+    FINISHED = 'finished'
 }
 
 export interface GameStats {
@@ -55,4 +68,9 @@ export interface GameInitResponse {
 export interface GameInitRequest {
     playlist_id: string;
     opponent_id: string;
+}
+
+export interface GetGameResponse {
+    active: Game[];
+    past: Game[];
 }
