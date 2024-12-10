@@ -70,6 +70,11 @@ export default defineEventHandler(async (event) => {
         return {error: 'unauthenticated'};
     }
 
+    if(result.data.opponent_id === user.id) {
+        setResponseStatus(event, 400);
+        return {error: 'You cannot play against yourself'};
+    }
+
     // Determine songs
     const token = await getSpotifyToken();
     const spotifySongs = await getSongsFromPlaylist(token, result.data.playlist_id);
