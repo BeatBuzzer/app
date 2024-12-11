@@ -22,7 +22,7 @@ const props = defineProps({
         default: FriendshipStatus.ACCEPTED
     },
     friendId: {
-        type: Number,
+        type: String,
         required: true
     },
     viewType: {
@@ -81,9 +81,9 @@ async function getFriendInformation() {
     <div class="modal-overlay">
         <div class="modal">
             <NuxtImg :src="profilePicture" class="rounded-full h-32 w-32 mb-3" />
-            <p v-if="props.viewType === UserViewType.SENTREQUESTS">Do you want to accept {{ name }}'s friend request?'</p>
+            <p v-if="props.viewType === UserViewType.REQUESTS">Do you want to accept {{ name }}'s friend request?'</p>
             <p v-else>Streak: {{  }}</p>
-            <div v-if="props.viewType === UserViewType.SENTREQUESTS" class="flex mt-5 gap-10">
+            <div v-if="props.viewType === UserViewType.REQUESTS" class="flex mt-5 gap-10">
                 <div :class="icon_wrapper" @click="handleFriendship(FriendshipAction.DECLINE)">
                     <Icon name="mdi:close" class="text-5xl text-red-600"  />
                 </div>
