@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { FriendshipAction, FriendshipStatus } from '@/types/api/user.friends';
 import type { GetUserResponse } from '@/types/api/users';
+import { UserViewType } from '@/types/components/users.view';
+
 
 const props = defineProps({
     profilePicture: {
@@ -16,20 +18,24 @@ const props = defineProps({
         required: true
     },
     friendsStatus: {
-        type: FriendshipStatus,
+        type: String,
         default: FriendshipStatus.ACCEPTED
     },
     friendId: {
         type: Number,
         required: true
-    }
+    },
+    viewType: {
+    type: Number,
+    required: true
+  },
 });
 
 const friend = ref()
 
 onMounted(async () => {
     friend.value = await getFriendInformation()
-    console.log(friend.value.daily_streak);
+    console.log(props.viewType);
 })
 
 const emit = defineEmits(['close-modal']);
@@ -75,17 +81,20 @@ async function getFriendInformation() {
     <div class="modal-overlay">
         <div class="modal">
             <NuxtImg :src="profilePicture" class="rounded-full h-32 w-32 mb-3" />
-            <p v-if="props.friendsStatus === FriendshipStatus.PENDING">Do you want to accept {{ name }}'s friend request?'</p>
+            <p v-if="props.viewType === UserViewType.SENTREQUESTS">Do you want to accept {{ name }}'s friend request?'</p>
             <p v-else>Streak: {{  }}</p>
-            <div v-if="props.friendsStatus === FriendshipStatus.PENDING" class="flex mt-5 gap-10">
+            <div v-if="props.viewType === UserViewType.SENTREQUESTS" class="flex mt-5 gap-10">
                 <div :class="icon_wrapper" @click="handleFriendship(FriendshipAction.DECLINE)">
-                    <Icon name="mdi:close" class="text-5xl text-red-600" />
+                    <Icon name="mdi:close" class="text-5xl text-red-600"  />
                 </div>
                 <div :class="icon_wrapper" @click="handleFriendship(FriendshipAction.ACCEPT)">
                     <Icon name="mdi:check" class="text-5xl text-red-600" />
                 </div>
             </div>
-            <button class="bg-indigo-600 hover:bg-indigo-800" @click="$emit('close-modal')">Close</button>
+            <div v-else-if="props.viewType === UserViewType.FRIENDS" class="flex mt-5 gap-10">
+                <button class="bg-yellow-500 hover:bg-yellow-600 text-red-600 my-2" @click="handleFriendship(FriendshipAction.REMOVE)">Remove Friend</button>
+            </div>
+            <button class="bg-indigo-600 hover:bg-indigo-800 my-5 text-white" @click="$emit('close-modal')">Close</button>
         </div>
     </div>
 </template>
@@ -124,9 +133,7 @@ async function getFriendInformation() {
 button {
     width: 150px;
     height: 40px;
-    color: white;
     font-size: 14px;
     border-radius: 16px;
-    margin-top: 50px;
 }
 </style>

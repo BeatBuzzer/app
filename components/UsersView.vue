@@ -113,6 +113,7 @@ const mappedUsers: Array<GetUserResponse> = computed(() => {
           :friendship-id="friendshipId"
           :friends-status="friendshipStatus"
           :friend-id="user.id"
+          :view-type="props.viewType"
       />
       <!-- Placeholder for scrolling -->
       <div v-if="users.length > 3" class="px-1 py-4"/>
