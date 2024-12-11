@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+import { FriendshipStatus } from '@/types/api/user.friends';
 
 const props = defineProps({
   profilePicture: {
@@ -16,18 +18,32 @@ const props = defineProps({
   friendRequest: {
     type: Boolean,
     default: false
+  },
+  friendshipId: {
+    type: Number,
+    default: 0
+  },
+  friendsStatus: {
+    type: FriendshipStatus,
+    default: FriendshipStatus.PENDING
+  },
+  friendId: {
+    type: Number,
+    required: true
   }
 });
+
+const showModal = ref(false);
 </script>
 
 <template>
   <div 
   :class="[
-    'bg-blue-600 rounded-3xl px-3 w-full',
+    'bg-blue-600 rounded-3xl px-3 w-full hover:bg-sky-700',
     props.userTurn
       ? 'flex items-center'
       : 'flex flex-col items-center justify-center mb-3 py-2'
-  ]">
+  ]" @click="showModal = true">
     <!-- Profile Picture -->
     <NuxtImg 
     :class="[
@@ -43,10 +59,6 @@ const props = defineProps({
     <button v-if="props.userTurn" class="ml-auto p-2 sm:p-3 md:p-4 lg:p-5" @click="console.log(props.name)">
       <Icon name="mdi:play" class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-white" />
     </button>
-
-    <!-- Accept Button -->
-    <!--button v-if="props.friendRequest" class="ml-auto p-2 sm:p-3 md:p-4 lg:p-5" @click="console.log(props.name)">
-      <Icon name="mdi:check" class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-white" />
-    </button-->
   </div>
+  <ProfileUserModal v-show="showModal" :profile-picture="props.profilePicture" :name="props.name" :friendship-id="props.friendshipId" :friends-status="props.friendsStatus" :friend-id="props.friendId" @close-modal="showModal = false"/>
 </template>

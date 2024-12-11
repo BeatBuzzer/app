@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {GetFriendsResponse} from "@/types/api/user.friends";
+import {type GetFriendsResponse, FriendshipStatus} from "@/types/api/user.friends";
 import {UserViewType} from "@/types/components/users.view";
 import type {GetUserResponse} from "@/types/api/users";
 
@@ -15,14 +15,16 @@ const props = defineProps({
   }
 });
 
+const friendshipId = ref(0);
+const friendshipStatus = ref(FriendshipStatus.ACCEPTED);
+
 const default_avatar = ref('https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg');
 
 // Computed Classes
 const containerClasses = computed(() => {
   const baseClasses = 'w-full bg-gray-200 px-3 pb-1 mt-auto rounded-3xl mb-3';
   if (props.viewType === UserViewType.USERTURN) return `${baseClasses} h-full overflow-y-hidden overflow-x-auto flex-grow-0`;
-  if (props.viewType === UserViewType.OPPONENTTURN || props.viewType === UserViewType.FRIENDS || props.viewType === UserViewType.REQUESTS) return `${baseClasses} overflow-y-hidden`;
-  return '';
+  else return `${baseClasses} overflow-y-hidden`;
 });
 
 const userBoxContainerClasses = computed(() =>
@@ -33,6 +35,9 @@ const userBoxContainerClasses = computed(() =>
 
 
 function isGetFriendsResponse(user: GetFriendsResponse | GetUserResponse): user is GetFriendsResponse {
+  friendshipId.value = user.friendship_id;
+  friendshipStatus.value = user.status;
+  console.log("userView:" + friendshipId.value)
   return 'friend_id' in user;
 }
 
@@ -59,7 +64,7 @@ const mappedUsers: Array<GetUserResponse> = computed(() => {
   <div
       :class="[
                     containerClasses,
-                    ((viewType === UserViewType.FRIENDS || viewType === UserViewType.OPPONENTTURN || viewType === UserViewType.REQUESTS) && users.length > 3) ? 'pr-0' : ''
+                    ((viewType != UserViewType.USERTURN) && users.length > 3) ? 'pr-0' : ''
                 ]"
   >
     <!-- Fixed Conditional Header -->
@@ -76,6 +81,9 @@ const mappedUsers: Array<GetUserResponse> = computed(() => {
       <p v-else-if="viewType === UserViewType.REQUESTS" class="fixed">
         Friend Requests
       </p>
+      <p v-else-if="viewType === UserViewType.SENTREQUESTS" class="fixed">
+        Sent Friend Requests
+      </p>
     </div>
 
     <!-- Scrollable User Boxes -->
@@ -90,18 +98,21 @@ const mappedUsers: Array<GetUserResponse> = computed(() => {
           :name="user.username"
           :user-turn="viewType === UserViewType.USERTURN"
           :class="[
-                    (viewType === UserViewType.FRIENDS || viewType === UserViewType.OPPONENTTURN || viewType === UserViewType.REQUESTS) 
+                    (viewType != UserViewType.USERTURN) 
                         ? users.length === 3 ? 'w-1/3' 
                         : users.length === 2 ? 'w-1/2' 
                         : 'w-full'
                         : ''
                 ]"
-          :style="(viewType === UserViewType.FRIENDS || viewType === UserViewType.OPPONENTTURN || viewType === UserViewType.REQUESTS)
+          :style="(viewType != UserViewType.USERTURN)
                     ? users.length > 3 
                         ? { width: 'calc(33.33% - .98rem)', flexShrink: 0 } 
                         : {} 
                     : {}"
           :friend-request="viewType === UserViewType.REQUESTS"
+          :friendship-id="friendshipId"
+          :friends-status="friendshipStatus"
+          :friend-id="user.id"
       />
       <!-- Placeholder for scrolling -->
       <div v-if="users.length > 3" class="px-1 py-4"/>
