@@ -46,12 +46,14 @@ const showModal = ref(false);
 
 <template>
   <div>
-    <div :class="[
+    <div 
+      :class="[
       'bg-blue-600 rounded-3xl px-3 w-full hover:bg-sky-700',
       props.userTurn
         ? 'flex items-center'
         : 'flex flex-col items-center justify-center mb-3 py-2'
-    ]" @click="showModal = true">
+      ]" 
+      @click="showModal = true">
       <!-- Profile Picture -->
       <NuxtImg :class="[
         'rounded-full',
