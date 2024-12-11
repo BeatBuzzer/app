@@ -38,6 +38,7 @@ const addFriend = async () => {
     });
     console.log('Friend request sent successfully:', data);
     newFriendError.value = '';
+    newFriend.value = ''
     await getFriendships();
   } catch (err) {
     if (err.response) {

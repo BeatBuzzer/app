@@ -64,12 +64,6 @@ async function handleFriendship(action: FriendshipAction) {
     }
     console.log('emit: user-modal')
     emit('refresh')
-    if (action === FriendshipAction.ACCEPT) {
-        console.log()
-    }
-    else {
-        console.log("Decline")
-    }
 };
 
 async function getFriendInformation() {
@@ -94,6 +88,9 @@ async function getFriendInformation() {
             </div>
             <div v-else-if="props.viewType === UserViewType.FRIENDS" class="flex mt-5 gap-10">
                 <button class="bg-yellow-500 hover:bg-yellow-600 text-red-600 my-2" @click="handleFriendship(FriendshipAction.REMOVE)">Remove Friend</button>
+            </div>
+            <div v-else-if="props.viewType === UserViewType.SENTREQUESTS" class="flex mt-5 gap-10">
+                <button class="bg-yellow-500 hover:bg-yellow-600 text-red-600 my-2" @click="handleFriendship(FriendshipAction.DECLINE)">Cancel Request</button>
             </div>
             <button class="bg-indigo-600 hover:bg-indigo-800 my-5 text-white" @click="$emit('close-modal')">Close</button>
         </div>
