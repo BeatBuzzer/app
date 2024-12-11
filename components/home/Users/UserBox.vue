@@ -38,7 +38,10 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(['refresh']);
+
 const showModal = ref(false);
+
 </script>
 
 <template>
@@ -65,5 +68,5 @@ const showModal = ref(false);
       <Icon name="mdi:play" class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-white" />
     </button>
   </div>
-  <ProfileUserModal v-if="viewType === UserViewType.FRIENDS || viewType === UserViewType.REQUESTS" v-show="showModal" :profile-picture="props.profilePicture" :name="props.name" :friendship-id="props.friendshipId" :friends-status="props.friendsStatus" :friend-id="props.friendId" :view-type="props.viewType" @close-modal="showModal = false"/>
+  <ProfileUserModal v-if="viewType === UserViewType.FRIENDS || viewType === UserViewType.REQUESTS" v-show="showModal" :profile-picture="props.profilePicture" :name="props.name" :friendship-id="props.friendshipId" :friends-status="props.friendsStatus" :friend-id="props.friendId" :view-type="props.viewType" @close-modal="showModal = false" @refresh="emit('refresh')"/>
 </template>

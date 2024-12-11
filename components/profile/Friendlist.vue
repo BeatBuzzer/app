@@ -53,9 +53,9 @@ const addFriend = async () => {
 </script>
 
 <template>
-  <UsersView v-if="friends.length > 0" :view-type="UserViewType.FRIENDS" :users="friends" />
-  <UsersView v-if="requests.length > 0" :view-type="UserViewType.REQUESTS" :users="requests"/>
-  <UsersView v-if="sentRequests.length > 0" :view-type="UserViewType.SENTREQUESTS" :users="sentRequests" />
+  <UsersView v-if="friends.length > 0" :view-type="UserViewType.FRIENDS" :users="friends" @refresh="getFriendships"/>
+  <UsersView v-if="requests.length > 0" :view-type="UserViewType.REQUESTS" :users="requests" @refresh="getFriendships"/>
+  <UsersView v-if="sentRequests.length > 0" :view-type="UserViewType.SENTREQUESTS" :users="sentRequests" @refresh="getFriendships"/>
 
   <div class="mt-3">
     <input v-model="newFriend" class="rounded-3xl pl-2">

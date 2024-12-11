@@ -15,6 +15,8 @@ const props = defineProps({
   }
 });
 
+const emit = defineEmits(['refresh']);
+
 const friendshipId = ref(0);
 const friendshipStatus = ref(FriendshipStatus.ACCEPTED);
 
@@ -37,7 +39,6 @@ const userBoxContainerClasses = computed(() =>
 function isGetFriendsResponse(user: GetFriendsResponse | GetUserResponse): user is GetFriendsResponse {
   friendshipId.value = user.friendship_id;
   friendshipStatus.value = user.status;
-  console.log("userView:" + friendshipId.value)
   return 'friend_id' in user;
 }
 
@@ -114,6 +115,7 @@ const mappedUsers: Array<GetUserResponse> = computed(() => {
           :friends-status="friendshipStatus"
           :friend-id="user.id"
           :view-type="props.viewType"
+          @refresh="emit('refresh');"
       />
       <!-- Placeholder for scrolling -->
       <div v-if="users.length > 3" class="px-1 py-4"/>

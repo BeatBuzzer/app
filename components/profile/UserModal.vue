@@ -31,14 +31,13 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(['close-modal', 'refresh']);
+
 const friend = ref()
 
 onMounted(async () => {
     friend.value = await getFriendInformation()
-    console.log(props.viewType);
 })
-
-const emit = defineEmits(['close-modal']);
 
 const icon_wrapper = 'bg-yellow-500 flex items-center rounded-full justify-center p-1 hover:cursor-pointer hover:bg-yellow-600'
 
@@ -63,6 +62,8 @@ async function handleFriendship(action: FriendshipAction) {
             console.error('Error message:', err.message);
         }
     }
+    console.log('emit: user-modal')
+    emit('refresh')
     if (action === FriendshipAction.ACCEPT) {
         console.log()
     }
@@ -82,7 +83,7 @@ async function getFriendInformation() {
         <div class="modal">
             <NuxtImg :src="profilePicture" class="rounded-full h-32 w-32 mb-3" />
             <p v-if="props.viewType === UserViewType.REQUESTS">Do you want to accept {{ name }}'s friend request?'</p>
-            <p v-else>Streak: {{  }}</p>
+            <p v-else>{{ name }}</p>
             <div v-if="props.viewType === UserViewType.REQUESTS" class="flex mt-5 gap-10">
                 <div :class="icon_wrapper" @click="handleFriendship(FriendshipAction.DECLINE)">
                     <Icon name="mdi:close" class="text-5xl text-red-600"  />
