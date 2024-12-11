@@ -15,7 +15,7 @@
       </div>
 
       <!-- Content -->
-      <div class="h-5/6 border rounded-3xl">
+      <div class="h-full border rounded-3xl">
         <slot name="content" />
       </div>
 
