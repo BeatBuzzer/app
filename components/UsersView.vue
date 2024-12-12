@@ -25,14 +25,14 @@ const default_avatar = ref('https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970
 // Computed Classes
 const containerClasses = computed(() => {
   const baseClasses = 'w-full bg-gray-200 px-3 pb-1 mt-auto rounded-3xl mb-3';
-  if (props.viewType === UserViewType.USERTURN) return `${baseClasses} h-full overflow-y-hidden overflow-x-auto flex-grow-0`;
+  if (props.viewType === UserViewType.USERTURN) return `${baseClasses} h-full overflow-y-hidden overflow-x-hidden flex-grow-0`;
   else return `${baseClasses} overflow-y-hidden`;
 });
 
 const userBoxContainerClasses = computed(() =>
     props.viewType === UserViewType.USERTURN
         ? 'flex flex-col space-y-1 md:space-y-3 h-full overflow-y-auto'
-        : 'flex gap-1 md:gap-3 mt-6 md:mt-9'
+        : 'flex gap-1 md:gap-3 md:mt-9 overflow-x-auto'
 );
 
 
@@ -73,16 +73,16 @@ const mappedUsers: Array<GetUserResponse> = computed(() => {
       <p v-if="viewType === UserViewType.USERTURN">
         Your Turn
       </p>
-      <p v-else-if="viewType === UserViewType.OPPONENTTURN" class="fixed">
+      <p v-else-if="viewType === UserViewType.OPPONENTTURN">
         Opponent's Turn
       </p>
-      <p v-else-if="viewType === UserViewType.FRIENDS" class="fixed">
+      <p v-else-if="viewType === UserViewType.FRIENDS">
         Friends
       </p>
-      <p v-else-if="viewType === UserViewType.REQUESTS" class="fixed">
+      <p v-else-if="viewType === UserViewType.REQUESTS">
         Friend Requests
       </p>
-      <p v-else-if="viewType === UserViewType.SENTREQUESTS" class="fixed">
+      <p v-else-if="viewType === UserViewType.SENTREQUESTS">
         Sent Friend Requests
       </p>
     </div>
