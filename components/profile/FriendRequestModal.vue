@@ -1,15 +1,4 @@
 <script setup lang="ts">
-import { FriendshipAction, FriendshipStatus } from '@/types/api/user.friends';
-import type { GetUserResponse } from '@/types/api/users';
-import { UserViewType } from '@/types/components/users.view';
-
-
-const props = defineProps({
-    name: {
-        type: String,
-        default: 'User'
-    },
-});
 
 const emit = defineEmits(['close-modal', 'refresh']);
 
@@ -39,10 +28,11 @@ const addFriend = async () => {
 <template>
     <div class="modal-overlay">
         <div class="modal">
-            <!--NuxtImg :src="profilePicture" class="rounded-full h-32 w-32 mb-3" /-->
+            <p class="text-3xl font-bold">New friend</p>
+            <p class="mb-3">Enter your friends name:</p>
             <input v-model="newFriend" class="rounded-3xl pl-2 border border-black">
             <p v-if="newFriendError" class="error-message">{{ newFriendError }}</p>
-            <button class="bg-yellow-500 hover:bg-yellow-600 text-red-600 my-2" @click="addFriend">Add Friend</button>
+            <button class="bg-yellow-500 hover:bg-yellow-600 text-red-600 my-4" @click="addFriend">Add Friend</button>
             <button class="bg-indigo-600 hover:bg-indigo-800 my-5 text-white" @click="$emit('close-modal')">Close</button>
         </div>
     </div>
@@ -70,7 +60,6 @@ const addFriend = async () => {
     height: 500px;
     width: 500px;
     margin-top: 10%;
-    padding: 60px 0;
     border-radius: 20px;
 }
 
