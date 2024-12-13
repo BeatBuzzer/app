@@ -32,7 +32,7 @@ const containerClasses = computed(() => {
 const userBoxContainerClasses = computed(() =>
     props.viewType === UserViewType.USERTURN
         ? 'flex flex-col space-y-1 md:space-y-3 h-full overflow-y-auto'
-        : 'flex gap-1 md:gap-3 md:mt-9 overflow-x-auto'
+        : 'flex gap-1 md:gap-3 overflow-x-auto'
 );
 
 
