@@ -7,7 +7,7 @@ import Friendlist from './Friendlist.vue';
 <template>
     <div>
         <div class="p-3">
-            <ProfileInformation class="py-8"/>
+            <ProfileInformation class="py-5"/>
             <Friendlist/>
         </div>
     </div>

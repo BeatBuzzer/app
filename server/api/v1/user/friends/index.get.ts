@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
         return {error: error.message};
     }
 
-    if(data === null) return [];
+    if (data === null) return [];
 
     // Hide spotify id if not visible
     // Yes this works even when the IDE marks it as an error
@@ -37,5 +37,25 @@ export default defineEventHandler(async (event) => {
         }
     });
 
-    return data;
+    const friends = data.map((friendship: GetFriendsResponse) => {
+        return {
+            friendship_id: friendship.friendship_id,
+            friend_id: friendship.friend_id,
+            created_at: friendship.created_at,
+            updated_at: friendship.updated_at,
+            status: friendship.status,
+            request_type: friendship.request_type,
+            user: {
+                id: friendship.friend_id,
+                avatar_url: friendship.friend_avatar,
+                username: friendship.friend_username,
+                spotify_id: friendship.friend_spotify_visibility ? friendship.friend_spotify_id : undefined,
+                spotify_visibility: friendship.friend_spotify_visibility,
+                daily_streak: undefined,
+                daily_streak_updated_at: undefined
+            }
+        }
+    });
+
+    return friends;
 });

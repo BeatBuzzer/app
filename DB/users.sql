@@ -17,23 +17,3 @@ ALTER TABLE users
                                          username ~ '^[a-zA-Z0-9_]+$');
                                          
 CREATE INDEX idx_username ON users(username);
-
-CREATE OR REPLACE FUNCTION get_profile_information(userId UUID)
-    RETURNS RECORD
-AS
-$$
-DECLARE
-    result RECORD;
-BEGIN
-    SELECT u.id                 AS user_id,
-           u.avatar_url         AS user_avatar,
-           u.username           AS username,
-           u.spotify_id         AS user_spotify_id,
-           u.spotify_visibility AS spotify_visibility
-    INTO result
-    FROM users u
-    WHERE u.id = userId;
-
-    RETURN result;
-END;
-$$ LANGUAGE plpgsql;
