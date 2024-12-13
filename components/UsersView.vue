@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {type GetFriendsResponse, FriendshipStatus} from "@/types/api/user.friends";
+import {FriendshipStatus, type GetFriendsResponse} from "@/types/api/user.friends";
 import {UserViewType} from "@/types/components/users.view";
 import type {GetUserResponse} from "@/types/api/users";
 
@@ -12,6 +12,14 @@ const props = defineProps({
   users: {
     type: Array as PropType<GetFriendsResponse[] | GetUserResponse[]>,
     required: true,
+  },
+  onAction: {
+    type: Function as PropType<() => void>,
+    required: false
+  },
+  actionLabel: {
+    type: String,
+    required: false
   }
 });
 
@@ -48,7 +56,7 @@ function isUserInformation(user: GetFriendsResponse | GetUserResponse): user is 
 
 // Map users conditionally depending on their type
 const mappedUsers: Array<GetUserResponse> = computed(() => {
-  if(!props.users || props.users.length < 1) return [];
+  if (!props.users || props.users.length < 1) return [];
 
   return props.users.map(user => {
     if (isGetFriendsResponse(user)) {
@@ -69,7 +77,7 @@ const mappedUsers: Array<GetUserResponse> = computed(() => {
                 ]"
   >
     <!-- Fixed Conditional Header -->
-    <div class="mb-1 text-xs md:text-base bg-gray-200 mt-2">
+    <div class="mb-1 text-xs md:text-base bg-gray-200 mt-2 flex justify-between">
       <p v-if="viewType === UserViewType.USERTURN">
         Your Turn
       </p>
@@ -85,6 +93,10 @@ const mappedUsers: Array<GetUserResponse> = computed(() => {
       <p v-else-if="viewType === UserViewType.SENTREQUESTS">
         Sent Friend Requests
       </p>
+      <button v-if="props.onAction && props.actionLabel" class="flex items-center text-gray-700" @click="props.onAction()">
+        <Icon name="mdi:plus"/>
+        {{ props.actionLabel }}
+      </button>
     </div>
 
     <!-- Scrollable User Boxes -->

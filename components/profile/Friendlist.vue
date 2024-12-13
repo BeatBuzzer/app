@@ -31,14 +31,14 @@ async function getFriendships() {
   <div class="flex flex-col">
     <!-- Buttons Section -->
     <div class="flex justify-center mb-3">
-      <button class="p-2 bg-blue-500 text-white rounded-3xl ml-2" @click="showModal = true">Add new friend</button>
+      <button v-if="friends.length < 1" class="p-2 bg-blue-500 text-white rounded-3xl ml-2" @click="showModal = true">Add new friend</button>
       <ProfileFriendRequestModal v-show="showModal" @close-modal="showModal = false" @refresh="getFriendships" />
     </div>
 
     <!-- Responsive Size Content Section -->
     <div class="overflow-y-auto" style="max-height: 43vh;">
       <UsersView v-if="friends.length > 0" :view-type="UserViewType.FRIENDS" :users="friends"
-        @refresh="getFriendships" />
+        action-label="Add Friend" :on-action="() => {showModal = true}" @refresh="getFriendships" />
       <UsersView v-if="requests.length > 0" :view-type="UserViewType.REQUESTS" :users="requests"
         @refresh="getFriendships" />
       <UsersView v-if="sentRequests.length > 0" :view-type="UserViewType.SENTREQUESTS" :users="sentRequests"

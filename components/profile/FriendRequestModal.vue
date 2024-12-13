@@ -26,7 +26,7 @@ const addFriend = async () => {
 </script>
 
 <template>
-    <div class="modal-overlay">
+    <div class="modal-overlay z-50">
         <div class="modal">
             <p class="text-3xl font-bold">New friend</p>
             <p class="mb-3">Enter your friends name:</p>
