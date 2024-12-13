@@ -31,7 +31,7 @@ async function getFriendships() {
   <div class="flex flex-col">
     <!-- Buttons Section -->
     <div class="flex justify-center mb-3">
-      <button class="p-2 bg-blue-500 text-white rounded-3xl ml-2" @click="showModal = true">Add new Friends</button>
+      <button class="p-2 bg-blue-500 text-white rounded-3xl ml-2" @click="showModal = true">Add new friend</button>
       <ProfileFriendRequestModal v-show="showModal" @close-modal="showModal = false" @refresh="getFriendships" />
     </div>
 

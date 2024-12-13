@@ -58,7 +58,7 @@ const addFriend = async () => {
     text-align: center;
     background-color: white;
     height: 500px;
-    width: 500px;
+    width: 40vb;
     margin-top: 10%;
     border-radius: 20px;
 }

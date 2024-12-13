@@ -86,13 +86,13 @@ async function getFriendInformation() {
                     <Icon name="mdi:check" class="text-5xl text-red-600" />
                 </div>
             </div>
-            <div v-else-if="props.viewType === UserViewType.FRIENDS" class="flex mt-5 gap-10">
+            <div v-else-if="props.viewType === UserViewType.FRIENDS" class="flex mt-16 gap-10">
                 <button class="bg-yellow-500 hover:bg-yellow-600 text-red-600 my-2" @click="handleFriendship(FriendshipAction.REMOVE)">Remove Friend</button>
             </div>
-            <div v-else-if="props.viewType === UserViewType.SENTREQUESTS" class="flex mt-5 gap-10">
+            <div v-else-if="props.viewType === UserViewType.SENTREQUESTS" class="flex mt-16 gap-10">
                 <button class="bg-yellow-500 hover:bg-yellow-600 text-red-600 my-2" @click="handleFriendship(FriendshipAction.DECLINE)">Cancel Request</button>
             </div>
-            <button class="bg-indigo-600 hover:bg-indigo-800 my-5 text-white" @click="$emit('close-modal')">Close</button>
+            <button class="bg-indigo-600 hover:bg-indigo-800 my-3 text-white" @click="$emit('close-modal')">Close</button>
         </div>
     </div>
 </template>
@@ -117,9 +117,8 @@ async function getFriendInformation() {
     text-align: center;
     background-color: white;
     height: 500px;
-    width: 500px;
+    width: 40vb;
     margin-top: 10%;
-    padding: 60px 0;
     border-radius: 20px;
 }
 
