@@ -20,7 +20,7 @@
 <template>
   <div
     :class="[
-      'bg-blue-600 rounded-3xl p-3 mr-3 mb-3 inline-block w-24 md:w-28'
+      'bg-blue-600 rounded-3xl p-3 mb-3 inline-block w-24 md:w-28'
     ]"
   >
     <!-- Playlist Cover -->

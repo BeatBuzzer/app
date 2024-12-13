@@ -46,12 +46,3 @@ async function getFriendships() {
     </div>
   </div>
 </template>
-
-
-<style scoped>
-.error-message {
-  color: red;
-  margin-top: 5px;
-  background-color: white;
-}
-</style>
