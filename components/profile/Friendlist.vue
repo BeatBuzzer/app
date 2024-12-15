@@ -18,7 +18,7 @@ onMounted(async () => {
 })
 
 async function getFriendships() {
-  $fetch<GetFriendsResponse[]>('http://localhost:3000/api/v1/user/friends')
+  $fetch<GetFriendsResponse[]>('/api/v1/user/friends')
     .then((data) => {
       requests.value = data.filter((item) => item.request_type == FriendshipType.INCOMING && item.status === FriendshipStatus.PENDING)
       friends.value = data.filter((item) => item.status === FriendshipStatus.ACCEPTED)
