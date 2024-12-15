@@ -1,6 +1,7 @@
 import {serverSupabaseServiceRole, serverSupabaseUser} from "#supabase/server";
 import {mapDatabaseRowsToGames, mapGameToActiveGame} from "~/server/utils/mapper/game-mapper";
-import {GameStatus, GetGameResponse} from "~/types/api/game";
+import type {GetGameResponse} from "~/types/api/game";
+import {GameStatus} from "~/types/api/game";
 import {fetchPreviewUrl} from "~/server/utils/spotify";
 
 export default defineEventHandler(async (event) => {
@@ -26,10 +27,13 @@ export default defineEventHandler(async (event) => {
             .filter(game => game.status === GameStatus.PLAYING && game.creator_id !== user.id)
             .map(async (game) => {
                 //  handle all the async preview URL fetches for this game
-                const updatedGame = { ...game };
+                const updatedGame = {...game};
                 await Promise.all(
                     updatedGame.rounds.map(async (round) => {
-                        round.correct_song.preview_url = await fetchPreviewUrl(round.correct_song.id);
+                        if (!round.correct_song.preview_url) {
+                            round.correct_song.preview_url = await fetchPreviewUrl(round.correct_song.id);
+                            client.from('songs').update({preview_url: round.correct_song.preview_url} as never).eq('spotify_song_id', round.correct_song.id);
+                        }
                     })
                 );
                 // Then map synchronously
