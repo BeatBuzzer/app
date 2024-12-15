@@ -46,7 +46,7 @@ function addPlaylist() {
         </div>
 
         <!-- Scrollable Playlist Boxes -->
-        <div class="flex flex-row flex-nowrap overflow-x-auto space-x-2">
+        <div class="flex flex-row flex-nowrap overflow-x-auto gap-2">
           <PlaylistsPlaylistBox v-for="item in playlists" :key="item.id" :name="item.name"
             v-bind="item.cover ? { cover: item.cover } : {}" class="flex-grow-0 flex-shrink-0" />
           <button @click="addPlaylist">

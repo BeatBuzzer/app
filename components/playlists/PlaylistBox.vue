@@ -15,6 +15,8 @@
       default: null
     }
     });
+
+    const showModal = ref(false);
 </script>
 
 <template>
@@ -22,6 +24,7 @@
     :class="[
       'bg-blue-600 rounded-3xl p-3 mb-3 inline-block w-24 md:w-28'
     ]"
+    @click="showModal = true"
   >
     <!-- Playlist Cover -->
     <div class="flex flex-col items-center justify-center">
@@ -44,6 +47,8 @@
       <p :class="['text-center text-sm md:text-base', props.name.length > 12 ? 'scrolling-text' : '']">{{ props.name }}</p>
     </div>
   </div>
+
+  <PlaylistsPlaylistModal  v-show="showModal" @close-modal="showModal = false"/>
 </template>
 
 <style scoped>
