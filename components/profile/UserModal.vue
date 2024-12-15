@@ -73,7 +73,7 @@ async function getFriendInformation() {
 </script>
 
 <template>
-    <div class="modal-overlay">
+    <div class="modal-overlay z-50">
         <div class="modal">
             <NuxtImg :src="profilePicture" class="rounded-full h-32 w-32 mb-3" />
             <p v-if="props.viewType === UserViewType.REQUESTS">Do you want to accept {{ name }}'s friend request?'</p>
