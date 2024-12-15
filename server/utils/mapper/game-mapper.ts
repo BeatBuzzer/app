@@ -1,8 +1,7 @@
 // Types from your original interfaces
 
-import type {Game, GameRound, Song} from "~/types/api/game";
+import type {ActiveGame, Game, GameRound, GameStatus, Song} from "~/types/api/game";
 import type {GetUserResponse} from "~/types/api/users";
-import {GameStatus} from "~/types/api/game";
 
 interface DatabaseGameRow {
     // Game basic info
@@ -56,7 +55,6 @@ const createSongFromRow = (
     id,
     name,
     artists: [{
-        id: 'placeholder', // You might want to adjust this based on your needs
         name: artist
     }],
     preview_url: previewUrl,
@@ -123,8 +121,8 @@ export const mapDatabaseRowsToGame = (rows: DatabaseGameRow[]): Game => {
             name: firstRow.playlist_name,
             cover: firstRow.playlist_cover
         },
-        opponents: [opponent],
-        songs: rounds,
+        players: [opponent],
+        rounds: rounds,
         created_at: firstRow.created_at
     };
 };
@@ -143,3 +141,24 @@ export const mapDatabaseRowsToGames = (rows: DatabaseGameRow[]): Game[] => {
     return Array.from(gameRows.values())
         .map(gameRows => mapDatabaseRowsToGame(gameRows));
 };
+
+export const mapGameToActiveGame = (game: Game): ActiveGame => {
+    const mappedRounds = game.rounds.map((round) => ({
+        round: round.round,
+        preview_url: round.correct_song.preview_url!,
+        options: [round.correct_song, ...round.wrong_songs].map(option => {
+            // Remove preview URL from all options to not identify the correct one
+            option.preview_url = null;
+            return option;
+        }).sort(() => Math.random() - 0.5)
+    }));
+
+    return {
+        game_id: game.game_id,
+        status: game.status,
+        creator_id: game.creator_id,
+        playlist: game.playlist,
+        players: game.players,
+        rounds: mappedRounds
+    };
+}

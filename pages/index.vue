@@ -41,8 +41,8 @@ function setLevelbar(newValue: number) {
       </template>
       <template #content>
         <div class="flex flex-col h-full p-3">
-          <UsersView :view-type="UserViewType.USERTURN" class="h-3/6" :users="games?.active.map(game=>game.opponents[0])"/>
-          <UsersView :view-type="UserViewType.OPPONENTTURN" class="h-2/6" :users="games?.waiting ? games?.waiting.map(game=>game.opponents[0]) : []"/>
+          <UsersView :view-type="UserViewType.USERTURN" class="h-3/6" :users="games?.active.map(game=>game.players[0])"/>
+          <UsersView :view-type="UserViewType.OPPONENTTURN" class="h-2/6" :users="games?.waiting ? games?.waiting.map(game=>game.players[0]) : []"/>
           <HomeControlsGameButtons class="h-1/6"/>
         </div>
       </template>

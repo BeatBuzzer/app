@@ -2,8 +2,11 @@ import {z} from "zod";
 import {spotifyIDRegex} from "~/server/utils/data-validation";
 import {serverSupabaseServiceRole, serverSupabaseUser} from "#supabase/server";
 import {fetchPreviewUrl, getSongsFromPlaylist} from "~/server/utils/spotify";
-import type {GameRound, Song, SpotifySong} from "~/types/api/game";
+import type {ActiveGame, ActiveGameRound, GameInitResponse, GameRound, Song, SpotifySong} from "~/types/api/game";
+import {GameStatus} from "~/types/api/game";
 import type {SupabaseClient} from "@supabase/supabase-js";
+import type {Playlist} from "~/types/api/playlist";
+import type {PostgrestError} from "@supabase/postgrest-js";
 
 const GameInitSchema = z.object({
     playlist_id: z.string().regex(spotifyIDRegex),
@@ -70,9 +73,30 @@ export default defineEventHandler(async (event) => {
         return {error: 'unauthenticated'};
     }
 
-    if(result.data.opponent_id === user.id) {
+    if (result.data.opponent_id === user.id) {
         setResponseStatus(event, 400);
         return {error: 'You cannot play against yourself'};
+    }
+
+    const client = serverSupabaseServiceRole(event);
+    const {data: playlist, error: playlistError}: {
+        data: Playlist | null,
+        error: PostgrestError | null
+    } = await client.from('playlists').select().eq('id', result.data.playlist_id).single();
+
+    if (playlistError) {
+        setResponseStatus(event, 500);
+        return {error: playlistError.message};
+    }
+
+    if (!playlist) {
+        setResponseStatus(event, 400);
+        return {error: 'Playlist not found'};
+    }
+
+    if (!playlist.enabled) {
+        setResponseStatus(event, 400);
+        return {error: 'Playlist is disabled'};
     }
 
     // Determine songs
@@ -90,7 +114,6 @@ export default defineEventHandler(async (event) => {
     }
 
     const songs = spotifySongs.items.map((item: SpotifySong) => item.track).filter((track: Song) => track.is_playable);
-    const client = serverSupabaseServiceRole(event);
 
     try {
         await saveSongsToDatabase(client, songs);
@@ -107,22 +130,39 @@ export default defineEventHandler(async (event) => {
             }))
         }
 
-        const {error} = await client.rpc('init_game', init_game_params as never).select().single();
+        const {data: initData, error: error}: {
+            data: GameInitResponse | null,
+            error: PostgrestError | null
+        } = await client.rpc('init_game', init_game_params as never).select();
 
         if (error) {
             setResponseStatus(event, 500);
             return {error: error.message};
         }
 
-        const response = {
-            rounds: gameRounds.map((round) => ({
-                round: round.round,
-                preview_url: round.correct_song.preview_url!,
-                options: [round.correct_song, ...round.wrong_songs].sort(() => Math.random() - 0.5)
-            }))
+        const mappedGameRounds: ActiveGameRound[] = gameRounds.map((round) => ({
+            round: round.round,
+            preview_url: round.correct_song.preview_url!,
+            options: [round.correct_song, ...round.wrong_songs].sort(() => Math.random() - 0.5)
+        }));
+
+        const game: ActiveGame = {
+            game_id: initData!.game_id,
+            status: GameStatus.PLAYING,
+            creator_id: user.id,
+            playlist: {
+                id: result.data.playlist_id,
+                name: playlist.name,
+                cover: playlist.cover
+            },
+            players: [
+                {id: user.id},
+                {id: result.data.opponent_id}
+            ], // TODO: Fetch opponent data and fix this
+            rounds: mappedGameRounds
         }
 
-        return response;
+        return game;
     } catch (error) {
         setResponseStatus(event, 500);
         return {error: error instanceof Error ? error.message : 'An unknown error occurred'};
