@@ -44,7 +44,7 @@ const showModal = ref(false);
     </div>
   </div>
 
-  <PlaylistsPlaylistModal v-show="showModal" :playlist-id="props.playlistId" @close-modal="showModal = false" />
+  <PlaylistsPlaylistModal v-show="showModal" :playlist-id="props.playlistId" :playlist-name="props.name" :playlist-cover="props.cover.toString()" @close-modal="showModal = false" />
 </template>
 
 <style scoped>
