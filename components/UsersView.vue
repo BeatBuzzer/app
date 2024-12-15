@@ -79,10 +79,10 @@ const mappedUsers: Array<GetUserResponse> = computed(() => {
     <!-- Fixed Conditional Header -->
     <div class="mb-1 text-xs md:text-base bg-gray-200 mt-2 flex justify-between">
       <p v-if="viewType === UserViewType.USERTURN">
-        Your Turn
+        Your Turn(s)
       </p>
       <p v-else-if="viewType === UserViewType.OPPONENTTURN">
-        Opponent's Turn
+        Opponent's Turn(s)
       </p>
       <p v-else-if="viewType === UserViewType.FRIENDS">
         Friends
