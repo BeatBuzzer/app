@@ -133,7 +133,7 @@ export default defineEventHandler(async (event) => {
         const {data: initData, error: error}: {
             data: GameInitResponse | null,
             error: PostgrestError | null
-        } = await client.rpc('init_game', init_game_params as never).select();
+        } = await client.rpc('init_game', init_game_params as never).select().single();
 
         if (error) {
             setResponseStatus(event, 500);

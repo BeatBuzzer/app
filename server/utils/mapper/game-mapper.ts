@@ -1,7 +1,6 @@
 // Types from your original interfaces
 
-import type {ActiveGame, Game, GameRound, Song} from "~/types/api/game";
-import {GameStatus} from "~/types/api/game";
+import type {ActiveGame, Game, GameRound, Song,GameStatus} from "~/types/api/game";
 import type {GetUserResponse} from "~/types/api/users";
 
 interface DatabaseGameRow {
