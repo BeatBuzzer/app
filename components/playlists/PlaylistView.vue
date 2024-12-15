@@ -47,10 +47,10 @@ function addPlaylist() {
 
         <!-- Scrollable Playlist Boxes -->
         <div class="flex flex-row flex-nowrap overflow-x-auto gap-2">
-          <PlaylistsPlaylistBox v-for="item in playlists" :key="item.id" :name="item.name"
+          <PlaylistsPlaylistBox v-for="item in playlists" :key="item.id" :playlist-id="item.spotifyId" :name="item.name"
             v-bind="item.cover ? { cover: item.cover } : {}" class="flex-grow-0 flex-shrink-0" />
           <button @click="addPlaylist">
-            <PlaylistsPlaylistBox name="Add Playlist" control-element="mdi:plus" />
+            <PlaylistsPlaylistBox playlist-id="button" name="Add Playlist" control-element="mdi:plus" />
           </button>
         </div>
       </div>

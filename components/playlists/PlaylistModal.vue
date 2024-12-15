@@ -1,12 +1,20 @@
 <script setup lang="ts">
+import { followPlaylist } from '@/server/utils/spotify';
+
+const props = defineProps({
+    playlistId: {
+        type: String,
+        required: true
+    }
+}) 
 
 const emit = defineEmits(['close-modal']);
-
 </script>
 
 <template>
     <div class="modal-overlay z-50">
         <div class="modal">
+            <button @click="followPlaylist(props.playlistId)">{{ props.playlistId }}</button>
             <button class="bg-indigo-600 hover:bg-indigo-800 my-5 text-white" @click="emit('close-modal')">Close</button>
         </div>
     </div>
