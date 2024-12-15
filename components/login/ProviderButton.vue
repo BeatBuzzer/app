@@ -20,6 +20,7 @@ async function signIn() {
     provider: props.provider,
     options: {
       redirectTo: `http://${window.location.host}/confirm`,
+      scopes: `playlist-modify-public playlist-modify-private`
     },
   });
   if (error) {
