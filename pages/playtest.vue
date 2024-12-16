@@ -65,7 +65,8 @@ const clickOption = async (option: Song) => {
   // mark clicked option
   const el = document.getElementById(option.id);
   if (!el) return;
-  el.classList.add('bg-blue-400');
+  el.classList.add('bg-purple-300');
+  el.classList.remove('bg-white');
 
   // async fetch if the guess is correct
   const response = $fetch<PlayGameResponse>(`/api/v1/game/${game.value!.game_id}/play`, {
@@ -87,7 +88,7 @@ const clickOption = async (option: Song) => {
   score.value = data.score;
 
 
-  el.classList.remove('bg-blue-400');
+  el.classList.remove('bg-purple-300');
   if (data.correct_guess) {
     el.classList.add('bg-green-400');
   } else {
@@ -100,6 +101,7 @@ const clickOption = async (option: Song) => {
   await new Promise(resolve => setTimeout(resolve, 175));
 
   el.classList.remove('bg-green-400', 'bg-red-400');
+  el.classList.add('bg-white');
 
   nextRound();
 }
@@ -126,21 +128,27 @@ async function newGame() {
         <button v-if="!game" @click="newGame()">New Game</button>
       </template>
       <template #round-indicator>
-        <div>
-          <div class="text-white text-center"> Round:</div>
-          <div class="text-white text-center">🔴🔴⭕⭕⭕</div>
-          <div class="text-white text-center" v-text="score"/>
-          <div v-if="scoreAddition" class="text-white text-center"> +{{scoreAddition}}</div>
+        <div class="flex justify-center gap-2 p-4">
+        <span
+            v-for="roundNum in 5"
+            :key="roundNum"
+            class="text-2xl"
+        >
+          {{ roundIdx >= roundNum ? '🔴' : '⭕' }}
+        </span>
         </div>
-
       </template>
+
       <template #select-options>
-        <div v-if="game">
-          <div class="grid grid-cols-2 grid-rows-2 gap-4 text-xl text-balance">
-            <button v-for="option in round!.options" :id="option.id" :key="option.id"
-                    class="container px-5 py-2.5 rounded bg-amber-50" @click="clickOption(option)"
-                    v-text="option.name"/>
-          </div>
+        <div class="grid grid-cols-2 grid-rows-2 gap-4 w-full px-4">
+          <button
+              v-for="option in round?.options"
+              :key="option.id"
+              :id="option.id"
+              class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-4 px-6 border border-gray-400 rounded shadow-sm transition-colors duration-200 min-h-[100px] h-full flex items-center justify-center text-center"
+              @click="clickOption(option)"
+              v-text="option.name"
+          />
         </div>
       </template>
     </GameSelectLayout>
