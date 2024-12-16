@@ -44,7 +44,7 @@ async function getPlaylists() {
   <div class="flex flex-col">
     <div class="overflow-y-auto" style="max-height: 85vh;">
 
-      <PlaylistsPlaylistContainer v-for="categoryEl in categories" :key="categoryEl.category" :genre="categoryEl.category" :playlists="playlists" :categories="categories"/>
+      <PlaylistsPlaylistContainer v-for="categoryEl in categories" :key="categoryEl.category" :genre="categoryEl.category" :playlist-ids="categoryEl.ids" :playlists="playlists" :categories="categories"/>
 
     </div>
   </div>
