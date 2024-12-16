@@ -7,7 +7,7 @@
     <!-- Wrapper div für die Breiten-Kontrolle -->
     <div class="w-full xl:w-1/2 2xl:w-1/4 flex flex-col h-full">
       <!-- Content -->
-      <div class="flex-1 border rounded-3xl">
+      <div class="flex-1 p-3">
           <slot name="content"/>
       </div>
 

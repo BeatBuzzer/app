@@ -18,8 +18,6 @@ function setLevelbar(newValue: number) {
     levelbar.style.width = newValue + "%"
   }
 }
-
-
 </script>
 
 <template>

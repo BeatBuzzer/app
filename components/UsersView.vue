@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {GetFriendsResponse} from "@/types/api/user.friends";
+import {FriendshipStatus, type GetFriendsResponse} from "@/types/api/user.friends";
 import {UserViewType} from "@/types/components/users.view";
 import type {GetUserResponse} from "@/types/api/users";
 
@@ -12,27 +12,41 @@ const props = defineProps({
   users: {
     type: Array as PropType<GetFriendsResponse[] | GetUserResponse[]>,
     required: true,
+  },
+  onAction: {
+    type: Function as PropType<() => void>,
+    required: false
+  },
+  actionLabel: {
+    type: String,
+    required: false
   }
 });
+
+const emit = defineEmits(['refresh']);
+
+const friendshipId = ref(0);
+const friendshipStatus = ref(FriendshipStatus.ACCEPTED);
 
 const default_avatar = ref('https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg');
 
 // Computed Classes
 const containerClasses = computed(() => {
   const baseClasses = 'w-full bg-gray-200 px-3 pb-1 mt-auto rounded-3xl mb-3';
-  if (props.viewType === UserViewType.USERTURN) return `${baseClasses} h-full overflow-y-hidden overflow-x-auto flex-grow-0`;
-  if (props.viewType === UserViewType.OPPONENTTURN || props.viewType === UserViewType.FRIENDS) return `${baseClasses} overflow-y-hidden`;
-  return '';
+  if (props.viewType === UserViewType.USERTURN) return `${baseClasses} h-full overflow-y-hidden overflow-x-hidden flex-grow-0`;
+  else return `${baseClasses} overflow-y-hidden`;
 });
 
 const userBoxContainerClasses = computed(() =>
     props.viewType === UserViewType.USERTURN
         ? 'flex flex-col space-y-1 md:space-y-3 h-full overflow-y-auto'
-        : 'flex gap-1 md:gap-3 mt-6 md:mt-9'
+        : 'flex gap-1 md:gap-3 overflow-x-auto'
 );
 
 
 function isGetFriendsResponse(user: GetFriendsResponse | GetUserResponse): user is GetFriendsResponse {
+  friendshipId.value = user.friendship_id;
+  friendshipStatus.value = user.status;
   return 'friend_id' in user;
 }
 
@@ -42,7 +56,7 @@ function isUserInformation(user: GetFriendsResponse | GetUserResponse): user is 
 
 // Map users conditionally depending on their type
 const mappedUsers: Array<GetUserResponse> = computed(() => {
-  if(!props.users || props.users.length < 1) return [];
+  if (!props.users || props.users.length < 1) return [];
 
   return props.users.map(user => {
     if (isGetFriendsResponse(user)) {
@@ -59,20 +73,30 @@ const mappedUsers: Array<GetUserResponse> = computed(() => {
   <div
       :class="[
                     containerClasses,
-                    ((viewType === UserViewType.FRIENDS || viewType === UserViewType.OPPONENTTURN) && users.length > 3) ? 'pr-0' : ''
+                    ((viewType != UserViewType.USERTURN) && users.length > 3) ? 'pr-0' : ''
                 ]"
   >
     <!-- Fixed Conditional Header -->
-    <div class="mb-1 text-xs md:text-base bg-gray-200 mt-2">
+    <div class="mb-1 text-xs md:text-base bg-gray-200 mt-2 flex justify-between">
       <p v-if="viewType === UserViewType.USERTURN">
-        Your Turn
+        Your Turn(s)
       </p>
-      <p v-else-if="viewType === UserViewType.OPPONENTTURN" class="fixed">
-        Opponent's Turn
+      <p v-else-if="viewType === UserViewType.OPPONENTTURN">
+        Opponent's Turn(s)
       </p>
-      <p v-else-if="viewType === UserViewType.FRIENDS" class="fixed">
+      <p v-else-if="viewType === UserViewType.FRIENDS">
         Friends
       </p>
+      <p v-else-if="viewType === UserViewType.REQUESTS">
+        Friend Requests
+      </p>
+      <p v-else-if="viewType === UserViewType.SENTREQUESTS">
+        Sent Friend Requests
+      </p>
+      <button v-if="props.onAction && props.actionLabel" class="flex items-center text-gray-700" @click="props.onAction()">
+        <Icon name="mdi:plus"/>
+        {{ props.actionLabel }}
+      </button>
     </div>
 
     <!-- Scrollable User Boxes -->
@@ -87,17 +111,23 @@ const mappedUsers: Array<GetUserResponse> = computed(() => {
           :name="user.username"
           :user-turn="viewType === UserViewType.USERTURN"
           :class="[
-                    (viewType === UserViewType.FRIENDS || viewType === UserViewType.OPPONENTTURN) 
+                    (viewType != UserViewType.USERTURN) 
                         ? users.length === 3 ? 'w-1/3' 
                         : users.length === 2 ? 'w-1/2' 
                         : 'w-full'
                         : ''
                 ]"
-          :style="(viewType === UserViewType.FRIENDS || viewType === UserViewType.OPPONENTTURN)
+          :style="(viewType != UserViewType.USERTURN)
                     ? users.length > 3 
                         ? { width: 'calc(33.33% - .98rem)', flexShrink: 0 } 
                         : {} 
                     : {}"
+          :friend-request="viewType === UserViewType.REQUESTS"
+          :friendship-id="friendshipId"
+          :friends-status="friendshipStatus"
+          :friend-id="user.id"
+          :view-type="props.viewType"
+          @refresh="emit('refresh');"
       />
       <!-- Placeholder for scrolling -->
       <div v-if="users.length > 3" class="px-1 py-4"/>
