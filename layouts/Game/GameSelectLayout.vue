@@ -9,10 +9,10 @@
       <div class="basis-full">
         <slot name="scoreboard"/>
       </div>
-      <div class="basis-full">
+      <div class="flex flex-col">
         <slot name="round-indicator"/>
       </div>
-      <div class="flex basis-full justify-center items-end mb-10 h-full">
+      <div class="flex basis-full justify-center items-end mb-28 h-full">
         <slot name="select-options"/>
       </div>
     </div>

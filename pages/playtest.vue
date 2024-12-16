@@ -8,11 +8,13 @@ const round = computed(() => game.value ? game.value.rounds[roundIdx.value - 1] 
 const time = ref(0);
 const roundIdx = ref(1)
 
+const buttonActiveColor = 'bg-indigo-500';
+
 const score = ref(0);
 const scoreAddition = ref(0);
 
 const audio = ref<HTMLAudioElement | null>(null);
-const volume = ref(0.1);
+const volume = ref(0.03);
 
 onMounted(async () => {
   await nextTick();
@@ -65,7 +67,7 @@ const clickOption = async (option: Song) => {
   // mark clicked option
   const el = document.getElementById(option.id);
   if (!el) return;
-  el.classList.add('bg-purple-300');
+  el.classList.add(buttonActiveColor);
   el.classList.remove('bg-white');
 
   // async fetch if the guess is correct
@@ -88,7 +90,7 @@ const clickOption = async (option: Song) => {
   score.value = data.score;
 
 
-  el.classList.remove('bg-purple-300');
+  el.classList.remove(buttonActiveColor);
   if (data.correct_guess) {
     el.classList.add('bg-green-400');
   } else {
@@ -128,7 +130,7 @@ async function newGame() {
         <button v-if="!game" @click="newGame()">New Game</button>
       </template>
       <template #round-indicator>
-        <div class="flex justify-center gap-2 p-4">
+        <div v-if="game" class="flex justify-center gap-2 p-4">
         <span
             v-for="roundNum in 5"
             :key="roundNum"
@@ -140,12 +142,12 @@ async function newGame() {
       </template>
 
       <template #select-options>
-        <div class="grid grid-cols-2 grid-rows-2 gap-4 w-full px-4">
+        <div class="grid grid-cols-1 gap-4 w-full px-4">
           <button
               v-for="option in round?.options"
               :key="option.id"
               :id="option.id"
-              class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-4 px-6 border border-gray-400 rounded shadow-sm transition-colors duration-200 min-h-[100px] h-full flex items-center justify-center text-center"
+              class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-4 px-6 border border-gray-700 rounded shadow-sm transition-colors duration-200 min-h-[75px] h-full flex items-center justify-center text-center"
               @click="clickOption(option)"
               v-text="option.name"
           />
