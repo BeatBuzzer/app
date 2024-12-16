@@ -15,10 +15,10 @@ const PlayGameSchema = z.object({
 // Calculate score based on time to guess
 // Upper bound is 500, lower bound is 18 (max time to guess is 30s)
 // Perfect score for guessing lower than 0.175 s
-const time_ceiling_for_perfect_score = Math.abs(0.175);
+const time_ceiling_for_perfect_score = Math.abs(0.4);
 
 function calculateScore(time_to_guess: number): number {
-    const reward = Math.floor(500 * Math.exp((-0.11 * (time_to_guess - time_ceiling_for_perfect_score))));
+    const reward = Math.floor(500 * Math.exp((-0.19 * (time_to_guess - time_ceiling_for_perfect_score))));
     if (reward > 500) return 500;
     return reward;
 }

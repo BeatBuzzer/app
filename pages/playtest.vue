@@ -112,6 +112,7 @@ async function newGame() {
       opponent_id: '9da97502-5363-4964-ae80-c242a053e810',
     }),
   });
+  score.value = 0;
   playAudio(data.rounds[0].preview_url);
   game.value = data;
 }
@@ -125,16 +126,17 @@ async function newGame() {
         <button v-if="!game" @click="newGame()">New Game</button>
       </template>
       <template #round-indicator>
-        <div class="text-white text-center"> Round:</div>
-        <div class="text-white text-center">🔴🔴⭕⭕⭕</div>
-        <div class="text-white text-center" v-text="score"/>
-        <div v-if="scoreAddition" class="text-white text-center"> +{{scoreAddition}}</div>
+        <div>
+          <div class="text-white text-center"> Round:</div>
+          <div class="text-white text-center">🔴🔴⭕⭕⭕</div>
+          <div class="text-white text-center" v-text="score"/>
+          <div v-if="scoreAddition" class="text-white text-center"> +{{scoreAddition}}</div>
+        </div>
+
       </template>
       <template #select-options>
-        <br>
-        <div class="text-white text-center">Select:</div>
-        <div v-if="game" class="flex  justify-center">
-          <div class="grid grid-cols-2 grid-rows-2 gap-4 text-2xl">
+        <div v-if="game">
+          <div class="grid grid-cols-2 grid-rows-2 gap-4 text-xl text-balance">
             <button v-for="option in round!.options" :id="option.id" :key="option.id"
                     class="container px-5 py-2.5 rounded bg-amber-50" @click="clickOption(option)"
                     v-text="option.name"/>
