@@ -9,7 +9,7 @@ import type {Playlist} from "~/types/api/playlist";
 import type {PostgrestError} from "@supabase/postgrest-js";
 
 const GameInitSchema = z.object({
-    playlist_id: z.string().regex(spotifyIDRegex),
+    playlist_id: z.string().regex(spotifyIDRegex, {message: 'Invalid Spotify ID'}),
     opponent_id: z.string().uuid()
 }).readonly()
 

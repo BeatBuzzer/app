@@ -68,7 +68,7 @@ export interface GameStats {
 }
 
 export interface GameStatsContent {
-    song_order: number;
+    round_number: number;
     song: Song;
     time_to_guess: number;
     correct_guess: boolean;

@@ -46,6 +46,42 @@ interface DatabaseGameRow {
     wrong_song_3_preview_url: string | null;
 }
 
+export interface GetGameDBRow {
+    game_id: number;
+    status: GameStatus;
+    playlist_id: string;
+    created_at: string;
+    player_id: string;
+    is_creator: boolean;
+    has_played: boolean;
+    round_number: number;
+    correct_song_id: string;
+}
+
+interface GameDBPlayer {
+    player_id: string;
+    is_creator: boolean;
+    has_played: boolean;
+    score?: number;
+}
+
+interface GameDBRound {
+    round_number: number;
+    correct_song_id: string;
+    time_to_guess?: number;
+    correct_guess?: boolean;
+    guess?: string;
+}
+
+export interface GameDB {
+    game_id: number;
+    status: GameStatus;
+    playlist_id: string;
+    created_at: string;
+    players: GameDBPlayer[];
+    rounds: GameDBRound[];
+}
+
 const createSongFromRow = (
     id: string,
     name: string,
@@ -160,5 +196,25 @@ export const mapGameToActiveGame = (game: Game): ActiveGame => {
         playlist: game.playlist,
         players: game.players,
         rounds: mappedRounds
+    };
+}
+
+export function mapGameRows(rows: GetGameDBRow[]): GameDB {
+    const firstRow = rows[0];
+
+    return {
+        game_id: firstRow.game_id,
+        status: firstRow.status,
+        playlist_id: firstRow.playlist_id,
+        created_at: firstRow.created_at,
+        players: [...new Set(rows.map(row => row.player_id))].map(playerId => ({
+            player_id: playerId,
+            is_creator: rows.find(r => r.player_id === playerId)!.is_creator,
+            has_played: rows.find(r => r.player_id === playerId)!.has_played
+        })),
+        rounds: [...new Set(rows.map(row => row.round_number))].map(roundNum => ({
+            round_number: roundNum,
+            correct_song_id: rows.find(r => r.round_number === roundNum)!.correct_song_id
+        }))
     };
 }

@@ -241,3 +241,100 @@ BEGIN
         ORDER BY g.created_at DESC, gr.song_order ASC;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Get a game by its ID
+-- Returns multiple rows, one for each player in the game
+CREATE OR REPLACE FUNCTION get_game(p_game_id INTEGER)
+    RETURNS TABLE
+            (
+                -- Game info
+                game_id         INTEGER,
+                status          game_status,
+                playlist_id     TEXT,
+                created_at      TIMESTAMPTZ,
+                -- Players array
+                player_id       UUID,
+                is_creator      BOOLEAN,
+                has_played      BOOLEAN,
+                -- Round info
+                round_number    INTEGER,
+                correct_song_id TEXT
+            )
+AS
+$$
+BEGIN
+    RETURN QUERY
+        SELECT g.game_id,
+               g.status,
+               g.playlist_id,
+               g.created_at,
+               gp.user_id,
+               gp.is_creator,
+                EXISTS(SELECT 1
+                         FROM game_player_song_stats gpss
+                         WHERE gpss.game_id = g.game_id
+                            AND gpss.user_id = gp.user_id) AS has_played,
+               gr.song_order,
+               gr.song_id as correct_song_id
+        FROM games g
+                 -- Join to get all players
+                 JOIN game_players gp
+                      ON g.game_id = gp.game_id
+            -- Join to get rounds
+                 JOIN game_rounds gr
+                      ON g.game_id = gr.game_id
+        WHERE g.game_id = p_game_id
+        ORDER BY gr.song_order;
+END;
+$$ LANGUAGE plpgsql;
+
+-- A player finished his rounds
+CREATE OR REPLACE FUNCTION handle_player_finish(
+    p_game_id INTEGER,
+    p_user_id UUID,
+    p_song_orders INTEGER[],
+    p_times_to_guess INTEGER[],
+    p_correct_guesses BOOLEAN[],
+    p_guessed_song_ids TEXT[],
+    p_score INTEGER
+) RETURNS VOID AS
+$$
+DECLARE
+    i INTEGER;
+BEGIN
+    -- Insert all stats
+    FOR i IN 1..array_length(p_song_orders, 1)
+        LOOP
+            INSERT INTO game_player_song_stats (game_id,
+                                                user_id,
+                                                song_order,
+                                                time_to_guess,
+                                                correct_guess,
+                                                guessed_song_id)
+            VALUES (p_game_id,
+                    p_user_id,
+                    p_song_orders[i],
+                    p_times_to_guess[i],
+                    p_correct_guesses[i],
+                    p_guessed_song_ids[i]);
+        END LOOP;
+
+    -- Update player's score with provided score
+    UPDATE game_players
+    SET score = p_score
+    WHERE game_id = p_game_id
+      AND user_id = p_user_id;
+
+    -- Check if all players have finished and update game status if needed
+    UPDATE games
+    SET status = 'finished'
+    WHERE game_id = p_game_id
+      AND NOT EXISTS (SELECT 1
+                      FROM game_players gp
+                               LEFT JOIN (SELECT DISTINCT user_id
+                                          FROM game_player_song_stats
+                                          WHERE game_id = p_game_id) gpss ON gp.user_id = gpss.user_id
+                      WHERE gp.game_id = p_game_id
+                        AND gpss.user_id IS NULL);
+END;
+$$ LANGUAGE plpgsql;
