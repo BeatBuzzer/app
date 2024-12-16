@@ -1,5 +1,5 @@
 <script setup lang="ts">
-//import { useSpotify } from '@/composables/useSpotify';
+import useSpotify from '@/composables/useSpotify';
 
 const props = defineProps({
     playlistId: {
@@ -20,7 +20,6 @@ const emit = defineEmits(['close-modal']);
 
 const session = useSupabaseSession();
 const token = ref('');
-const playlistStatus = ref(false);
 
 onMounted(async () => {
   if (session.value) {
@@ -28,70 +27,10 @@ onMounted(async () => {
   }
 });
 
+console.log(props.playlistId)
+const { playlistStatus, getPlaylistStatus, followPlaylist, unfollowPlaylist } = useSpotify(token, props.playlistId);
+
 onUpdated(async () => { playlistStatus.value = await getPlaylistStatus()});
-
-async function getPlaylistStatus() {
-    try {
-        const res = await fetch(`https://api.spotify.com/v1/playlists/${props.playlistId}/followers/contains`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token.value}`,
-            },
-        });
-
-        // Ensure the response is OK
-        if (!res.ok) {
-            console.error(`Error: ${res.status} - ${res.statusText}`);
-            return false;
-        }
-
-        // Parse the response JSON
-        const data = await res.json();
-
-        // Log the response data
-        return data[0];
-    } catch (error) {
-        console.error('Failed to get playlist status:', error);
-    }
-}
-
-async function followPlaylist(): Promise<void> {
-    const res = await fetch(`https://api.spotify.com/v1/playlists/${props.playlistId}/followers`, {
-        method: 'PUT', // Specify the HTTP method as PUT
-        headers: {
-            'Authorization': `Bearer ${token.value}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({public: true}) // An empty JSON body
-    });
-    playlistStatus.value = await getPlaylistStatus()
-
-    if (res.status === 200) {
-        console.log('Successfully followed the playlist.');
-    } else {
-        const errorData = await res.json();
-        console.error('Failed to follow playlist:', errorData);
-    }
-}
-
-async function unfollowPlaylist(): Promise<void> {
-    const res = await fetch(`https://api.spotify.com/v1/playlists/${props.playlistId}/followers`, {
-        method: 'DELETE', // Specify the HTTP method as PUT
-        headers: {
-            'Authorization': `Bearer ${token.value}`,
-            'Content-Type': 'application/json'
-        },
-    });
-    playlistStatus.value = await getPlaylistStatus()
-
-    if (res.status === 200) {
-        console.log('Successfully unfollowed the playlist.');
-    } else {
-        const errorData = await res.json();
-        console.error('Failed to unfollow playlist:', errorData);
-    }
-}
-
 
 </script>
 
