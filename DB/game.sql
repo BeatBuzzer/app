@@ -127,7 +127,7 @@ BEGIN
     WHERE game_players.game_id = new_game_id
       AND game_players.user_id = player_ids[1];
 
-    -- Insert songs (assuming the songs already exist in the songs table)
+    -- Insert songs with preserved order
     INSERT INTO game_rounds (game_id,
                              song_order,
                              song_id,
@@ -135,16 +135,16 @@ BEGIN
                              wrong_option_2,
                              wrong_option_3)
     SELECT new_game_id,
-           row_number() OVER (ORDER BY song.spotify_song_id), -- Added ORDER BY
+           ordinality, -- This preserves the array order
            song.spotify_song_id,
            song.wrong_option_1,
            song.wrong_option_2,
            song.wrong_option_3
-    FROM unnest(song_data) song;
+    FROM unnest(song_data) WITH ORDINALITY as song;
 
+    -- Return the new game info
     RETURN QUERY
-        SELECT new_game_id AS game_id, new_created_at AS created_at;
-
+        SELECT new_game_id, new_created_at;
 END;
 $$ LANGUAGE plpgsql;
 

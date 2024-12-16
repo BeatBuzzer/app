@@ -122,7 +122,7 @@ export default defineEventHandler(async (event) => {
         const init_game_params = {
             playlist_id_input: result.data.playlist_id,
             player_ids: [user.id, result.data.opponent_id],
-            song_data: gameRounds.map(round => ({
+            song_data: gameRounds.sort((gr)=> gr.round).map(round => ({
                 spotify_song_id: round.correct_song.id,
                 wrong_option_1: round.wrong_songs[0].id,
                 wrong_option_2: round.wrong_songs[1].id,
@@ -143,7 +143,15 @@ export default defineEventHandler(async (event) => {
         const mappedGameRounds: ActiveGameRound[] = gameRounds.map((round) => ({
             round: round.round,
             preview_url: round.correct_song.preview_url!,
-            options: [round.correct_song, ...round.wrong_songs].sort(() => Math.random() - 0.5)
+            options: [round.correct_song, ...round.wrong_songs]
+                .sort(() => Math.random() - 0.5)
+                .map((song) => ({
+                    id: song.id,
+                    name: song.name,
+                    artists: [song.artists[0].name],
+                    is_playable: song.is_playable,
+                    preview_url: null
+                }))
         }));
 
         const game: ActiveGame = {
