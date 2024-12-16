@@ -90,3 +90,15 @@ export interface GetGameResponse {
     waiting: Game[];
     past: Game[];
 }
+
+export interface PlayGameRequest {
+    round: number;
+    guess: string;
+    time: number;
+}
+
+export interface PlayGameResponse {
+    correct_guess: boolean;
+    score: number;
+    was_last_round: boolean;
+}

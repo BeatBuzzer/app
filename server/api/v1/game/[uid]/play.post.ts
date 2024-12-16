@@ -12,8 +12,15 @@ const PlayGameSchema = z.object({
 }).readonly()
 
 
+// Calculate score based on time to guess
+// Upper bound is 500, lower bound is 18 (max time to guess is 30s)
+// Perfect score for guessing lower than 0.175 s
+const time_ceiling_for_perfect_score = Math.abs(0.175);
+
 function calculateScore(time_to_guess: number): number {
-    return Math.floor((15 - time_to_guess) * 9.81);
+    const reward = Math.floor(500 * Math.exp((-0.11 * (time_to_guess - time_ceiling_for_perfect_score))));
+    if (reward > 500) return 500;
+    return reward;
 }
 
 export default defineEventHandler(async (event) => {
@@ -93,7 +100,7 @@ export default defineEventHandler(async (event) => {
     const player = game.players.find(player => player.player_id === user.id);
 
     // Check if round has already been played by player
-    if(game.rounds.some(round => round.round_number === body.data.round && round.time_to_guess) || player?.has_played) {
+    if (game.rounds.some(round => round.round_number === body.data.round && round.time_to_guess) || player?.has_played) {
         setResponseStatus(event, 400);
         return {error: 'Round has already been played'};
     }
@@ -133,9 +140,9 @@ export default defineEventHandler(async (event) => {
             p_times_to_guess: game.rounds.map(round => round.time_to_guess),
             p_correct_guesses: game.rounds.map(round => round.correct_guess),
             p_guessed_song_ids: game.rounds.map(round => round.guess),
-            p_score: game.players.find(player => player.player_id === user.id)?.score
+            p_score: Math.floor(game.players.find(player => player.player_id === user.id)!.score!)
         };
-        const {error} = await client.rpc('handle_player_finish', params as never);
+        const {error} = await client.rpc('game_handle_player_finish', params as never);
 
         if (error) {
             setResponseStatus(event, 500);
@@ -146,6 +153,10 @@ export default defineEventHandler(async (event) => {
         useStorage().removeItem('game:' + gameId).then(() => console.debug('Removed game from memory:' + gameId));
     }
 
-    return {correct_guess: round.correct_guess, score: player!.score, was_last_round: game.rounds.length === body.data.round};
+    return {
+        correct_guess: round.correct_guess,
+        score: player!.score,
+        was_last_round: game.rounds.length === body.data.round
+    };
 
 });

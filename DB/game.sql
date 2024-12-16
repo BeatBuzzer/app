@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS game_player_song_stats
     game_id         INTEGER REFERENCES games (game_id) ON DELETE CASCADE,
     user_id         UUID REFERENCES users (id),
     song_order      INTEGER NOT NULL,
-    time_to_guess   INTEGER,
+    time_to_guess   NUMERIC,
     correct_guess   BOOLEAN NOT NULL DEFAULT false,
     guessed_song_id TEXT,
     PRIMARY KEY (game_id, user_id, song_order),
@@ -289,11 +289,11 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- A player finished his rounds
-CREATE OR REPLACE FUNCTION handle_player_finish(
+CREATE OR REPLACE FUNCTION game_handle_player_finish(
     p_game_id INTEGER,
     p_user_id UUID,
     p_song_orders INTEGER[],
-    p_times_to_guess INTEGER[],
+    p_times_to_guess NUMERIC[],
     p_correct_guesses BOOLEAN[],
     p_guessed_song_ids TEXT[],
     p_score INTEGER
