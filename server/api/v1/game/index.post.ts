@@ -145,10 +145,10 @@ export default defineEventHandler(async (event) => {
             preview_url: round.correct_song.preview_url!,
             options: [round.correct_song, ...round.wrong_songs]
                 .sort(() => Math.random() - 0.5)
-                .map((song) => ({
+                .map<Song>((song) => ({
                     id: song.id,
                     name: song.name,
-                    artists: [song.artists[0].name],
+                    artists: [{name: song.artists[0].name}],
                     is_playable: song.is_playable,
                     preview_url: null
                 }))

@@ -1,29 +1,30 @@
-# Nuxt 3 Minimal Starter
-
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+# BeatBuzzer Music Game
 
 ## Setup
 
-Make sure to install the dependencies:
+Execute the following commands to run the project locally:
 
 ```bash
-npm install
+npm install && npm run dev
 ```
 
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-npm run dev
-```
+The server will be available at `http://localhost:3000`.
 
 ## TSDocs
+
+To generate the TSDoc documentation, run the following command:
+
 ```bash
 npm run docs:serve
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
-
 ## Required Environment Variables
+
 Check `.env.example` for the required environment variables.
+
+Utilize ur systems capabilities to set the environment variables or create a `.env` file in the root of the project and
+set the variables there. Latter is suggested.
+
+> [!WARNING] Careful
+> Make sure to never commit the `.env` file to the repository.  
+> Check the `.gitignore` file to see the `.env` file is ignored.
