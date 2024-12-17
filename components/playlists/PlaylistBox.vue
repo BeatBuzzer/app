@@ -41,7 +41,10 @@ const showModal = ref(false);
 
     <!-- Horizontally Scrolling Text -->
     <div class="overflow-hidden">
-      <p :class="['text-center text-sm md:text-base', props.name.length > 12 ? 'scrolling-text' : '']">{{ props.name }}
+      <p 
+        :class="['text-center text-sm md:text-base', props.name.length > 13 ? 'scrolling-text' : '']"
+        :style="{ animationDuration: props.name.length / 7 + 's' }">
+        {{ props.name }}
       </p>
     </div>
   </div>
@@ -52,14 +55,14 @@ const showModal = ref(false);
 <style scoped>
 .scrolling-text {
   display: inline-block;
-  animation: scrollText 5s linear infinite;
+  animation: scrollText linear infinite;
   white-space: nowrap;
 }
 
 /* Scroll animation keyframe */
 @keyframes scrollText {
   0% {
-    transform: translateX(0%);
+    transform: translateX(75%);
     /* Start at beginning */
   }
 
