@@ -1,5 +1,11 @@
-export default function useSpotify(token: Ref<string>, playlistId: string) {
+export default function useSpotify(playlistId: string) {
     const playlistStatus = ref<boolean | null>(null);
+
+    const session = useSupabaseSession();
+    const token = ref('');
+    if (session.value) {
+        token.value = session.value.provider_token;
+    }
 
     async function getPlaylistStatus(): Promise<boolean | null> {
         try {
