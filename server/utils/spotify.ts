@@ -45,7 +45,7 @@ export async function getPlaylistCover(token: string | null, playlistId: string)
     })
     const data = await res.json()
     // console.log(data)
-    return data[0].url;
+    return data[1].url; // [0] = 640px, [1] = 300px, [2] = 60px
 }
 
 export async function getSongsFromPlaylist(token: string | null, playlistId: string) {
