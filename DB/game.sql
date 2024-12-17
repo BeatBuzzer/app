@@ -238,6 +238,14 @@ BEGIN
                  JOIN songs w2 ON gr.wrong_option_2 = w2.spotify_song_id
                  JOIN songs w3 ON gr.wrong_option_3 = w3.spotify_song_id
                  JOIN playlists p ON g.playlist_id = p.id
+        -- This is an edge case - happens when the player has played all his rounds but the creator hasn't.
+        -- Without the creator's play, the game won't finish when the opponent plays their round.
+        -- To combat this, we will remove the active games for the user when he already played his round.
+        WHERE NOT EXISTS(SELECT 1
+                         FROM game_player_song_stats gpss
+                         WHERE gpss.game_id = g.game_id
+                           AND gpss.user_id = gp_current.user_id)
+        -- End edge case
         ORDER BY g.created_at DESC, gr.song_order ASC;
 END;
 $$ LANGUAGE plpgsql;
@@ -270,12 +278,12 @@ BEGIN
                g.created_at,
                gp.user_id,
                gp.is_creator,
-                EXISTS(SELECT 1
-                         FROM game_player_song_stats gpss
-                         WHERE gpss.game_id = g.game_id
-                            AND gpss.user_id = gp.user_id) AS has_played,
+               EXISTS(SELECT 1
+                      FROM game_player_song_stats gpss
+                      WHERE gpss.game_id = g.game_id
+                        AND gpss.user_id = gp.user_id) AS has_played,
                gr.song_order,
-               gr.song_id as correct_song_id
+               gr.song_id                              as correct_song_id
         FROM games g
                  -- Join to get all players
                  JOIN game_players gp
