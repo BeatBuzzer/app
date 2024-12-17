@@ -18,17 +18,17 @@ const props = defineProps({
     type: String,
     default: null
   }
-
-
 });
 
 const showModal = ref(false);
 </script>
 
 <template>
-  <div :class="[
-    'bg-blue-600 rounded-3xl p-3 mb-3 inline-block w-24 md:w-28'
-  ]" @click="showModal = true">
+  <div 
+    :class="[
+      'bg-blue-600 rounded-3xl p-3 mb-3 inline-block w-24 md:w-28'
+    ]" 
+    @click="showModal = true">
     <!-- Playlist Cover -->
     <div class="flex flex-col items-center justify-center">
       <Icon v-if="controlElement" :name="props.controlElement" :class="[
@@ -38,8 +38,7 @@ const showModal = ref(false);
         'w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-2xl'
       ]" :src="props.cover.toString()" :alt="props.name" />
     </div>
-
-    <!-- Horizontally Scrolling Text -->
+    <!-- Playlist name, scrolls when it's too long -->
     <div class="overflow-hidden">
       <p 
         :class="['text-center text-sm md:text-base', props.name.length > 13 ? 'scrolling-text' : '']"
@@ -49,6 +48,7 @@ const showModal = ref(false);
     </div>
   </div>
 
+  <!-- Modal for (un)following playlists -->
   <PlaylistsPlaylistModal v-show="showModal" :playlist-id="props.playlistId" :playlist-name="props.name" :playlist-cover="props.cover.toString()" @close-modal="showModal = false" />
 </template>
 
@@ -59,16 +59,13 @@ const showModal = ref(false);
   white-space: nowrap;
 }
 
-/* Scroll animation keyframe */
+/* Scroll animation*/
 @keyframes scrollText {
   0% {
     transform: translateX(75%);
-    /* Start at beginning */
   }
-
   100% {
     transform: translateX(-100%);
-    /* Scroll completely to the left */
   }
 }
 </style>
