@@ -1,10 +1,11 @@
+/* Communicate with Spotify API */
 export default function useSpotify(playlistId: string) {
     const playlistStatus = ref<boolean | null>(null);
 
     const session = useSupabaseSession();
     const token = ref('');
     if (session.value) {
-        token.value = session.value.provider_token;
+        token.value = session.value.provider_token ?? '';
     }
 
     async function getPlaylistStatus(): Promise<boolean | null> {
@@ -32,8 +33,6 @@ export default function useSpotify(playlistId: string) {
 
     async function followPlaylist(): Promise<void> {
         try {
-            console.log(token.value)
-            console.log(playlistId.value)
             const res = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/followers`, {
                 method: 'PUT',
                 headers: {
@@ -44,7 +43,6 @@ export default function useSpotify(playlistId: string) {
             });
 
             if (res.ok) {
-                console.log('Successfully followed the playlist.');
                 await getPlaylistStatus();
             } else {
                 const errorData = await res.json();
@@ -66,7 +64,6 @@ export default function useSpotify(playlistId: string) {
             });
 
             if (res.ok) {
-                console.log('Successfully unfollowed the playlist.');
                 await getPlaylistStatus();
             } else {
                 const errorData = await res.json();
