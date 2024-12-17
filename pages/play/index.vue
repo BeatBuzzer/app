@@ -2,9 +2,8 @@
 
 import type {ActiveGame, ActiveGameRound, PlayGameResponse, Song} from "@/types/api/game";
 import GameSelectLayout from "@/layouts/Game/GameSelectLayout.vue";
-import {FetchError} from "ofetch";
 
-interface Scoreboard {
+export interface Scoreboard {
   score: number;
   change: number;
 }
@@ -158,7 +157,7 @@ const pauseAudio = () => {
 const endGame = () => {
   audio.value!.src = '';
   audio.value?.load();
-  navigateTo('/');
+  navigateTo('/play/end');
 }
 
 const abortGame = () => {

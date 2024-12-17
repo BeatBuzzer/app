@@ -1,6 +1,6 @@
 // Types from your original interfaces
 
-import type {ActiveGame, Game, GameRound, Song,GameStatus} from "~/types/api/game";
+import type {ActiveGame, Game, GameRound, Song, GameStatus, GameStats} from "~/types/api/game";
 import type {GetUserResponse} from "~/types/api/users";
 
 interface DatabaseGameRow {
@@ -13,14 +13,15 @@ interface DatabaseGameRow {
     created_at: string;
     creator_id: string; // who created the game and thus already started playing
 
-    // Opponent info (the other player's data)
-    opponent_user_id: string;
-    opponent_avatar_url: string | null;
-    opponent_username: string;
-    opponent_spotify_id: string | null;
-    opponent_spotify_visibility: boolean;
-    opponent_daily_streak: number | null;
-    opponent_daily_streak_updated_at: string | null;
+    // Player info
+    player_user_id: string;
+    player_avatar_url: string | null;
+    player_username: string;
+    player_spotify_id: string | null;
+    player_spotify_visibility: boolean;
+    player_daily_streak: number | null;
+    player_daily_streak_updated_at: string | null;
+    player_score: number;
 
     // Round info (the song being played)
     round_number: number;         // From game_rounds table - the order of the song
@@ -44,6 +45,14 @@ interface DatabaseGameRow {
     wrong_song_3_name: string;
     wrong_song_3_artist: string;
     wrong_song_3_preview_url: string | null;
+
+    // Player round stats
+    time_to_guess: number | null;
+    correct_guess: boolean | null;
+    guessed_song_id: string | null;
+    guessed_song_name: string | null;
+    guessed_song_artist: string | null;
+    guessed_song_preview_url: string | null;
 }
 
 export interface GetGameDBRow {
@@ -105,49 +114,94 @@ export const mapDatabaseRowsToGame = (rows: DatabaseGameRow[]): Game => {
 
     const firstRow = rows[0];
 
-    // Map opponent info
-    const opponent: GetUserResponse = {
-        id: firstRow.opponent_user_id,
-        avatar_url: firstRow.opponent_avatar_url ?? undefined,
-        username: firstRow.opponent_username,
-        spotify_id: firstRow.opponent_spotify_id ?? undefined,
-        spotify_visibility: firstRow.opponent_spotify_visibility,
-        daily_streak: firstRow.opponent_daily_streak ?? undefined,
-        daily_streak_updated_at: firstRow.opponent_daily_streak_updated_at ?? undefined
-    };
+    // Group all players from rows
+    const playersMap = new Map<string, GetUserResponse>();
+
+    rows.forEach(row => {
+        const playerId = row.player_user_id;
+        if (!playersMap.has(playerId)) {
+            playersMap.set(playerId, {
+                id: row.player_user_id,
+                avatar_url: row.player_avatar_url ?? undefined,
+                username: row.player_username,
+                spotify_id: row.player_spotify_id ?? undefined,
+                spotify_visibility: row.player_spotify_visibility,
+                daily_streak: row.player_daily_streak ?? undefined,
+                daily_streak_updated_at: row.player_daily_streak_updated_at ?? undefined
+            });
+        }
+    });
 
     // Map rounds
-    const rounds: GameRound[] = rows.map(row => ({
-        round: row.round_number,
-        correct_song: createSongFromRow(
-            row.correct_song_id,
-            row.correct_song_name,
-            row.correct_song_artist,
-            row.correct_song_preview_url
-        ),
-        wrong_songs: [
-            createSongFromRow(
-                row.wrong_song_1_id,
-                row.wrong_song_1_name,
-                row.wrong_song_1_artist,
-                row.wrong_song_1_preview_url
-            ),
-            createSongFromRow(
-                row.wrong_song_2_id,
-                row.wrong_song_2_name,
-                row.wrong_song_2_artist,
-                row.wrong_song_2_preview_url
-            ),
-            createSongFromRow(
-                row.wrong_song_3_id,
-                row.wrong_song_3_name,
-                row.wrong_song_3_artist,
-                row.wrong_song_3_preview_url
-            )
-        ]
-    }));
+    const uniqueRounds = new Map<number, GameRound>();
+    rows.forEach(row => {
+        if (!uniqueRounds.has(row.round_number)) {
+            uniqueRounds.set(row.round_number, {
+                round: row.round_number,
+                correct_song: createSongFromRow(
+                    row.correct_song_id,
+                    row.correct_song_name,
+                    row.correct_song_artist,
+                    row.correct_song_preview_url
+                ),
+                wrong_songs: [
+                    createSongFromRow(
+                        row.wrong_song_1_id,
+                        row.wrong_song_1_name,
+                        row.wrong_song_1_artist,
+                        row.wrong_song_1_preview_url
+                    ),
+                    createSongFromRow(
+                        row.wrong_song_2_id,
+                        row.wrong_song_2_name,
+                        row.wrong_song_2_artist,
+                        row.wrong_song_2_preview_url
+                    ),
+                    createSongFromRow(
+                        row.wrong_song_3_id,
+                        row.wrong_song_3_name,
+                        row.wrong_song_3_artist,
+                        row.wrong_song_3_preview_url
+                    )
+                ]
+            });
+        }
+    });
 
-    // Construct final game object with players instead of player_ids
+    // Map stats
+    const stats: GameStats[] = [];
+    const statsMap = new Map<string, GameStats>();
+
+    rows.forEach(row => {
+        if (!statsMap.has(row.player_user_id)) {
+            statsMap.set(row.player_user_id, {
+                user_id: row.player_user_id,
+                score: row.player_score,
+                guesses: []
+            });
+        }
+
+        const playerStats = statsMap.get(row.player_user_id)!;
+
+        // Only add guess if we have stats data for this round
+        if (row.time_to_guess !== null) {
+            playerStats.guesses.push({
+                round_number: row.round_number,
+                time_to_guess: row.time_to_guess,
+                correct_guess: row.correct_guess!,
+                song: createSongFromRow(
+                    row.guessed_song_id!,
+                    row.guessed_song_name!,
+                    row.guessed_song_artist!,
+                    row.guessed_song_preview_url
+                )
+            });
+        }
+    });
+
+    // Add all stats to the array
+    stats.push(...Array.from(statsMap.values()));
+
     return {
         game_id: firstRow.game_id,
         status: firstRow.status as GameStatus,
@@ -157,9 +211,10 @@ export const mapDatabaseRowsToGame = (rows: DatabaseGameRow[]): Game => {
             name: firstRow.playlist_name,
             cover: firstRow.playlist_cover
         },
-        players: [opponent],
-        rounds: rounds,
-        created_at: firstRow.created_at
+        players: Array.from(playersMap.values()),
+        rounds: Array.from(uniqueRounds.values()),
+        created_at: firstRow.created_at,
+        stats: stats.length > 0 ? stats : undefined
     };
 };
 

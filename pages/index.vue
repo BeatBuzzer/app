@@ -12,8 +12,8 @@ const {games, loading, error, fetchGames} = useGame();
 
 const curr_game = useState<ActiveGame | null>('current_game', () => null);
 
-onMounted(() => {
-  fetchGames();
+onMounted(async () => {
+  await fetchGames();
 });
 
 function setLevelbar(newValue: number) {

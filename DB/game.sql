@@ -153,100 +153,123 @@ CREATE OR REPLACE FUNCTION get_player_games(p_user_id UUID)
     RETURNS TABLE
             (
                 -- Game basic info
-                game_id                          INTEGER,
-                status                           game_status,
-                playlist_id                      TEXT,
-                playlist_cover                   TEXT,
-                playlist_name                    TEXT,
-                created_at                       TIMESTAMPTZ,
-                creator_id                       UUID,
-                -- Opponent info (renamed from player_ to opponent_)
-                opponent_user_id                 UUID,
-                opponent_avatar_url              TEXT,
-                opponent_username                TEXT,
-                opponent_spotify_id              TEXT,
-                opponent_spotify_visibility      BOOLEAN,
-                opponent_daily_streak            INTEGER,
-                opponent_daily_streak_updated_at TIMESTAMPTZ,
+                game_id              INTEGER,
+                status              game_status,
+                playlist_id         TEXT,
+                playlist_cover      TEXT,
+                playlist_name       TEXT,
+                created_at         TIMESTAMPTZ,
+                creator_id         UUID,
+
+                -- Player info
+                player_user_id     UUID,
+                player_avatar_url  TEXT,
+                player_username    TEXT,
+                player_spotify_id  TEXT,
+                player_spotify_visibility BOOLEAN,
+                player_daily_streak INTEGER,
+                player_daily_streak_updated_at TIMESTAMPTZ,
+                player_score       INTEGER,
+
                 -- Round info
-                round_number                     INTEGER,
-                correct_song_id                  TEXT,
-                correct_song_name                TEXT,
-                correct_song_artist              TEXT,
-                correct_song_preview_url         TEXT,
-                wrong_song_1_id                  TEXT,
-                wrong_song_1_name                TEXT,
-                wrong_song_1_artist              TEXT,
-                wrong_song_1_preview_url         TEXT,
-                wrong_song_2_id                  TEXT,
-                wrong_song_2_name                TEXT,
-                wrong_song_2_artist              TEXT,
-                wrong_song_2_preview_url         TEXT,
-                wrong_song_3_id                  TEXT,
-                wrong_song_3_name                TEXT,
-                wrong_song_3_artist              TEXT,
-                wrong_song_3_preview_url         TEXT
+                round_number       INTEGER,
+                correct_song_id    TEXT,
+                correct_song_name  TEXT,
+                correct_song_artist TEXT,
+                correct_song_preview_url TEXT,
+                wrong_song_1_id    TEXT,
+                wrong_song_1_name  TEXT,
+                wrong_song_1_artist TEXT,
+                wrong_song_1_preview_url TEXT,
+                wrong_song_2_id    TEXT,
+                wrong_song_2_name  TEXT,
+                wrong_song_2_artist TEXT,
+                wrong_song_2_preview_url TEXT,
+                wrong_song_3_id    TEXT,
+                wrong_song_3_name  TEXT,
+                wrong_song_3_artist TEXT,
+                wrong_song_3_preview_url TEXT,
+
+                -- Round stats (directly associated with player)
+                time_to_guess      NUMERIC,
+                correct_guess      BOOLEAN,
+                guessed_song_id    TEXT,
+                guessed_song_name  TEXT,
+                guessed_song_artist TEXT,
+                guessed_song_preview_url TEXT
             )
 AS
 $$
 BEGIN
     RETURN QUERY
-        SELECT g.game_id,
-               g.status,
-               g.playlist_id,
-               p.cover,
-               p.name,
-               g.created_at,
-               gp_creator.user_id,
-
-               -- Opponent information
-               u.id,
-               u.avatar_url,
-               u.username,
-               u.spotify_id,
-               u.spotify_visibility,
-               u.daily_streak,
-               u.daily_streak_updated_at,
-               -- Round information
-               gr.song_order,
-               cs.spotify_song_id,
-               cs.song_name,
-               cs.artist_name,
-               cs.preview_url,
-               w1.spotify_song_id,
-               w1.song_name,
-               w1.artist_name,
-               w1.preview_url,
-               w2.spotify_song_id,
-               w2.song_name,
-               w2.artist_name,
-               w2.preview_url,
-               w3.spotify_song_id,
-               w3.song_name,
-               w3.artist_name,
-               w3.preview_url
+        SELECT DISTINCT ON (g.game_id, gr.song_order, all_players.user_id)
+            g.game_id,
+            g.status,
+            g.playlist_id,
+            p.cover,
+            p.name,
+            g.created_at,
+            gp_creator.user_id,
+            -- Player information
+            all_players.user_id,
+            u.avatar_url,
+            u.username,
+            u.spotify_id,
+            u.spotify_visibility,
+            u.daily_streak,
+            u.daily_streak_updated_at,
+            gp_stats.score,
+            -- Round information
+            gr.song_order,
+            cs.spotify_song_id,
+            cs.song_name,
+            cs.artist_name,
+            cs.preview_url,
+            w1.spotify_song_id,
+            w1.song_name,
+            w1.artist_name,
+            w1.preview_url,
+            w2.spotify_song_id,
+            w2.song_name,
+            w2.artist_name,
+            w2.preview_url,
+            w3.spotify_song_id,
+            w3.song_name,
+            w3.artist_name,
+            w3.preview_url,
+            -- Stats information (associated with player)
+            gpss.time_to_guess,
+            gpss.correct_guess,
+            gs.spotify_song_id,
+            gs.song_name,
+            gs.artist_name,
+            gs.preview_url
         FROM games g
-                 -- Join to get current user's games
-                 JOIN game_players gp_current ON g.game_id = gp_current.game_id AND gp_current.user_id = p_user_id
-            -- Join to get opponent's info
-                 JOIN game_players gp_opponent ON g.game_id = gp_opponent.game_id AND gp_opponent.user_id != p_user_id
-                 LEFT JOIN game_players gp_creator ON g.game_id = gp_creator.game_id AND gp_creator.is_creator = true
-                 JOIN users u ON gp_opponent.user_id = u.id
+                 -- Get current player's games
+                 JOIN game_players gp_current ON g.game_id = gp_current.game_id
+            AND gp_current.user_id = p_user_id
+            -- Get all players in the game
+                 JOIN game_players all_players ON g.game_id = all_players.game_id
+            -- Get user info for all players
+                 JOIN users u ON all_players.user_id = u.id
+            -- Get creator info
+                 LEFT JOIN game_players gp_creator ON g.game_id = gp_creator.game_id
+            AND gp_creator.is_creator = true
+            -- Get rounds info
                  JOIN game_rounds gr ON g.game_id = gr.game_id
                  JOIN songs cs ON gr.song_id = cs.spotify_song_id
                  JOIN songs w1 ON gr.wrong_option_1 = w1.spotify_song_id
                  JOIN songs w2 ON gr.wrong_option_2 = w2.spotify_song_id
                  JOIN songs w3 ON gr.wrong_option_3 = w3.spotify_song_id
                  JOIN playlists p ON g.playlist_id = p.id
-        -- This is an edge case - happens when the player has played all his rounds but the creator hasn't.
-        -- Without the creator's play, the game won't finish when the opponent plays their round.
-        -- To combat this, we will remove the active games for the user when he already played his round.
-        WHERE NOT EXISTS(SELECT 1
-                         FROM game_player_song_stats gpss
-                         WHERE gpss.game_id = g.game_id
-                           AND gpss.user_id = gp_current.user_id)
-        -- End edge case
-        ORDER BY g.created_at DESC, gr.song_order ASC;
+            -- Get stats for all players
+                 LEFT JOIN game_players gp_stats ON g.game_id = gp_stats.game_id
+            AND gp_stats.user_id = all_players.user_id
+                 LEFT JOIN game_player_song_stats gpss ON g.game_id = gpss.game_id
+            AND gpss.song_order = gr.song_order
+            AND gpss.user_id = all_players.user_id
+                 LEFT JOIN songs gs ON gpss.guessed_song_id = gs.spotify_song_id
+        ORDER BY g.game_id, gr.song_order, all_players.user_id, g.created_at DESC;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -346,3 +369,6 @@ BEGIN
                         AND gpss.user_id IS NULL);
 END;
 $$ LANGUAGE plpgsql;
+
+SELECT *
+FROM get_player_games('d2e6a9a3-a0be-45ce-ae39-676c6a88c53a');

@@ -41,13 +41,15 @@ export interface ActiveGame {
     game_id: number;
     status: GameStatus;
     creator_id: string; // who created the game and thus already played its turn
-    playlist: {
-        id: string;
-        name: string;
-        cover?: string;
-    };
+    playlist: ActiveGamePlaylist;
     players: GetUserResponse[];
     rounds: ActiveGameRound[];
+}
+
+export interface ActiveGamePlaylist {
+    id: string;
+    name: string;
+    cover?: string;
 }
 
 export interface ActiveGameRound {
