@@ -184,6 +184,9 @@ export default defineEventHandler(async (event) => {
                 }
                 // If less than 24 hours, keep current streak
 
+                // Update streak if changed
+                if(newStreak === data.daily_streak) return;
+
                 const {error: updateError} = await client
                     .from('users')
                     .update({
