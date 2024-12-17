@@ -38,6 +38,8 @@ const computeGame = (activeGame?: ActiveGame): Game | null => {
   }
 };
 
+const defaultImg = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/eb777e7a-7d3c-487e-865a-fc83920564a1/d7kpm65-437b2b46-06cd-4a86-9041-cc8c3737c6f0.jpg/v1/fit/w_800,h_800,q_70,strp/no_album_art__no_cover___placeholder_picture_by_cmdrobot_d7kpm65-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9ODAwIiwicGF0aCI6IlwvZlwvZWI3NzdlN2EtN2QzYy00ODdlLTg2NWEtZmM4MzkyMDU2NGExXC9kN2twbTY1LTQzN2IyYjQ2LTA2Y2QtNGE4Ni05MDQxLWNjOGMzNzM3YzZmMC5qcGciLCJ3aWR0aCI6Ijw9ODAwIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.8yjX5CrFjxVH06LB59TpJLu6doZb0wz8fGQq4tM64mg"
+
 // Hooks
 onMounted(async () => {
   await fetchUser();
@@ -57,7 +59,7 @@ onUnmounted(() => {
       <template #content>
         <div class="h-full flex flex-col">
           <!-- Text content fixed at top -->
-          <div class="text-center p-12 pb-48">
+          <div class="text-center p-20">
             Lots of content..
           </div>
 
@@ -65,29 +67,34 @@ onUnmounted(() => {
           <div class="flex-grow"></div>
 
           <!-- Game rounds container aligned to bottom -->
-          <div class="w-full">
+          <div class="w-full pb-5">
             <div
                 v-for="(gameRound, idx) in game?.rounds"
                 :key="gameRound.round"
-                class="flex flex-col basis-1/5 items-center mb-4"
+                class="flex flex-col basis-1/5 items-center mb-3"
             >
               <div class="inline-flex items-center justify-around w-full">
-                <div>
-                  <Icon v-if="stats!.guesses[idx].correct_guess" name="mdi:checkbox-outline" class="text-green-500 text-4xl"/>
-                  <Icon v-else name="mdi:close-box-outline" class="text-red-500 text-4xl"/>
-                  <div class="text-sm font-thin" v-text="stats?.guesses[idx].time_to_guess + 's'"/>
+                <div class="inline-flex flex-col">
+                  <Icon v-if="stats!.guesses[idx].correct_guess" name="mdi:checkbox-marked" class="text-green-500 text-4xl"/>
+                  <Icon v-else name="mdi:close-box" class="text-red-500 text-4xl"/>
+                  <div class="text-sm font-thin text-center" v-text="stats?.guesses[idx].time_to_guess + 's'"/>
                 </div>
                 <NuxtImg
-                    src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/eb777e7a-7d3c-487e-865a-fc83920564a1/d7kpm65-437b2b46-06cd-4a86-9041-cc8c3737c6f0.jpg/v1/fit/w_800,h_800,q_70,strp/no_album_art__no_cover___placeholder_picture_by_cmdrobot_d7kpm65-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9ODAwIiwicGF0aCI6IlwvZlwvZWI3NzdlN2EtN2QzYy00ODdlLTg2NWEtZmM4MzkyMDU2NGExXC9kN2twbTY1LTQzN2IyYjQ2LTA2Y2QtNGE4Ni05MDQxLWNjOGMzNzM3YzZmMC5qcGciLCJ3aWR0aCI6Ijw9ODAwIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.8yjX5CrFjxVH06LB59TpJLu6doZb0wz8fGQq4tM64mg"
-                    width="50" height="50"
+                    :src="defaultImg"
+                    width="55" height="auto"
                 />
-                <div>
-                  <Icon v-if="opStats!.guesses[idx].correct_guess" name="mdi:checkbox-outline" class="text-green-500 text-4xl"/>
-                  <Icon v-else name="mdi:close-box-outline" class="text-red-500 text-4xl"/>
-                  <div class="text-sm font-thin" v-text="opStats?.guesses[idx].time_to_guess + 's'"/>
+                <div v-if="opStats?.guesses && opStats.guesses.length > 1" class="inline-flex flex-col">
+                  <Icon v-if="opStats?.guesses[idx].correct_guess" name="mdi:checkbox-marked" class="text-green-500 text-4xl"/>
+                  <Icon v-else name="mdi:close-box" class="text-red-500 text-4xl"/>
+                  <div class="text-sm font-thin text-center " v-text="opStats?.guesses[idx].time_to_guess + 's'"/>
+                </div>
+                <div v-else class="inline-flex flex-col">
+                  <!-- Invisible to not break layout -->
+                  <Icon name="mdi:help-box" class="text-gray-500 text-4xl invisible"/>
+                  <div class="text-sm font-thin text-center invisible" v-text="'dnf'"/>
                 </div>
               </div>
-              <div class="mt-1">{{ gameRound.correct_song.name }}</div>
+              <div class="tracking-tight font-semibold mt-1 mb-2 text-sm">{{ gameRound.correct_song.name }}</div>
             </div>
           </div>
         </div>
