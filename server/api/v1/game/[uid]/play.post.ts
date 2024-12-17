@@ -151,6 +151,51 @@ export default defineEventHandler(async (event) => {
 
         // asynchronously remove game from memory. No await!
         useStorage().removeItem('game:' + gameId).then(() => console.debug('Removed game from memory:' + gameId));
+
+        // Update or reset streak
+        client.from('users').select('*').eq('id', user.id).single()
+            .then(async ({data, error}: {
+                data: {
+                    daily_streak: number,
+                    daily_streak_last_updated: string,
+                } | null,
+                error: PostgrestError | null
+            }) => {
+                if (error) {
+                    console.error('Error getting user', error);
+                    return;
+                }
+                if (!data) return;
+
+                const lastUpdated = new Date(data.daily_streak_last_updated);
+                const now = new Date();
+                const hoursDifference = (now.getTime() - lastUpdated.getTime()) / (1000 * 60 * 60);
+
+                let newStreak = data.daily_streak;
+
+                // If last update was more than 24 hours ago but less than 48 hours ago
+                if (hoursDifference >= 24 && hoursDifference < 48) {
+                    // Increment streak
+                    newStreak = data.daily_streak + 1;
+                }
+                // If more than 48 hours passed, reset streak
+                else if (hoursDifference >= 48) {
+                    newStreak = 0;
+                }
+                // If less than 24 hours, keep current streak
+
+                const {error: updateError} = await client
+                    .from('users')
+                    .update({
+                        daily_streak: newStreak,
+                        // no need to update timestamp. DB hook will automatically set it
+                    } as never)
+                    .eq('id', user.id);
+
+                if (updateError) {
+                    console.error('Error updating streak', updateError);
+                }
+            });
     }
 
     return {

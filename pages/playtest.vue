@@ -112,7 +112,7 @@ async function newGame() {
   const data = await $fetch<ActiveGame>('/api/v1/game', {
     method: 'POST',
     body: JSON.stringify({
-      playlist_id: '0X9Td39Sy24s2vmmiTFIez',
+      playlist_id: '4DZ79IJM4IlYBI8dpWZZO2',
       opponent_id: '9da97502-5363-4964-ae80-c242a053e810',
     }),
   });
@@ -147,7 +147,7 @@ async function newGame() {
               v-for="option in round?.options"
               :key="option.id"
               :id="option.id"
-              class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-4 px-6 border border-gray-700 rounded shadow-sm transition-colors duration-200 min-h-[75px] h-full flex items-center justify-center text-center"
+              class="bg-white text-gray-800 font-semibold py-4 px-6 border border-gray-700 rounded shadow-sm transition-colors duration-300 h-full"
               @click="clickOption(option)"
               v-text="option.name"
           />
