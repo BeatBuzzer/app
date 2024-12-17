@@ -77,7 +77,7 @@ onUnmounted(() => {
                 <div class="inline-flex flex-col">
                   <Icon v-if="stats!.guesses[idx].correct_guess" name="mdi:checkbox-marked" class="text-green-500 text-4xl"/>
                   <Icon v-else name="mdi:close-box" class="text-red-500 text-4xl"/>
-                  <div class="text-sm font-thin text-center" v-text="stats?.guesses[idx].time_to_guess + 's'"/>
+                  <div class="text-sm max-w-9 font-thin text-center" v-text="stats?.guesses[idx].time_to_guess + 's'"/>
                 </div>
                 <NuxtImg
                     :src="defaultImg"

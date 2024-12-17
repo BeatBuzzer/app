@@ -157,7 +157,7 @@ export default defineEventHandler(async (event) => {
             .then(async ({data, error}: {
                 data: {
                     daily_streak: number,
-                    daily_streak_last_updated: string,
+                    daily_streak_updated_at: string,
                 } | null,
                 error: PostgrestError | null
             }) => {
@@ -167,7 +167,7 @@ export default defineEventHandler(async (event) => {
                 }
                 if (!data) return;
 
-                const lastUpdated = new Date(data.daily_streak_last_updated);
+                const lastUpdated = new Date(data.daily_streak_updated_at);
                 const now = new Date();
                 const hoursDifference = (now.getTime() - lastUpdated.getTime()) / (1000 * 60 * 60);
 
