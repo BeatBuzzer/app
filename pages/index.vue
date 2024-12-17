@@ -3,6 +3,7 @@ import HeaderFooterView from "~/layouts/HeaderFooterView.vue";
 import {UserViewType} from "@/types/components/users.view"
 import {useGame} from "@/composables/useGames";
 import type {ActiveGame} from "@/types/api/game";
+import VerticalGameList from "@/components/home/Game/VerticalGameList.vue";
 
 const {user} = useUser()
 
@@ -44,8 +45,7 @@ function setLevelbar(newValue: number) {
       </template>
       <template #content>
         <div class="flex flex-col h-full p-3">
-          <UsersView :view-type="UserViewType.USERTURN" class="h-3/6"
-                     :users="games?.active.map(game=>game.players[0])"/>
+          <VerticalGameList :games="games?.active || []" class="h-3/6"/>
           <UsersView :view-type="UserViewType.OPPONENTTURN" class="h-2/6"
                      :users="games?.waiting ? games?.waiting.map(game=>game.players[0]) : []"/>
           <HomeControlsGameButtons class="h-1/6" @quick-game="()=>{curr_game=games!.active[0]; navigateTo('/play');}"/>
