@@ -13,7 +13,6 @@ export interface Song {
 }
 
 interface SongArtist {
-    id: string;
     name: string;
 }
 
@@ -32,10 +31,31 @@ export interface Game {
         name: string;
         cover?: string;
     };
-    opponents: GetUserResponse[];
-    songs: GameRound[];
+    players: GetUserResponse[];
+    rounds: GameRound[];
     created_at: string;
     stats?: GameStats[];
+}
+
+export interface ActiveGame {
+    game_id: number;
+    status: GameStatus;
+    creator_id: string; // who created the game and thus already played its turn
+    playlist: ActiveGamePlaylist;
+    players: GetUserResponse[];
+    rounds: ActiveGameRound[];
+}
+
+export interface ActiveGamePlaylist {
+    id: string;
+    name: string;
+    cover?: string;
+}
+
+export interface ActiveGameRound {
+    round: number;
+    preview_url: string;
+    options: Song[];
 }
 
 export enum GameStatus {
@@ -50,18 +70,15 @@ export interface GameStats {
 }
 
 export interface GameStatsContent {
-    song_order: number;
+    round_number: number;
     song: Song;
     time_to_guess: number;
     correct_guess: boolean;
 }
 
 export interface GameInitResponse {
-    rounds: {
-        round: number;
-        preview_url: string;
-        options: Song[];
-    }
+    game_id: number,
+    new_created_at: string
 }
 
 // Requests
@@ -71,7 +88,19 @@ export interface GameInitRequest {
 }
 
 export interface GetGameResponse {
-    active: Game[];
+    active: ActiveGame[];
     waiting: Game[];
     past: Game[];
+}
+
+export interface PlayGameRequest {
+    round: number;
+    guess: string;
+    time: number;
+}
+
+export interface PlayGameResponse {
+    correct_guess: boolean;
+    score: number;
+    was_last_round: boolean;
 }

@@ -2,14 +2,18 @@
 import HeaderFooterView from "~/layouts/HeaderFooterView.vue";
 import {UserViewType} from "@/types/components/users.view"
 import {useGame} from "@/composables/useGames";
+import type {ActiveGame} from "@/types/api/game";
+import VerticalGameList from "@/components/home/Game/VerticalGameList.vue";
 
-const { user } = useUser()
+const {user} = useUser()
 
 useUser().fetchUser(); // loading user state just in case
 const {games, loading, error, fetchGames} = useGame();
 
-onMounted(() => {
-  fetchGames();
+const curr_game = useState<ActiveGame | null>('current_game', () => null);
+
+onMounted(async () => {
+  await fetchGames();
 });
 
 function setLevelbar(newValue: number) {
@@ -18,6 +22,20 @@ function setLevelbar(newValue: number) {
     levelbar.style.width = newValue + "%"
   }
 }
+
+const newGame = async () => {
+  const data = await $fetch<ActiveGame>('/api/v1/game', {
+    method: 'POST',
+    body: JSON.stringify({
+      playlist_id: '4DZ79IJM4IlYBI8dpWZZO2',
+      opponent_id: '9da97502-5363-4964-ae80-c242a053e810',
+    }),
+  });
+
+  curr_game.value = data;
+  navigateTo('/play');
+}
+
 </script>
 
 <template>
@@ -26,14 +44,14 @@ function setLevelbar(newValue: number) {
       <template #header>
 
         <div class="m-3 w-full flex items-center justify-center">
-          <Icon name="mdi:star" class="text-red-600 text-6xl  mr-2 -my-1" />
+          <Icon name="mdi:star" class="text-red-600 text-6xl  mr-2 -my-1"/>
           <div class="w-full bg-gray-700 rounded-full h-2.5">
-            <div id="levelbar" class="bg-red-600 h-2.5 rounded-full" style="width: 50%" />
+            <div id="levelbar" class="bg-red-600 h-2.5 rounded-full" style="width: 50%"/>
           </div>
         </div>
 
         <div class="m-3 w-full flex items-center justify-center">
-          <Icon name="mdi:fire" class="text-red-600 text-4xl mr-2" />
+          <Icon name="mdi:fire" class="text-red-600 text-4xl mr-2"/>
           <p class="text-xl font-bold">Streak: {{ user?.daily_streak }}</p>
         </div>
 
@@ -41,20 +59,21 @@ function setLevelbar(newValue: number) {
       </template>
       <template #content>
         <div class="flex flex-col h-full p-3">
-          <UsersView :view-type="UserViewType.USERTURN" class="h-3/6" :users="games?.active.map(game=>game.opponents[0])"/>
-          <UsersView :view-type="UserViewType.OPPONENTTURN" class="h-2/6" :users="games?.waiting ? games?.waiting.map(game=>game.opponents[0]) : []"/>
-          <HomeControlsGameButtons class="h-1/6"/>
+          <VerticalGameList :games="games?.active || []" class="h-3/6"/>
+          <UsersView :view-type="UserViewType.OPPONENTTURN" class="h-2/6"
+                     :users="games?.waiting ? games?.waiting.map(game=>game.players[0]) : []"/>
+          <HomeControlsGameButtons class="h-1/6" @quick-game="()=>newGame()"/>
         </div>
       </template>
       <template #footer>
-        <NuxtLink to="/playlists" class="inline-flex items-center text-5xl rounded-xl">
-          <Icon name="mdi:album" class="" />
+        <NuxtLink to="/playlist" class="inline-flex items-center text-5xl rounded-xl">
+          <Icon name="mdi:album" class=""/>
         </NuxtLink>
         <NuxtLink to="/" class="inline-flex items-center text-6xl rounded-full p-1.5">
-          <Icon name="mdi:home" class="text-white" />
+          <Icon name="mdi:home" class="text-white"/>
         </NuxtLink>
         <NuxtLink to="/profile" class="inline-flex items-center text-5xl rounded-xl">
-          <Icon name="mdi:account-details" class="" />
+          <Icon name="mdi:account-details" class=""/>
         </NuxtLink>
       </template>
     </HeaderFooterView>

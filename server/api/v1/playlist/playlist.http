@@ -31,6 +31,6 @@ POST {{baseUrl}}/playlist
 "name": "This is SEGA SOUND TEAM",
 "spotifyId": "37i9dQZF1DX2CtuHQcongT",
 "categories": ["sega"]
-"enabled": false
+"enabled": true
 }
 

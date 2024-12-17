@@ -30,5 +30,5 @@ export const useUser = () => {
 }
 
 async function useProfileInformation() {
-    return await $fetch<GetUserResponse>('http://localhost:3000/api/v1/user/')
+    return await $fetch<GetUserResponse>('/api/v1/user/')
 }

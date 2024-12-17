@@ -25,5 +25,5 @@ export const useGame = () => {
 }
 
 async function getGames() {
-    return await $fetch<GetGameResponse>('http://localhost:3000/api/v1/games/')
+    return await $fetch<GetGameResponse>('/api/v1/game/')
 }
