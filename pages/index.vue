@@ -22,6 +22,20 @@ function setLevelbar(newValue: number) {
     levelbar.style.width = newValue + "%"
   }
 }
+
+const newGame = async () => {
+  const data = await $fetch<ActiveGame>('/api/v1/game', {
+    method: 'POST',
+    body: JSON.stringify({
+      playlist_id: '4DZ79IJM4IlYBI8dpWZZO2',
+      opponent_id: '9da97502-5363-4964-ae80-c242a053e810',
+    }),
+  });
+
+  curr_game.value = data;
+  navigateTo('/play');
+}
+
 </script>
 
 <template>
@@ -48,7 +62,7 @@ function setLevelbar(newValue: number) {
           <VerticalGameList :games="games?.active || []" class="h-3/6"/>
           <UsersView :view-type="UserViewType.OPPONENTTURN" class="h-2/6"
                      :users="games?.waiting ? games?.waiting.map(game=>game.players[0]) : []"/>
-          <HomeControlsGameButtons class="h-1/6" @quick-game="()=>{curr_game=games!.active[0]; navigateTo('/play');}"/>
+          <HomeControlsGameButtons class="h-1/6" @quick-game="()=>newGame()"/>
         </div>
       </template>
       <template #footer>
