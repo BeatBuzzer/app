@@ -2,7 +2,7 @@
 import type { GetPlaylistResponse } from "@/types/api/playlists";
 
 const playlists = ref<GetPlaylistResponse[]>([]);
-  const categories = ref<{ category: string; ids: number[] }[]>([]);
+const categories = ref<{ category: string; ids: number[] }[]>([]);
 
 const session = useSupabaseSession();
 
@@ -18,19 +18,22 @@ async function getPlaylists() {
     const data = await $fetch<GetPlaylistResponse[]>('http://localhost:3000/api/v1/playlist');
     playlists.value = [...data];
 
-    playlists.value.forEach(element => {
-      element.categories.forEach(category => {
+    playlists.value.forEach(playlist => {
+      // Skip disabled playlists
+      if(!playlist.enabled) return;
+
+      playlist.categories.forEach(category => {
         // Check if the category already exists in the array
         const existingCategory = categories.value.find(item => item.category === category);
 
         if (existingCategory) {
           // Add the new ID if not already present
-          if (!existingCategory.ids.includes(element.id)) {
-            existingCategory.ids.push(element.id);
+          if (!existingCategory.ids.includes(playlist.id)) {
+            existingCategory.ids.push(playlist.id);
           }
         } else {
           // Add a new entry if the category does not exist
-          categories.value.push({ category, ids: [element.id] });
+          categories.value.push({ category, ids: [playlist.id] });
         }
       });
     });
