@@ -2,13 +2,19 @@
 
 ## Setup
 
-Execute the following commands to run the project locally:
+Execute the following commands to run the project locally in development mode:
 
 ```bash
 npm install && npm run dev
 ```
 
 The server will be available at `http://localhost:3000`.
+
+Run in **production mode** instead:
+
+```bash
+npm install && npm start
+```
 
 ## TSDocs
 
@@ -30,6 +36,7 @@ set the variables there. Latter is suggested.
 > Check the `.gitignore` file to see the `.env` file is ignored.
 
 ## Project Structure
+
 We are using the following project structure:
 
 ```
@@ -45,4 +52,5 @@ We are using the following project structure:
         └── health.get.ts   # eg, GET /api/health  
     └── utils               # For server utilities
 ```
+
 Please see the [Nuxt Documentation](https://nuxt.com/docs/guide/directory-structure/app) for more detailed information.
