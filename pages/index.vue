@@ -66,7 +66,7 @@ const newGame = async () => {
         <div class="flex flex-col h-full p-3">
           <VerticalGameList :games="games?.active || []" class="h-3/6"/>
           <UsersView :view-type="UserViewType.OPPONENTTURN" class="h-2/6"
-                     :users="games?.waiting ? games?.waiting.map(game=>game.players[0]) : []"/>
+                     :users="games?.waiting ? games?.waiting.map(game=>game.players.find((p)=>p.id != user?.id)) : []"/>
           <HomeControlsGameButtons class="h-1/6" @quick-game="()=>newGame()"/>
         </div>
       </template>
