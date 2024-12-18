@@ -5,12 +5,15 @@ import {useGame} from "@/composables/useGames";
 import type {ActiveGame} from "@/types/api/game";
 import VerticalGameList from "@/components/home/Game/VerticalGameList.vue";
 import RegistrationView from "@/components/login/RegistrationModal.vue";
+import StartGameModal from "@/components/home/StartGameModal.vue";
 
-const {fetchUser, user,error:userError} = useUser()
+const {fetchUser, user, error:userError} = useUser()
 
 const {games, fetchGames} = useGame();
 
 const curr_game = useState<ActiveGame | null>('current_game', () => null);
+
+const showModal = ref(false);
 
 onMounted(async () => {
   setLevelbar(70);
@@ -23,27 +26,28 @@ function setLevelbar(newValue: number) {
   if (levelbar) {
     levelbar.style.width = newValue + "%"
   }
-}
+};
 
-const newGame = async () => {
+const newGame = async (friendId: string, playlistId: string) => {
   const data = await $fetch<ActiveGame>('/api/v1/game', {
     method: 'POST',
     body: JSON.stringify({
-      playlist_id: '4DZ79IJM4IlYBI8dpWZZO2',
-      opponent_id: '9da97502-5363-4964-ae80-c242a053e810',
+      playlist_id: playlistId,
+      opponent_id: friendId,
     }),
   });
 
   curr_game.value = data;
   navigateTo('/play');
-}
-
+};
 </script>
 
 <template>
   <div class="bg-gradient-to-b from-indigo-500 to-purple-500">
 
     <RegistrationView v-if="userError" :on-register="async ()=> {await fetchUser();}"/>
+
+    <StartGameModal v-show="showModal" @close-modal="showModal = false" @friend-playlist-chosen="newGame"/>
 
     <HeaderFooterView v-if="user">
       <template #header>
@@ -67,7 +71,7 @@ const newGame = async () => {
           <VerticalGameList :games="games?.active || []" class="h-3/6"/>
           <UsersView :view-type="UserViewType.OPPONENTTURN" class="h-2/6"
                      :users="games?.waiting ? games?.waiting.map(game=>game.players.find((p)=>p.id != user?.id)) : []"/>
-          <HomeControlsGameButtons class="h-1/6" @quick-game="()=>newGame()"/>
+          <HomeControlsGameButtons class="h-1/6" @start-game="showModal = true" @quick-game="()=>newGame()"/>
         </div>
       </template>
       <template #footer>

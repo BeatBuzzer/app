@@ -2,11 +2,18 @@
 import { FriendshipStatus, FriendshipType, type GetFriendsResponse } from "@/types/api/user.friends";
 import { UserViewType } from "@/types/components/users.view";
 
+const props = defineProps({
+  startGame: {
+    type: Boolean,
+    default: false
+  }
+})
+
 const requests: Ref<GetFriendsResponse[]> = useState("incoming_friendships", () => [])
 const friends: Ref<GetFriendsResponse[]> = useState("accepted_friendships", () => [])
 const sentRequests: Ref<GetFriendsResponse[]> = useState("outgoing_friendships", () => [])
 
-const session = useSupabaseSession()
+const session = useSupabaseSession();
 
 const showModal = ref(false);
 
@@ -25,6 +32,12 @@ async function getFriendships() {
       sentRequests.value = data.filter((item) => item.request_type == FriendshipType.OUTGOING && item.status === FriendshipStatus.PENDING)
     });
 }
+
+const emit = defineEmits(['chose_friend'])
+
+function handleChoseFriend(friendId: string) {
+  emit('chose_friend', friendId)
+}
 </script>
 
 <template>
@@ -38,10 +51,10 @@ async function getFriendships() {
     <!-- Responsive Size Content Section -->
     <div class="overflow-y-auto" style="max-height: 43vh;">
       <UsersView v-if="friends.length > 0" :view-type="UserViewType.FRIENDS" :users="friends"
-        action-label="Add Friend" :on-action="() => {showModal = true}" @refresh="getFriendships" />
-      <UsersView v-if="requests.length > 0" :view-type="UserViewType.REQUESTS" :users="requests"
+        action-label="Add Friend" :on-action="() => {showModal = true}" :start-game="props.startGame" @refresh="getFriendships" @chose_friend="handleChoseFriend" />
+      <UsersView v-if="requests.length > 0 && !props.startGame" :view-type="UserViewType.REQUESTS" :users="requests"
         @refresh="getFriendships" />
-      <UsersView v-if="sentRequests.length > 0" :view-type="UserViewType.SENTREQUESTS" :users="sentRequests"
+      <UsersView v-if="sentRequests.length > 0 && !props.startGame" :view-type="UserViewType.SENTREQUESTS" :users="sentRequests"
         @refresh="getFriendships" />
     </div>
   </div>
