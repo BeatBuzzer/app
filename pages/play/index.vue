@@ -37,7 +37,7 @@ onMounted(async () => {
     await selectOption(round.value!.options[0]);
   }
 
-  playRound();
+  startGame();
 });
 
 onUnmounted(() => {
