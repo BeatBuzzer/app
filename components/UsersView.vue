@@ -20,10 +20,14 @@ const props = defineProps({
   actionLabel: {
     type: String,
     required: false
+  },
+  startGame: {
+    type: Boolean,
+    default: false
   }
 });
 
-const emit = defineEmits(['refresh']);
+const emit = defineEmits(['refresh', 'chose_friend']);
 
 const friendshipId = ref(0);
 const friendshipStatus = ref(FriendshipStatus.ACCEPTED);
@@ -67,6 +71,10 @@ const mappedUsers: Array<GetUserResponse> = computed(() => {
     return {};
   });
 });
+
+function handleChoseFriend(friendId: string) {
+  emit('chose_friend', friendId)
+}
 </script>
 
 <template>
@@ -127,6 +135,8 @@ const mappedUsers: Array<GetUserResponse> = computed(() => {
           :friends-status="friendshipStatus"
           :friend-id="user.id"
           :view-type="props.viewType"
+          :start-game="props.startGame"
+          @chose_friend="handleChoseFriend"
           @refresh="emit('refresh');"
       />
       <!-- Placeholder for scrolling -->

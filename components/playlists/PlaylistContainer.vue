@@ -13,13 +13,23 @@ const props = defineProps({
     playlistIds: {
         type: Array,
         required: true
+    },
+    startGame: {
+        type: Boolean,
+        default: false
     }
 });
+
+const emit = defineEmits(['chose-playlist'])
 
 /* Filter the playlists array for playlits where the ID exists in the genre. */
 const filteredPlaylists = computed(() => 
     props.playlists.filter((item) => props.playlistIds.includes(item.spotifyId))
 );
+
+function handleChosePlaylist(playlistId: string) {
+    emit('chose-playlist', playlistId)
+}
 </script>
 
 <template>
@@ -35,7 +45,9 @@ const filteredPlaylists = computed(() =>
                 v-for="item in filteredPlaylists" 
                 :key="item.id" 
                 :playlist-id="item.spotifyId"
-                :name="item.name" 
+                :name="item.name"
+                :start-game="props.startGame"
+                @chose-playlist="handleChosePlaylist" 
                 v-bind="item.cover ? { cover: item.cover.toString() } : {}" class="flex-grow-0 flex-shrink-0" />
         </div>
     </div>
