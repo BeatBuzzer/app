@@ -71,7 +71,7 @@ const newGame = async () => {
         </div>
       </template>
       <template #footer>
-        <NuxtLink to="/playlist" class="inline-flex items-center text-5xl rounded-xl">
+        <NuxtLink to="/playlists" class="inline-flex items-center text-5xl rounded-xl">
           <Icon name="mdi:album" class=""/>
         </NuxtLink>
         <NuxtLink to="/" class="inline-flex items-center text-6xl rounded-full p-1.5">
