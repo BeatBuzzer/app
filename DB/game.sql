@@ -7,7 +7,6 @@ $$
     END
 $$;
 
-
 DO
 $$
     BEGIN
@@ -36,7 +35,7 @@ CREATE TABLE IF NOT EXISTS games
 CREATE TABLE IF NOT EXISTS game_players
 (
     game_id    INTEGER REFERENCES games (game_id) ON DELETE CASCADE,
-    user_id    UUID REFERENCES users (id),
+    user_id    UUID REFERENCES users (id) ON DELETE SET DEFAULT DEFAULT '00000000-0000-0000-0000-000000000000',
     score      INTEGER NOT NULL DEFAULT 0,
     is_creator BOOLEAN NOT NULL DEFAULT false,
     PRIMARY KEY (game_id, user_id)
@@ -79,7 +78,7 @@ CREATE TABLE IF NOT EXISTS game_rounds
 CREATE TABLE IF NOT EXISTS game_player_song_stats
 (
     game_id         INTEGER REFERENCES games (game_id) ON DELETE CASCADE,
-    user_id         UUID REFERENCES users (id),
+    user_id         UUID REFERENCES users (id)  ON DELETE SET DEFAULT DEFAULT '00000000-0000-0000-0000-000000000000',
     song_order      INTEGER NOT NULL,
     time_to_guess   NUMERIC,
     correct_guess   BOOLEAN NOT NULL DEFAULT false,
