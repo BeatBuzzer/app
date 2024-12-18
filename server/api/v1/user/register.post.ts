@@ -14,6 +14,17 @@ const registerSchema = z.object({
     spotify_visibility: z.boolean(),
 });
 
+/**
+ * Registers a new user profile with username and Spotify visibility settings
+ * @param {Object} body - Request body
+ * @param {string} body.username - Username (4+ chars, alphanumeric + underscore only)
+ * @param {boolean} body.spotify_visibility - Whether to show Spotify profile info publicly
+ * @throws {400} Bad Request - Invalid username format or missing required fields
+ * @throws {401} Unauthenticated - User is not logged in
+ * @throws {409} Conflict - Username already exists
+ * @throws {500} Internal Server Error - Database or server error
+ * @returns {Object} Empty object on success
+ */
 export default defineEventHandler(async (event) => {
     const body = await readValidatedBody(event, body => registerSchema.safeParse(body))
 
@@ -46,7 +57,5 @@ export default defineEventHandler(async (event) => {
         return {error: error.message};
     }
 
-    return {
-        success: true
-    };
+    return {};
 });

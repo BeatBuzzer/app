@@ -24,6 +24,19 @@ function calculateScore(time_to_guess: number): number {
     return reward;
 }
 
+/**
+ * Submits a guess for a specific round in a game
+ * @param {string} uid - The game ID
+ * @param {Object} body - Request body
+ * @param {number} body.round - Round number
+ * @param {string} body.guess - Spotify ID of the guessed song
+ * @param {number} body.time - Time taken to make the guess in seconds
+ * @throws {400} Bad Request - Invalid game ID, round number, or player not in game
+ * @throws {401} Unauthenticated - User is not logged in
+ * @throws {404} Not Found - Game not found
+ * @throws {500} Internal Server Error - Database or server error
+ * @returns {PlayGameResponse} Object containing game round results
+ */
 export default defineEventHandler(async (event) => {
     const gameId = getRouterParam(event, 'uid');
 

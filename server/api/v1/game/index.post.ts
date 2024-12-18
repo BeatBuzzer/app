@@ -14,51 +14,16 @@ const GameInitSchema = z.object({
     opponent_id: z.string().uuid()
 }).readonly()
 
-async function saveSongsToDatabase(client: SupabaseClient, songs: Song[]) {
-    const {error: songError} = await client
-        .from('songs')
-        .upsert(songs.map((song: Song) => ({
-            spotify_song_id: song.id,
-            song_name: song.name,
-            artist_name: song.artists[0].name, // Using first artist only
-            preview_url: song.preview_url      // Mostly null, spotify changed their API
-        })));
-
-    if (songError) {
-        throw new Error(songError.message);
-    }
-}
-
-async function createGameRounds(songs: Song[], rounds_to_play: number = 5): Promise<GameRound[]> {
-    const gameRounds: GameRound[] = [];
-    const shuffledSongs = [...songs].sort(() => Math.random() - 0.5);
-
-    for (let i = 0; i < rounds_to_play; i++) {
-        const selectedTrack = shuffledSongs.pop();
-        // Get preview url through parsing embed for selected track
-        selectedTrack!.preview_url = await fetchPreviewUrl(selectedTrack!.id);
-
-        // keep track of used IDs for this song option
-        const usedIds = new Set<string>([selectedTrack!.id]);
-        const getUniqueWrong = () => {
-            let wrongTrack;
-            do {
-                wrongTrack = shuffledSongs[Math.floor(Math.random() * shuffledSongs.length)];
-            } while (usedIds.has(wrongTrack.id));
-            usedIds.add(wrongTrack.id);
-            return wrongTrack;
-        };
-
-        gameRounds.push({
-            round: i + 1, // 1-indexed since postgres functions are also 1-indexed
-            correct_song: selectedTrack!,
-            wrong_songs: [getUniqueWrong(), getUniqueWrong(), getUniqueWrong()]
-        });
-    }
-
-    return gameRounds;
-}
-
+/**
+ * Initializes a new game between two players using a specified playlist
+ * @param {Object} body - Request body
+ * @param {string} body.playlist_id - Spotify ID of the playlist to use
+ * @param {string} body.opponent_id - UUID of the opponent to play against
+ * @throws {400} Bad Request - Invalid playlist ID, self-play attempt, disabled playlist, or insufficient tracks
+ * @throws {401} Unauthenticated - User is not logged in
+ * @throws {500} Internal Server Error - Database, Spotify API, or server error
+ * @returns {ActiveGame} Newly created game with randomized rounds and song options
+ */
 export default defineEventHandler(async (event) => {
     // validate post-request body
     const result = await readValidatedBody(event, body => GameInitSchema.safeParse(body))
@@ -171,9 +136,55 @@ export default defineEventHandler(async (event) => {
             rounds: mappedGameRounds
         }
 
+        setResponseStatus(event, 201);
         return game;
     } catch (error) {
         setResponseStatus(event, 500);
         return {error: error instanceof Error ? error.message : 'An unknown error occurred'};
     }
 });
+
+async function saveSongsToDatabase(client: SupabaseClient, songs: Song[]) {
+    const {error: songError} = await client
+        .from('songs')
+        .upsert(songs.map((song: Song) => ({
+            spotify_song_id: song.id,
+            song_name: song.name,
+            artist_name: song.artists[0].name, // Using first artist only
+            preview_url: song.preview_url      // Mostly null, spotify changed their API
+        })));
+
+    if (songError) {
+        throw new Error(songError.message);
+    }
+}
+
+async function createGameRounds(songs: Song[], rounds_to_play: number = 5): Promise<GameRound[]> {
+    const gameRounds: GameRound[] = [];
+    const shuffledSongs = [...songs].sort(() => Math.random() - 0.5);
+
+    for (let i = 0; i < rounds_to_play; i++) {
+        const selectedTrack = shuffledSongs.pop();
+        // Get preview url through parsing embed for selected track
+        selectedTrack!.preview_url = await fetchPreviewUrl(selectedTrack!.id);
+
+        // keep track of used IDs for this song option
+        const usedIds = new Set<string>([selectedTrack!.id]);
+        const getUniqueWrong = () => {
+            let wrongTrack;
+            do {
+                wrongTrack = shuffledSongs[Math.floor(Math.random() * shuffledSongs.length)];
+            } while (usedIds.has(wrongTrack.id));
+            usedIds.add(wrongTrack.id);
+            return wrongTrack;
+        };
+
+        gameRounds.push({
+            round: i + 1, // 1-indexed since postgres functions are also 1-indexed
+            correct_song: selectedTrack!,
+            wrong_songs: [getUniqueWrong(), getUniqueWrong(), getUniqueWrong()]
+        });
+    }
+
+    return gameRounds;
+}
