@@ -35,7 +35,8 @@ export default defineEventHandler(async (event) => {
         id: result.data.id,
         name: result.data.name,
         spotifyId: result.data.spotifyId,
-        cover: coverUrl
+        cover: coverUrl,
+        enabled: result.data.enabled
     }
 
     const categoriesInsert = result.data.categories.map((category) => ({
