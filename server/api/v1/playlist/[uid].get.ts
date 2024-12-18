@@ -2,11 +2,12 @@ import {serverSupabaseServiceRole, serverSupabaseUser} from "#supabase/server";
 
 
 /**
- * Endpoint to get a playlist by id
- * @returns {Object} - Playlist object
- * @throws {400} - Invalid playlistId
- * @throws {401} - Unauthenticated
- * @throws {500} - Internal Server Error
+ * Retrieves detailed information about a specific playlist
+ * @param {string} uid - Spotify playlist ID
+ * @throws {400} Bad Request - Invalid Spotify playlist ID format
+ * @throws {401} Unauthenticated - User is not logged in
+ * @throws {500} Internal Server Error - Database or server error
+ * @returns {GetPlaylistResponse} Playlist details including categories
  */
 export default defineEventHandler(async (event) => {
     const playlistId = getRouterParam(event, 'uid')

@@ -1,10 +1,10 @@
 import {serverSupabaseServiceRole, serverSupabaseUser} from "#supabase/server";
 
 /**
- * Endpoint to get all playlists
- * @throws {401} - Unauthenticated
- * @throws {500} - Internal Server Error
- * @returns {Array} - Array of playlists
+ * Retrieves all available playlists with their categories
+ * @throws {401} Unauthenticated - User is not logged in
+ * @throws {500} Internal Server Error - Database or server error
+ * @returns {GetPlaylistResponse[]} Array of playlists with their details and categories
  */
 export default defineEventHandler(async (event) => {
 

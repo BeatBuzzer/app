@@ -12,13 +12,18 @@ const schema = z.object({
     enabled: z.boolean().optional().default(true)
 })
 
-
 /**
- * Unauthenticated endpoint to create a playlist - management only
- * @throws {400} - Invalid body
- * @throws {400} - Playlist with this ID already exists
- * @throws {500} - Internal Server Error
- * @returns {Object} - Created playlist
+ * Creates a new playlist with categories
+ * @param {Object} body - Request body
+ * @param {string} body.id - Spotify playlist ID
+ * @param {string} body.name - Playlist name
+ * @param {string} body.spotifyId - Spotify playlist ID
+ * @param {string[]} body.categories - Array of category names
+ * @param {boolean} [body.enabled=true] - Whether the playlist is enabled
+ * @throws {400} Bad Request - Invalid request body format or duplicate playlist ID
+ * @throws {500} Internal Server Error - Database, Spotify API, or server error
+ * @returns {Object} Created playlist and categories data
+ * @status {201} Created successfully
  */
 export default defineEventHandler(async (event) => {
     const result = await readValidatedBody(event, body => schema.safeParse(body))

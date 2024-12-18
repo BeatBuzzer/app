@@ -4,6 +4,15 @@ import type {GetGameResponse} from "~/types/api/game";
 import {GameStatus} from "~/types/api/game";
 import {fetchPreviewUrl} from "~/server/utils/spotify";
 
+/**
+ * Retrieves all games for the authenticated user, categorized by status
+ * @throws {401} Unauthenticated - User is not logged in
+ * @throws {500} Internal Server Error - Database or server error
+ * @returns {GetGameResponse} Object containing arrays of:
+ * - active: Games where it's the user's turn to play
+ * - waiting: Games where user is waiting for opponent
+ * - past: Completed games
+ */
 export default defineEventHandler(async (event) => {
     // Require user to be authenticated
     const user = await serverSupabaseUser(event);

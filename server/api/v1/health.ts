@@ -1,3 +1,15 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface HealthCheckResponse {
+    status: string;
+    timestamp: string;
+    uptime: number;
+    memoryUsage: number;
+}
+
+/**
+ * Health check endpoint that provides basic server status information
+ * @returns {HealthCheckResponse} Server health status information
+ */
 export default defineEventHandler(async () => {
     return {
         status: 'ok',
