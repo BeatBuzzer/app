@@ -28,3 +28,21 @@ set the variables there. Latter is suggested.
 > [!WARNING] Careful
 > Make sure to never commit the `.env` file to the repository.  
 > Check the `.gitignore` file to see the `.env` file is ignored.
+
+## Project Structure
+We are using the following project structure:
+
+```
+.
+├── pages                   # For Vue pages
+├── components              # For Vue components
+├── composables             # For composables (Vue composition API)
+├── DB                      # All DDLs for the database
+├── layouts                 # For Vue layouts
+├── types                   # For TypeScript types
+└── server                  # For the Nitro server
+    ├── api                 # All API routes (route automatically defined as folder/file)
+        └── health.get.ts   # eg, GET /api/health  
+    └── utils               # For server utilities
+```
+Please see the [Nuxt Documentation](https://nuxt.com/docs/guide/directory-structure/app) for more detailed information.
