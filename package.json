@@ -7,6 +7,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "start": "nuxt build && nuxt start",
     "postinstall": "nuxt prepare",
     "docs": "typedoc",
     "docs:serve": "typedoc && npx serve docs"
