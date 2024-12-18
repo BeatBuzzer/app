@@ -6,13 +6,13 @@ WORKDIR /app
 # Install dependencies needed for node-gyp
 RUN apk add --no-cache python3 make g++
 
-# Copy package files
-COPY package*.json ./
+# Copy package files first
+COPY package.json package-lock.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies (this layer will be cached if package files don't change)
+RUN npm ci
 
-# Copy project files
+# Copy all source files
 COPY . .
 
 # Build the application
