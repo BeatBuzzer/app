@@ -14,8 +14,8 @@ export const useUser = () => {
 
             user.value = await useProfileInformation()
         } catch (err) {
-            error.value = 'Failed to fetch user'
-            console.error(err)
+            error.value = 'An error occurred';
+            console.error('Error fetching user', err)
         } finally {
             loading.value = false
         }

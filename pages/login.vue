@@ -1,10 +1,25 @@
 <script setup lang="ts">
 import SplitView from "~/layouts/SplitView.vue";
+import type {LoginError} from "@/pages/confirm.vue";
 
 useSeoMeta({
   title: "BeatBuzzer",
   description: "A fun music quiz game",
   viewport: "width=device-width, initial-scale=1.0",
+})
+
+const loginError = useState<LoginError>('login_error', () => ({error: null, error_code: null, msg: null}));
+
+onMounted(() => {
+  if(loginError.value.error){
+    throw createError({
+      fatal: true,
+      statusCode: 401,
+      statusMessage: 'Unauthorized',
+      message: loginError.value.msg || 'Login error',
+    })
+
+  }
 })
 </script>
 

@@ -4,15 +4,17 @@ import {UserViewType} from "@/types/components/users.view"
 import {useGame} from "@/composables/useGames";
 import type {ActiveGame} from "@/types/api/game";
 import VerticalGameList from "@/components/home/Game/VerticalGameList.vue";
+import RegistrationView from "@/components/login/RegistrationModal.vue";
 
-const {user} = useUser()
+const {fetchUser, user,error:userError} = useUser()
 
-useUser().fetchUser(); // loading user state just in case
-const {games, loading, error, fetchGames} = useGame();
+const {games, fetchGames} = useGame();
 
 const curr_game = useState<ActiveGame | null>('current_game', () => null);
 
 onMounted(async () => {
+  setLevelbar(70);
+  await fetchUser();
   await fetchGames();
 });
 
@@ -40,7 +42,10 @@ const newGame = async () => {
 
 <template>
   <div class="bg-gradient-to-b from-indigo-500 to-purple-500">
-    <HeaderFooterView>
+
+    <RegistrationView v-if="userError" :on-register="async ()=> {await fetchUser();}"/>
+
+    <HeaderFooterView v-if="user">
       <template #header>
 
         <div class="m-3 w-full flex items-center justify-center">
