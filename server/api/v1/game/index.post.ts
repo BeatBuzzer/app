@@ -7,6 +7,7 @@ import {GameStatus} from "~/types/api/game";
 import type {SupabaseClient} from "@supabase/supabase-js";
 import type {Playlist} from "~/types/api/playlist";
 import type {PostgrestError} from "@supabase/postgrest-js";
+import type {GetUserResponse} from "~/types/api/users";
 
 const GameInitSchema = z.object({
     playlist_id: z.string().regex(spotifyIDRegex, {message: 'Invalid Spotify ID'}),
@@ -164,8 +165,8 @@ export default defineEventHandler(async (event) => {
                 cover: playlist.cover
             },
             players: [
-                {id: user.id},
-                {id: result.data.opponent_id}
+                {id: user.id} as GetUserResponse,
+                {id: result.data.opponent_id} as GetUserResponse
             ], // TODO: Fetch opponent data and fix this
             rounds: mappedGameRounds
         }
