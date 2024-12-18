@@ -7,7 +7,7 @@ CREATE TABLE users
     spotify_visibility      boolean                  not null default false,
     created_at              timestamp with time zone          default now(),
     daily_streak            integer                  not null default 0,
-    daily_streak_updated_at timestamp with time zone not null default now(),
+    daily_streak_updated_at timestamp with time zone not null default now()-interval '1 day',
     primary key (id)
 );
 
