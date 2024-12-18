@@ -1,4 +1,6 @@
 import {serverSupabaseServiceRole, serverSupabaseUser} from "#supabase/server";
+import type {GetPlaylistDBResponse} from "~/types/api/playlists";
+import type {PostgrestError} from "@supabase/postgrest-js";
 
 /**
  * Retrieves all available playlists with their categories
@@ -16,20 +18,20 @@ export default defineEventHandler(async (event) => {
     }
 
     const client = serverSupabaseServiceRole(event);
-    const {data, error} = await client.from('playlists')
-    .select(`
-        *,
-        categories (name)
-    `);
+    const {data, error}: {
+        data: GetPlaylistDBResponse[] | null, error: PostgrestError | null
+    } = await client.from('playlists').select(`*, categories (name)`); // join categories
 
     if (error) {
         setResponseStatus(event, 500);
         return {error: error.message};
-    } else {
-        const transformedData = data.map(playlist => ({
-            ...playlist,
-            categories: playlist.categories.map(category => category.name),
-        }));
-        return transformedData;
     }
+
+    if(!data) return [];
+
+    return data.map(playlist => ({
+        ...playlist,
+        categories: playlist.categories.map(category => category.name),
+    }));
+
 })
