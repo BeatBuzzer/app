@@ -1,6 +1,7 @@
 import {isValidUUID} from "~/server/utils/data-validation";
 import {serverSupabaseServiceRole, serverSupabaseUser} from "#supabase/server";
 import type {GetUserResponse} from "~/types/api/users";
+import type {PostgrestError} from "@supabase/postgrest-js";
 
 /**
  * Retrieves a specific user's profile information by their UUID
@@ -28,7 +29,10 @@ export default defineEventHandler(async (event) => {
 
     // Send request
     const client = serverSupabaseServiceRole(event);
-    const {data, error}:{ data: GetUserResponse|null, error: any} = await client.from('users').select('*').eq('id', userId).maybeSingle();
+    const {data, error}: {
+        data: GetUserResponse | null,
+        error: PostgrestError | null
+    } = await client.from('users').select('*').eq('id', userId).maybeSingle();
 
     if (!data) {
         setResponseStatus(event, 404);

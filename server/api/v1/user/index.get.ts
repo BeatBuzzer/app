@@ -1,5 +1,6 @@
 import {serverSupabaseServiceRole, serverSupabaseUser} from "#supabase/server";
 import type {GetUserResponse} from "~/types/api/users";
+import type {PostgrestError} from "@supabase/postgrest-js";
 
 /**
  * Retrieves the authenticated user's profile information
@@ -19,7 +20,10 @@ export default defineEventHandler(async (event) => {
 
     // Send request
     const client = serverSupabaseServiceRole(event);
-    const {data, error}:{ data: GetUserResponse|null, error: any} = await client.from('users').select('*').eq('id', user.id).maybeSingle();
+    const {data, error}: {
+        data: GetUserResponse | null,
+        error: PostgrestError | null
+    } = await client.from('users').select('*').eq('id', user.id).maybeSingle();
 
     if (!data) {
         setResponseStatus(event, 404);

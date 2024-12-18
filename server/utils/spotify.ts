@@ -107,7 +107,8 @@ export async function fetchPreviewUrl(trackId: string): Promise<string | null> {
                 if (result && result.length > 0) {
                     return result[0] as string;
                 }
-            } catch (e) {
+            } catch (error) {
+                console.debug('Failed to parse script tag as JSON:', error);
                 // Skip this script tag if it's not valid JSON
             }
         }
