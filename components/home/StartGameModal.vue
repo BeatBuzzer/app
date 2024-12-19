@@ -31,9 +31,17 @@ function handleChoseFriendPlaylist(id: string) {
         friendId.value = id
         return;    
     } else if (friendChosen.value && !playlistChosen.value) {
-        playlistChosen.value = true;
         emit('friend-playlist-chosen', friendId.value, id);
+        playlistChosen.value = true;
+        emit('close-modal')
     }    
+}
+
+function handleClose() {
+    friendChosen.value = false;
+    friendId.value = '';
+    playlistChosen.value = false;
+    emit('close-modal') ;
 }
 
 
@@ -41,16 +49,16 @@ function handleChoseFriendPlaylist(id: string) {
 
 <template>
     <div class="modal-overlay z-50">
-        <div class="modal w-full">
-            <ProfileFriendlist v-if="!friendChosen && !playlistChosen" :start-game="true" @chose_friend="handleChoseFriendPlaylist"/>
-            <PlaylistsPlaylistView v-if="friendChosen && !playlistChosen" :start-game="true" @chose-playlist="handleChoseFriendPlaylist"/>           
-
-            <!--p class="text-3xl font-bold">New friend</p>
-            <p class="mb-3">Enter your friends name:</p>
-            <input v-model="newFriend" class="rounded-3xl pl-2 border border-black">
-            <p v-if="newFriendError" class="error-message">{{ newFriendError }}</p>
-            <button class="bg-yellow-500 hover:bg-yellow-600 text-red-600 my-4" @click="addFriend">Add Friend</button-->
-            <button class="bg-indigo-600 hover:bg-indigo-800 my-5 text-white" @click="$emit('close-modal')">Close</button>
+        <div class="mt-[10%] w-2/3 max-h-[80vh] overflow-y-auto bg-white rounded-lg p-5">
+            <div v-if="!friendChosen && !playlistChosen">
+                <p class="text-3xl font-bold">Choose your Opponent</p>
+                <ProfileFriendlist  :start-game="true" class="w-full p-3" @chose_friend="handleChoseFriendPlaylist"/>
+            </div>
+            <div v-if="friendChosen && !playlistChosen">
+                <p class="text-3xl font-bold">Choose your Playlist</p>
+                <PlaylistsPlaylistView :start-game="true" class="overflow-y-auto" @chose-playlist="handleChoseFriendPlaylist"/>  
+            </div>       
+            <button class="bg-indigo-600 hover:bg-indigo-800 my-5 text-white" @click="handleClose">Close</button>
         </div>
     </div>
 </template>
