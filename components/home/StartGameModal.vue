@@ -47,19 +47,22 @@ function handleClose() {
 
 <template>
     <div class="flex justify-center bg-black bg-opacity-85 z-50 p-3 fixed top-0 bottom-0 right-0 left-0">
-        <div class="mt-[10%] md:mt-[5%] w-full md:w-1/2 max-h-[80vh] overflow-y-auto bg-white rounded-3xl p-3">
-            <div v-if="!friendChosen && !playlistChosen" class="flex flex-col items-center justify-center h-full">
-                <p class="text-3xl font-bold mb-2">Choose your Opponent</p>
-                <ProfileFriendlist  :start-game="true" class="w-full p-3" @chose_friend="handleChoseFriendPlaylist"/>
+        <div class="mt-[10%] md:mt-[5%] w-full md:w-1/2 max-h-[80vh] bg-white rounded-3xl p-3 flex flex-col justify-between">
+            <div class="flex-grow">
+                <div v-if="!friendChosen && !playlistChosen" class="flex flex-col items-center justify-center h-full">
+                    <p class="text-3xl font-bold pb-2 text-center">Choose your Opponent</p>
+                    <ProfileFriendlist :start-game="true" class="w-full p-3" @chose_friend="handleChoseFriendPlaylist"/>
+                </div>
+                <div v-if="friendChosen && !playlistChosen">
+                    <p class="text-3xl font-bold pb-2 text-center">Choose your Playlist</p>
+                    <PlaylistsPlaylistView :start-game="true" class="overflow-y-auto max-h-[60vh] mb-5" @chose-playlist="handleChoseFriendPlaylist" />  
+                </div>       
             </div>
-            <div v-if="friendChosen && !playlistChosen">
-                <p class="text-3xl font-bold pb-2">Choose your Playlist</p>
-                <PlaylistsPlaylistView :start-game="true" class="overflow-y-auto" @chose-playlist="handleChoseFriendPlaylist"/>  
-            </div>       
-            <button class="bg-indigo-600 hover:bg-indigo-800 my-5 text-white mx-auto block" @click="handleClose">Close</button>
+            <button class="bg-indigo-600 hover:bg-indigo-800 text-white mx-auto block mb-5" @click="handleClose">Close</button>
         </div>
     </div>
 </template>
+
 
 <style scoped>
 button {

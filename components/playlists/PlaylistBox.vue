@@ -31,7 +31,7 @@ const showModal = ref(false);
 <template>
   <div 
     :class="[
-      'bg-blue-600 rounded-3xl p-3 mb-3 inline-block w-24 md:w-28'
+      'bg-blue-600 rounded-3xl p-3 mb-3 inline-block w-24 md:w-28 hover:bg-sky-700'
     ]" 
     @click="props.startGame ? emit('chose-playlist', props.playlistId) : showModal = true">
     <!-- Playlist cover, when none is given a default image is used -->

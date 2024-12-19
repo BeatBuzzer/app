@@ -58,7 +58,7 @@ function handleChosePlaylist(playlistId: string) {
 
 <template>
   <div class="flex flex-col">
-    <div class="overflow-y-auto" style="max-height: 85vh;">
+    <div class="overflow-y-auto">
       <PlaylistsPlaylistContainer v-for="categoryEl in categories" :key="categoryEl.category" :genre="categoryEl.category" :playlist-ids="categoryEl.ids" :playlists="playlists" :categories="categories" :start-game="props.startGame" @chose-playlist="handleChosePlaylist"/>
     </div>
   </div>
