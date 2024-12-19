@@ -10,7 +10,7 @@ const playlistError = ref('')
 
 <template> 
     <div class="fixed top-0 bottom-0 left-0 right-0 flex justify-center z-50 bg-black bg-opacity-85">
-        <div class="mt-[10%] md:mt-[5%] w-full md:w-1/6 max-h-[80vh] md:max-h-[50vh] rounded-3xl flex flex-col align-center text-center bg-white px-5 pt-10">
+        <div class="mt-[10%] md:mt-[5%] w-full sm:w-3/6 xl:w-2/6 2xl:w-2/6 max-h-[80vh] md:max-h-[50vh] rounded-3xl flex flex-col align-center text-center bg-white px-5 pt-10">
             <p class="text-3xl font-bold my-3">Your Playlists</p>
             <UserSpotifyPlaylistsView @refresh="emit('refresh')"/>
             <p v-if="playlistError" class="error-message">{{ playlistError }}</p>

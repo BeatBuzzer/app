@@ -80,7 +80,7 @@ export default function useSpotify(playlistId: string) {
 
     async function getUserPlaylists(): Promise<Playlist[] | null> {
         try {
-            const res = await fetch(`https://api.spotify.com/v1/users/${session.value?.user.user_metadata.full_name}/playlists`, {
+            const res = await fetch(`https://api.spotify.com/v1/users/${session.value?.user.user_metadata.provider_id}/playlists`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token.value}`,
