@@ -55,9 +55,10 @@ const showModal = ref(false);
       ]"
       @click="showModal = true">
       <!-- Profile Picture -->
-      <NuxtImg :class="[
-        'rounded-full',
-        'w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14',
+      <NuxtImg 
+        :class="[
+          'rounded-full',
+          'w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14',
         props.userTurn ? 'mr-3' : 'mb-0'
       ]" :src="props.profilePicture.toString()" :alt="props.name" />
 
