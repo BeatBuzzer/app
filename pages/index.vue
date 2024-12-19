@@ -71,7 +71,7 @@ const newGame = async (friendId: string, playlistId: string) => {
           <div class="h-4/6 min-h-0">
             <VerticalGameList :games="games?.active || []" class="h-full"/>
           </div>
-          <div class="h-fit min-h-0">
+          <div class="h-fit min-h-[15%]">
             <UsersView
                 :view-type="UserViewType.OPPONENTTURN"
                 :users="games?.waiting ? games?.waiting.map(game=>game.players.find((p)=>p.id != user?.id)) : []"
