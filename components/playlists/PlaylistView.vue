@@ -9,7 +9,7 @@ const props = defineProps({
 })
 
 const playlists = ref<GetPlaylistResponse[]>([]);
-const categories = ref<{ category: string; ids: number[] }[]>([]);
+const categories = ref<{ category: string; ids: string[] }[]>([]);
 
 const session = useSupabaseSession();
 
