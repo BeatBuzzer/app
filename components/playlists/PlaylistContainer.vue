@@ -16,11 +16,11 @@ const props = defineProps({
     },
     onAction: {
         type: Function as PropType<() => void>,
-        required: false
+        default: () => {}
     },
     actionLabel: {
         type: String,
-        required: false
+        default: ''
     }
 });
 
