@@ -67,11 +67,24 @@ const newGame = async (friendId: string, playlistId: string) => {
 
       </template>
       <template #content>
-        <div class="flex flex-col h-full p-3">
-          <VerticalGameList :games="games?.active || []" class="h-3/6"/>
-          <UsersView :view-type="UserViewType.OPPONENTTURN" class="h-2/6"
-                     :users="games?.waiting ? games?.waiting.map(game=>game.players.find((p)=>p.id != user?.id)) : []"/>
-          <HomeControlsGameButtons class="h-1/6" @start-game="showModal = true" @quick-game="()=>newGame()"/>
+        <div class="flex flex-col h-full p-3 min-h-0 gap-3">
+          <div class="h-4/6 min-h-0">
+            <VerticalGameList :games="games?.active || []" class="h-full"/>
+          </div>
+          <div class="h-fit min-h-0">
+            <UsersView
+                :view-type="UserViewType.OPPONENTTURN"
+                :users="games?.waiting ? games?.waiting.map(game=>game.players.find((p)=>p.id != user?.id)) : []"
+                class="h-full"
+            />
+          </div>
+          <div class="h-1/6 min-h-0">
+            <HomeControlsGameButtons
+                class="h-full"
+                @start-game="showModal = true"
+                @quick-game="()=>newGame('9da97502-5363-4964-ae80-c242a053e810','4zfjCJLxd7kB0gnNhKurNn')"
+            />
+          </div>
         </div>
       </template>
       <template #footer>
