@@ -1,23 +1,13 @@
 <script setup lang="ts">
 import { FriendshipStatus, type GetFriendsResponse } from "@/types/api/user.friends";
 
-const friends: Ref<GetFriendsResponse[]> = useState("accepted_friendships", () => [])
-
 const session = useSupabaseSession();
 
 onMounted(async () => {
   if (session.value) {
     await getFriendships()
-    //  friends.value.push() // unexpected behavior on initial page load
   }
 })
-
-async function getFriendships() {
-  $fetch<GetFriendsResponse[]>('/api/v1/user/friends')
-    .then((data) => {
-      friends.value = data.filter((item) => item.status === FriendshipStatus.ACCEPTED)
-    });
-}
 
 const emit = defineEmits(['close-modal', 'refresh', 'friend-playlist-chosen']);
 
@@ -25,6 +15,17 @@ const friendChosen = ref(false);
 const friendId = ref('')
 const playlistChosen = ref(false)
 
+const friends: Ref<GetFriendsResponse[]> = useState("accepted_friendships", () => [])
+
+/* Only get friends with an accepted friend request*/
+async function getFriendships() {
+  $fetch<GetFriendsResponse[]>('/api/v1/user/friends')
+    .then((data) => {
+      friends.value = data.filter((item) => item.status === FriendshipStatus.ACCEPTED)
+    });
+}
+
+/* Check if the user chose everything to start a game */
 function handleChoseFriendPlaylist(id: string) {
     if (!friendChosen.value && !playlistChosen.value) {
         friendChosen.value = true;
@@ -37,6 +38,7 @@ function handleChoseFriendPlaylist(id: string) {
     }    
 }
 
+/* Reset variables on close */
 function handleClose() {
     friendChosen.value = false;
     friendId.value = '';
