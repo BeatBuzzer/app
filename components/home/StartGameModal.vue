@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FriendshipStatus, FriendshipType, type GetFriendsResponse } from "@/types/api/user.friends";
+import { FriendshipStatus, type GetFriendsResponse } from "@/types/api/user.friends";
 
 const friends: Ref<GetFriendsResponse[]> = useState("accepted_friendships", () => [])
 
@@ -43,55 +43,25 @@ function handleClose() {
     playlistChosen.value = false;
     emit('close-modal') ;
 }
-
-
 </script>
 
 <template>
-    <div class="modal-overlay z-50">
-        <div class="mt-[10%] w-2/3 max-h-[80vh] overflow-y-auto bg-white rounded-lg p-5">
-            <div v-if="!friendChosen && !playlistChosen">
-                <p class="text-3xl font-bold">Choose your Opponent</p>
+    <div class="flex justify-center bg-black bg-opacity-85 z-50 p-3 fixed top-0 bottom-0 right-0 left-0">
+        <div class="mt-[10%] md:mt-[5%] w-full md:w-1/2 max-h-[80vh] overflow-y-auto bg-white rounded-3xl p-3">
+            <div v-if="!friendChosen && !playlistChosen" class="flex flex-col items-center justify-center h-full">
+                <p class="text-3xl font-bold mb-2">Choose your Opponent</p>
                 <ProfileFriendlist  :start-game="true" class="w-full p-3" @chose_friend="handleChoseFriendPlaylist"/>
             </div>
             <div v-if="friendChosen && !playlistChosen">
-                <p class="text-3xl font-bold">Choose your Playlist</p>
+                <p class="text-3xl font-bold pb-2">Choose your Playlist</p>
                 <PlaylistsPlaylistView :start-game="true" class="overflow-y-auto" @chose-playlist="handleChoseFriendPlaylist"/>  
             </div>       
-            <button class="bg-indigo-600 hover:bg-indigo-800 my-5 text-white" @click="handleClose">Close</button>
+            <button class="bg-indigo-600 hover:bg-indigo-800 my-5 text-white mx-auto block" @click="handleClose">Close</button>
         </div>
     </div>
 </template>
 
 <style scoped>
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-    background-color: #000000da;
-}
-
-.modal {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    background-color: white;
-    height: 500px;
-    margin-top: 10%;
-    border-radius: 20px;
-}
-
-.icon-wrapper {
-    aspect-ratio: 1;
-    border-radius: 50%;
-}
-
 button {
     width: 150px;
     height: 40px;
