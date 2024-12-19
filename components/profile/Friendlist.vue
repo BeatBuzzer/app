@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { FriendshipStatus, FriendshipType, type GetFriendsResponse } from "@/types/api/user.friends";
 import { UserViewType } from "@/types/components/users.view";
+import {useFriends} from "@/composables/useFriends";
 
 const props = defineProps({
   startGame: {
@@ -9,30 +10,16 @@ const props = defineProps({
   }
 })
 
-const requests: Ref<GetFriendsResponse[]> = useState("incoming_friendships", () => [])
-const friends: Ref<GetFriendsResponse[]> = useState("accepted_friendships", () => [])
-const sentRequests: Ref<GetFriendsResponse[]> = useState("outgoing_friendships", () => [])
-
 const session = useSupabaseSession();
+const {sentRequests, friends, requests,fetchFriends} = useFriends();
 
 const showModal = ref(false);
 
 onMounted(async () => {
   if (session.value) {
-    await getFriendships()
-    //  friends.value.push() // unexpected behavior on initial page load
+    await fetchFriends();
   }
 })
-
-async function getFriendships() {
-  $fetch<GetFriendsResponse[]>('/api/v1/user/friends')
-    .then((data) => {
-      requests.value = data.filter((item) => item.request_type == FriendshipType.INCOMING && item.status === FriendshipStatus.PENDING)
-      friends.value = data.filter((item) => item.status === FriendshipStatus.ACCEPTED)
-      sentRequests.value = data.filter((item) => item.request_type == FriendshipType.OUTGOING && item.status === FriendshipStatus.PENDING)
-    });
-}
-
 const emit = defineEmits(['chose_friend'])
 
 function handleChoseFriend(friendId: string) {
@@ -45,17 +32,17 @@ function handleChoseFriend(friendId: string) {
     <!-- Buttons Section -->
     <div class="flex justify-center mb-3">
       <button v-if="friends.length < 1" class="p-2 bg-blue-500 text-white rounded-3xl ml-2" @click="showModal = true">Add new friend</button>
-      <ProfileFriendRequestModal v-show="showModal" @close-modal="showModal = false" @refresh="getFriendships" />
+      <ProfileFriendRequestModal v-show="showModal" @close-modal="showModal = false" @refresh="fetchFriends" />
     </div>
 
     <!-- Responsive Size Content Section -->
     <div class="overflow-y-auto" style="max-height: 43vh;">
       <UsersView v-if="friends.length > 0" :view-type="UserViewType.FRIENDS" :users="friends"
-        action-label="Add Friend" :on-action="() => {showModal = true}" :start-game="props.startGame" @refresh="getFriendships" @chose_friend="handleChoseFriend" />
+        action-label="Add Friend" :on-action="() => {showModal = true}" :start-game="props.startGame" @refresh="fetchFriends" @chose_friend="handleChoseFriend" />
       <UsersView v-if="requests.length > 0 && !props.startGame" :view-type="UserViewType.REQUESTS" :users="requests"
-        @refresh="getFriendships" />
+        @refresh="fetchFriends" />
       <UsersView v-if="sentRequests.length > 0 && !props.startGame" :view-type="UserViewType.SENTREQUESTS" :users="sentRequests"
-        @refresh="getFriendships" />
+        @refresh="fetchFriends" />
     </div>
   </div>
 </template>
