@@ -7,6 +7,15 @@ const userSchema = z.object({
     receiver_name: z.string()
 }).readonly()
 
+/**
+ * Sends a friend request to a user by their username
+ * @param {Object} body - Request body
+ * @param {string} body.receiver_name - Username of the friend request recipient
+ * @throws {400} Bad Request - Invalid request body format
+ * @throws {401} Unauthenticated - User is not logged in
+ * @throws {500} Internal Server Error - Database or server error
+ * @returns {Object} Empty object on success
+ */
 export default defineEventHandler(async (event) => {
     // validate post-request body
     const result = await readValidatedBody(event, body => userSchema.safeParse(body))
@@ -33,5 +42,6 @@ export default defineEventHandler(async (event) => {
         return {error: error.message};
     }
 
+    setResponseStatus(event, 201);
     return {};
 });

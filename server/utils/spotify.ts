@@ -44,8 +44,10 @@ export async function getPlaylistCover(token: string | null, playlistId: string)
         headers: {'Authorization': `Bearer ${token}`}
     })
     const data = await res.json()
-    // console.log(data)
-    return data[1].url; // [0] = 640px, [1] = 300px, [2] = 60px
+    console.log(data)
+    //Normally [0] = 640px, [1] = 300px, [2] = 60px,
+    //but sometimes only one image is returned
+    return data[1]?.url || data[0]?.url;
 }
 
 export async function getSongsFromPlaylist(token: string | null, playlistId: string) {
@@ -105,7 +107,8 @@ export async function fetchPreviewUrl(trackId: string): Promise<string | null> {
                 if (result && result.length > 0) {
                     return result[0] as string;
                 }
-            } catch (e) {
+            } catch (error) {
+                console.debug('Failed to parse script tag as JSON:', error);
                 // Skip this script tag if it's not valid JSON
             }
         }

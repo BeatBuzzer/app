@@ -1,9 +1,12 @@
 import {serverSupabaseServiceRole, serverSupabaseUser} from "#supabase/server";
-import type {FriendError, GetFriendParam, GetFriendsDBResponse, GetFriendsResponse} from "~/types/api/user.friends";
+import type {FriendError, GetFriendParam, GetFriendsDBResponse} from "~/types/api/user.friends";
 
-// Not relative to userid because you should always only be able to see your own friends
-// User id can be grabbed from the access token
-
+/**
+ * Retrieves all friendships and friend requests for the authenticated user
+ * @throws {401} Unauthenticated - User is not logged in
+ * @throws {500} Internal Server Error - Database or server error
+ * @returns {GetFriendsResponse[]} Array of friendships with friend profile data
+ */
 export default defineEventHandler(async (event) => {
     // Require user to be authenticated
     const user = await serverSupabaseUser(event);

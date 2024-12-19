@@ -1,6 +1,14 @@
 import {serverSupabaseServiceRole, serverSupabaseUser} from "#supabase/server";
 import type {GetUserResponse} from "~/types/api/users";
+import type {PostgrestError} from "@supabase/postgrest-js";
 
+/**
+ * Retrieves the authenticated user's profile information
+ * @throws {401} Unauthenticated - User is not logged in
+ * @throws {404} Not Found - User profile does not exist
+ * @throws {500} Internal Server Error - Database or server error
+ * @returns {GetUserResponse} User profile data with spotify_id conditionally removed based on visibility settings
+ */
 export default defineEventHandler(async (event) => {
 
     // Require user to be authenticated
@@ -12,7 +20,10 @@ export default defineEventHandler(async (event) => {
 
     // Send request
     const client = serverSupabaseServiceRole(event);
-    const {data, error}:{ data: GetUserResponse|null, error: any} = await client.from('users').select('*').eq('id', user.id).maybeSingle();
+    const {data, error}: {
+        data: GetUserResponse | null,
+        error: PostgrestError | null
+    } = await client.from('users').select('*').eq('id', user.id).maybeSingle();
 
     if (!data) {
         setResponseStatus(event, 404);

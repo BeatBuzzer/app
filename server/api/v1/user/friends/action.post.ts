@@ -9,6 +9,17 @@ const friendActionSchema = z.object({
     action: z.nativeEnum(FriendshipAction)
 }).readonly()
 
+
+/**
+ * Handles friend request actions (accept/decline/remove)
+ * @param {Object} body - Request body
+ * @param {number} body.friendship_id - ID of the friendship to act upon
+ * @param {FriendshipAction} body.action - Action to perform (accept/decline/remove)
+ * @throws {400} Bad Request - Invalid request body or invalid friendship state for action
+ * @throws {401} Unauthenticated - User is not logged in
+ * @throws {500} Internal Server Error - Database or server error
+ * @returns {Object} Empty object on success
+ */
 export default defineEventHandler(async (event) => {
     // validate post-request body
     const result = await readValidatedBody(event, body => friendActionSchema.safeParse(body))

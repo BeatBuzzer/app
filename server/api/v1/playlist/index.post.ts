@@ -3,6 +3,8 @@ import {spotifyIDRegex} from "~/server/utils/data-validation";
 import {serverSupabaseServiceRole} from "#supabase/server";
 import {UNIQUE_VIOLATION} from "~/server/utils/postgres-errors";
 import {getPlaylistCover, getSpotifyToken} from "~/server/utils/spotify";
+import type {PostgrestError} from "@supabase/postgrest-js";
+import type {GetCategoryResponse} from "~/types/api/playlists";
 
 const schema = z.object({
     id: z.string().regex(spotifyIDRegex),
@@ -12,13 +14,18 @@ const schema = z.object({
     enabled: z.boolean().optional().default(true)
 })
 
-
 /**
- * Unauthenticated endpoint to create a playlist - management only
- * @throws {400} - Invalid body
- * @throws {400} - Playlist with this ID already exists
- * @throws {500} - Internal Server Error
- * @returns {Object} - Created playlist
+ * Creates a new playlist with categories
+ * @param {Object} body - Request body
+ * @param {string} body.id - Spotify playlist ID
+ * @param {string} body.name - Playlist name
+ * @param {string} body.spotifyId - Spotify playlist ID
+ * @param {string[]} body.categories - Array of category names
+ * @param {boolean} [body.enabled=true] - Whether the playlist is enabled
+ * @throws {400} Bad Request - Invalid request body format or duplicate playlist ID
+ * @throws {500} Internal Server Error - Database, Spotify API, or server error
+ * @returns {Object} Created playlist
+ * @status {201} Created successfully
  */
 export default defineEventHandler(async (event) => {
     const result = await readValidatedBody(event, body => schema.safeParse(body))
@@ -45,7 +52,10 @@ export default defineEventHandler(async (event) => {
     }));
 
     const client = serverSupabaseServiceRole(event);
-    const {data: playlistData, error: playlistError} = await client.from('playlists').insert(playlistInsert as never).select().single(); //todo: fix type error!
+    const {
+        data: playlistData,
+        error: playlistError
+    } = await client.from('playlists').insert(playlistInsert as never).select().single(); //todo: fix type error!
 
 
     if (playlistError) {
@@ -56,16 +66,16 @@ export default defineEventHandler(async (event) => {
         return {error: playlistError.message};
     }
 
-    const { data: categoriesData, error: categoriesError } = await client
-    .from('categories')
-    .insert(categoriesInsert as never);
+    const {data: categoriesData, error: categoriesError}:
+        { data: GetCategoryResponse[] | null, error: PostgrestError | null } = await client
+        .from('categories')
+        .insert(categoriesInsert as never).select();
 
     if (categoriesError) {
-    setResponseStatus(event, 500);
-    return { error: `Error inserting categories: ${categoriesError.message}` };
+        setResponseStatus(event, 500);
+        return {error: `Error inserting categories: ${categoriesError.message}`};
     }
 
-
     setResponseStatus(event, 201);
-    return { playlist: playlistData, categories: categoriesData };
+    return {playlist: playlistData, categories: categoriesData?.map((cat) => cat.name)};
 })

@@ -37,11 +37,14 @@ async function getFriendships() {
 
     <!-- Responsive Size Content Section -->
     <div class="overflow-y-auto" style="max-height: 43vh;">
-      <UsersView v-if="friends.length > 0" :view-type="UserViewType.FRIENDS" :users="friends"
+      <UsersView 
+        v-if="friends.length > 0" :view-type="UserViewType.FRIENDS" :users="friends"
         action-label="Add Friend" :on-action="() => {showModal = true}" @refresh="getFriendships" />
-      <UsersView v-if="requests.length > 0" :view-type="UserViewType.REQUESTS" :users="requests"
+      <UsersView 
+        v-if="requests.length > 0" :view-type="UserViewType.REQUESTS" :users="requests"
         @refresh="getFriendships" />
-      <UsersView v-if="sentRequests.length > 0" :view-type="UserViewType.SENTREQUESTS" :users="sentRequests"
+      <UsersView 
+        v-if="sentRequests.length > 0" :view-type="UserViewType.SENTREQUESTS" :users="sentRequests"
         @refresh="getFriendships" />
     </div>
   </div>
