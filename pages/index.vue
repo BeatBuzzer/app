@@ -4,9 +4,9 @@ import {UserViewType} from "@/types/components/users.view"
 import {useGame} from "@/composables/useGames";
 import type {ActiveGame} from "@/types/api/game";
 import VerticalGameList from "@/components/home/Game/VerticalGameList.vue";
-import RegistrationView from "@/components/login/RegistrationModal.vue";
+import RegistrationModal from "@/components/login/RegistrationModal.vue";
 
-const {fetchUser, user,error:userError} = useUser()
+const {fetchUser, user, error:userError} = useUser()
 
 const {games, fetchGames} = useGame();
 
@@ -43,7 +43,7 @@ const newGame = async () => {
 <template>
   <div class="bg-gradient-to-b from-indigo-500 to-purple-500">
 
-    <RegistrationView v-if="userError" :on-register="async ()=> {await fetchUser();}"/>
+    <RegistrationModal v-if="userError" :on-register="async ()=> { await fetchUser(); userError = null; }"/>
 
     <HeaderFooterView v-if="user">
       <template #header>
