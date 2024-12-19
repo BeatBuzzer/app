@@ -20,8 +20,6 @@ const playlistError = ref('')
     </div>
 </template>
 
-
-
 <style scoped>
 button {
     width: 150px;

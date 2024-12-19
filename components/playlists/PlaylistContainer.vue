@@ -41,7 +41,6 @@ const filteredPlaylists = computed(() =>
         </button>
         </div>
 
-
         <!-- Boxes with the name and cover of the playlist in the genre -->
         <div class="flex flex-row flex-nowrap overflow-x-auto gap-2">
             <PlaylistsPlaylistBox 

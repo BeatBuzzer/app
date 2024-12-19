@@ -16,8 +16,6 @@ onMounted(async () => {
   }
 });
 
-// action-label="Add Friend" :on-action="() => {showModal = true}"
-
 /* Get all available playlists and get every category with corresponding playlist IDs*/
 async function getPlaylists() {
   try {
@@ -25,47 +23,40 @@ async function getPlaylists() {
     playlists.value = [...data];
 
     playlists.value.forEach(playlist => {
-  // Skip disabled playlists
+
   if (!playlist.enabled) return;
 
+  /* Filter all IDs of playlists in each category. */
   playlist.categories.forEach(category => {
     if (category === "User created") {
-      // Handle "User created" category separately
       const existingUserCategory = userPlaylistIds.value.find(item => item.category === "User created");
 
       if (existingUserCategory) {
-        // Add the new ID if not already present
         if (!existingUserCategory.ids.includes(playlist.id)) {
           existingUserCategory.ids.push(playlist.id);
         }
       } else {
-        // Add a new entry for "User created" category
         userPlaylistIds.value.push({ category: "User created", ids: [playlist.id] });
       }
     } else {
-      // Check if the category already exists in the array
       const existingCategory = categories.value.find(item => item.category === category);
 
       if (existingCategory) {
-        // Add the new ID if not already present
         if (!existingCategory.ids.includes(playlist.id)) {
           existingCategory.ids.push(playlist.id);
         }
       } else {
-        // Add a new entry if the category does not exist
         categories.value.push({ category, ids: [playlist.id] });
       }
     }
   });
-  const userCreatedIds = userPlaylistIds.value.flatMap(item => item.ids); // Extract all IDs from "User created"
+  const userCreatedIds = userPlaylistIds.value.flatMap(item => item.ids);
   userPlaylists.value = playlists.value.filter(playlist => userCreatedIds.includes(playlist.id));
 });
   } catch (error) {
     console.error("Failed to fetch playlists:", error);
   }
 };
-
-
 </script>
 
 <template>
