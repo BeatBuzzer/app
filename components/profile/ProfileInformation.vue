@@ -28,15 +28,17 @@ const formatDate = (dateString : string) => {
       </div>
 
       <div class="grid grid-cols-2 gap-2">
-        <div class="bg-gray-200 h-8 rounded-3xl px-1 border border-black flex items-center justify-center">Games played</div>
-        <div class="bg-gray-200 h-8 rounded-3xl px-1 border border-black flex items-center justify-center">
+        <div class="bg-gray-200 h-8 rounded-3xl px-2 border border-gray-700 flex items-center">
+          Games played
+        </div>
+        <div class="bg-gray-200 h-8 rounded-3xl px-2 border border-gray-700 flex items-center">
           <Icon name="mdi:fire" class="text-2xl mr-2"/> 
           {{ user?.daily_streak }}
         </div>
-        <div class="bg-gray-200 h-8 rounded-3xl px-1 border border-black flex items-center justify-center">
+        <div class="bg-gray-200 h-8 rounded-3xl px-2 border border-gray-700 flex items-center">
           <Icon name="mdi:spotify" class="text-2xl mr-2"/> 
           {{user?.spotify_visibility ? 'public' : 'private'}}</div>
-        <div class="bg-gray-200 h-8 rounded-3xl px-1 border border-black flex items-center justify-center">
+        <div class="bg-gray-200 h-8 rounded-3xl px-2 border border-gray-700 flex items-center">
           <Icon name="mdi:account-plus" class="text-2xl mr-2"/>
           {{ formatDate(session?.user.created_at) }}
         </div>
