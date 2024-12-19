@@ -46,8 +46,8 @@ async function addPlaylist() {
 <template>
     <div class="fixed top-0 bottom-0 left-0 right-0 flex justify-center bg-black bg-opacity-85 z-50">
         <div
-            class="mt-[10%] w-5/6 md:w-1/6 h-5/6 md:h-3/6 rounded-3xl flex flex-col items-center justify-center text-center bg-white">
-            <p class="text-xl mb-2">{{ playlistName }}</p>
+            class="mt-[10%] md:mt-[5%] w-full md:w-1/6 max-h-[80vh] md:max-h-[50vh] m-5 rounded-3xl flex flex-col items-center justify-center text-center bg-white">
+            <p class="text-xl font-bold mb-10 w-2/3">{{ playlistName }}</p>
             <NuxtImg :src="playlistCover" class="rounded-2xl h-40 w-40 mb-6" />
             <div v-if="!props.userPlaylist">
                 <button 
