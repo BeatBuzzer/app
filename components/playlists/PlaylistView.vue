@@ -51,8 +51,8 @@ async function getPlaylists() {
   }
 }
 
-function handleChosePlaylist(playlistId: string) {
-    emit('chose-playlist', playlistId)
+function handleChosePlaylist(playlist: GetPlaylistResponse) {
+    emit('chose-playlist', playlist)
 }
 </script>
 

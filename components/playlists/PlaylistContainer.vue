@@ -27,8 +27,8 @@ const filteredPlaylists = computed(() =>
     props.playlists.filter((item) => props.playlistIds.includes(item.spotifyId))
 );
 
-function handleChosePlaylist(playlistId: string) {
-    emit('chose-playlist', playlistId)
+function handleChosePlaylist(playlist: GetPlaylistResponse) {
+    emit('chose-playlist', playlist)
 }
 </script>
 
@@ -47,7 +47,7 @@ function handleChosePlaylist(playlistId: string) {
                 :playlist-id="item.spotifyId"
                 :name="item.name"
                 :start-game="props.startGame"
-                @chose-playlist="handleChosePlaylist" 
+                @chose-playlist="handleChosePlaylist(item)"
                 v-bind="item.cover ? { cover: item.cover.toString() } : {}" class="flex-grow-0 flex-shrink-0" />
         </div>
     </div>

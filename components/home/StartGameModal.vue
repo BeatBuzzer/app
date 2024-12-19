@@ -1,76 +1,142 @@
 <script setup lang="ts">
-import { FriendshipStatus, type GetFriendsResponse } from "@/types/api/user.friends";
+import {ref} from 'vue'
+import type {GetPlaylistResponse} from "@/types/api/playlists";
+import {useFriends} from "@/composables/useFriends";
 
-const session = useSupabaseSession();
+const emit = defineEmits<{
+  'close-modal': []
+  'friend-playlist-chosen': [friendId: string, playlistId: string]
+}>()
+
+const currentView = ref<'main' | 'friends' | 'playlists'>('main')
+const selectedPlaylist = useState<GetPlaylistResponse | null>('selected_playlist', () => null)
+const selectedFriend = ref<string | null>(null)
+
+const {fetchFriends, friends} = useFriends();
+
+const showFriendsView = () => {
+  currentView.value = 'friends'
+}
+
+const showPlaylistsView = () => {
+  currentView.value = 'playlists'
+}
+
+const showMainView = () => {
+  currentView.value = 'main'
+  selectedFriend.value = null
+}
+
+const selectFriend = (friendId: string) => {
+  selectedFriend.value = friendId
+  if (selectedPlaylist.value) {
+    emit('friend-playlist-chosen', friendId, selectedPlaylist.value.id)
+    emit('close-modal')
+  } else showPlaylistsView();
+}
+
+const playWithRandom = () => {
+  if (selectedPlaylist.value) {
+    emit('friend-playlist-chosen', '', selectedPlaylist.value.id)
+    emit('close-modal')
+  }
+}
+
+const selectPlaylist = (playlist: GetPlaylistResponse) => {
+  console.log(playlist)
+  selectedPlaylist.value = playlist
+  if (selectedFriend.value) {
+    emit('friend-playlist-chosen', selectedFriend.value, playlist.id)
+    emit('close-modal')
+  } else showFriendsView();
+}
+
+const closeModal = () => {
+  emit('close-modal')
+}
+
+// New function to handle backdrop clicks
+const handleBackdropClick = (event: MouseEvent) => {
+  // Check if the click was directly on the backdrop
+  if ((event.target as HTMLElement).classList.contains('modal-backdrop')) {
+    closeModal()
+  }
+}
 
 onMounted(async () => {
-  if (session.value) {
-    await getFriendships()
-  }
+  await fetchFriends();
 })
-
-const emit = defineEmits(['close-modal', 'refresh', 'friend-playlist-chosen']);
-
-const friendChosen = ref(false);
-const friendId = ref('')
-const playlistChosen = ref(false)
-
-const friends: Ref<GetFriendsResponse[]> = useState("accepted_friendships", () => [])
-
-/* Only get friends with an accepted friend request*/
-async function getFriendships() {
-  $fetch<GetFriendsResponse[]>('/api/v1/user/friends')
-    .then((data) => {
-      friends.value = data.filter((item) => item.status === FriendshipStatus.ACCEPTED)
-    });
-}
-
-/* Check if the user chose everything to start a game */
-function handleChoseFriendPlaylist(id: string) {
-    if (!friendChosen.value && !playlistChosen.value) {
-        friendChosen.value = true;
-        friendId.value = id
-        return;    
-    } else if (friendChosen.value && !playlistChosen.value) {
-        emit('friend-playlist-chosen', friendId.value, id);
-        playlistChosen.value = true;
-        emit('close-modal')
-    }    
-}
-
-/* Reset variables on close */
-function handleClose() {
-    friendChosen.value = false;
-    friendId.value = '';
-    playlistChosen.value = false;
-    emit('close-modal') ;
-}
 </script>
 
 <template>
-    <div class="flex justify-center bg-black bg-opacity-85 z-50 p-3 fixed top-0 bottom-0 right-0 left-0">
-        <div class="mt-[10%] md:mt-[5%] w-full md:w-1/2 max-h-[80vh] bg-white rounded-3xl p-3 flex flex-col justify-between">
-            <div class="flex-grow">
-                <div v-if="!friendChosen && !playlistChosen" class="flex flex-col items-center justify-center h-full">
-                    <p class="text-3xl font-bold pb-2 text-center">Choose your Opponent</p>
-                    <ProfileFriendlist :start-game="true" class="w-full p-3" @chose_friend="handleChoseFriendPlaylist"/>
-                </div>
-                <div v-if="friendChosen && !playlistChosen">
-                    <p class="text-3xl font-bold pb-2 text-center">Choose your Playlist</p>
-                    <PlaylistsPlaylistView :start-game="true" class="overflow-y-auto max-h-[60vh] mb-5" @chose-playlist="handleChoseFriendPlaylist" />  
-                </div>       
-            </div>
-            <button class="bg-indigo-600 hover:bg-indigo-800 text-white mx-auto block mb-5" @click="handleClose">Close</button>
+  <!-- Added click handler and modal-backdrop class -->
+  <div
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 modal-backdrop"
+      @click="handleBackdropClick"
+  >
+    <!-- Modal content -->
+    <div class="bg-white rounded-3xl p-4 w-11/12 max-w-md">
+      <!-- Rest of the modal content stays the same -->
+      <div class="flex justify-end">
+        <button class="text-gray-500 hover:text-gray-700" @click="closeModal">
+          <Icon name="mdi:close" class="text-2xl"/>
+        </button>
+      </div>
+
+      <!-- Display playlist from last game or previous selection -->
+      <div v-if="selectedPlaylist" class="mb-4 flex flex-col items-center rounded-lg">
+        <NuxtImg
+            :src="selectedPlaylist?.cover || '/icons/default_cover.jpg'"
+            :alt="selectedPlaylist?.name || ''"
+            class="w-10 h-10 rounded"
+        />
+        <span class="text-sm font-medium">{{ selectedPlaylist.name }}</span>
+      </div>
+
+      <!-- Main content -->
+      <div v-if="currentView === 'main'" class="space-y-4">
+        <button
+            class="w-full py-4 bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 transition-colors"
+            @click="showFriendsView"
+        >
+          Play with a Friend
+        </button>
+        <button
+            class="w-full py-4 bg-purple-500 text-white rounded-xl hover:bg-purple-600 transition-colors"
+            @click="playWithRandom"
+        >
+          Play with Random Player
+        </button>
+      </div>
+
+      <!-- Friend view -->
+      <div v-else-if="currentView === 'friends'" class="space-y-4">
+        <div class="flex items-center mb-4">
+          <button class="text-gray-500 hover:text-gray-700 mr-2" @click="showMainView">
+            <Icon name="mdi:arrow-left" class="text-2xl"/>
+          </button>
+          <h2 class="text-lg font-semibold">Select a Friend</h2>
         </div>
+
+        <div class="space-y-2">
+          <HomeUsersUserBox
+              v-for="friend in friends"
+              :key="friend.user.id"
+              :user-turn="true"
+              :name="friend.user.username"
+              :profile-picture="friend.user.avatar_url || undefined"
+              :friend-id="friend.user.id"
+              @click="selectFriend(friend.user.id)"
+          />
+        </div>
+      </div>
+
+      <div v-else-if="currentView === 'playlists'">
+        <p class="text-3xl font-bold pb-2 text-center">Choose your Playlist</p>
+        <PlaylistsPlaylistView :start-game="true" class="overflow-y-auto max-h-[60vh] mb-5"
+                               @chose-playlist="selectPlaylist"/>
+      </div>
+
     </div>
+  </div>
 </template>
-
-
-<style scoped>
-button {
-    width: 150px;
-    height: 40px;
-    font-size: 14px;
-    border-radius: 16px;
-}
-</style>

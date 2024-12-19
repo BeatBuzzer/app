@@ -6,7 +6,7 @@ import { UserViewType } from '@/types/components/users.view';
 const props = defineProps({
   profilePicture: {
     type: String,
-    default: 'https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg'
+    default: "https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg"
   },
   name: {
     type: String,
@@ -34,7 +34,7 @@ const props = defineProps({
   },
   viewType: {
     type: Number,
-    required: true,
+    required: false,
   },
   startGame: {
     type: Boolean,
@@ -65,7 +65,7 @@ const showUserModal = ref(false);
         'w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14',
         props.userTurn ? 'mr-3' : 'mb-0'
         ]"
-        :src="props.profilePicture.toString()" :alt="props.name" />
+        :src="props.profilePicture" />
 
       <!-- User Name -->
       <p class="text-white text-sm sm:text-base md:text-lg" v-text="props.name" />
