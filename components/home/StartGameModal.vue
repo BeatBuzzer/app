@@ -52,6 +52,7 @@ const selectPlaylist = (playlist: GetPlaylistResponse) => {
 }
 
 const closeModal = () => {
+  showMainView();
   emit('close-modal')
 }
 
@@ -84,17 +85,23 @@ onMounted(async () => {
       </div>
 
       <!-- Display playlist from last game or previous selection -->
-      <div v-if="selectedPlaylist" class="mb-4 flex flex-col items-center rounded-lg">
-        <NuxtImg
-            :src="selectedPlaylist?.cover || '/icons/default_cover.jpg'"
-            :alt="selectedPlaylist?.name || ''"
-            class="w-10 h-10 rounded"
-        />
-        <span class="text-sm font-medium">{{ selectedPlaylist.name }}</span>
+      <div v-if="selectedPlaylist" class="relative group mb-4 flex flex-col items-center rounded-lg cursor-pointer" @click="showPlaylistsView">
+        <span class="text-sm font-light mb-1">Playing: </span>
+        <div class="relative">
+          <NuxtImg
+              :src="selectedPlaylist?.cover || '/icons/default_cover.jpg'"
+              :alt="selectedPlaylist?.name || ''"
+              class="md:w-24 w-20 rounded"
+          />
+          <div class="absolute inset-0 bg-black bg-opacity-50 rounded opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <Icon name="mdi:pencil" class="text-white text-lg"/>
+          </div>
+        </div>
+        <span class="text-sm md:text-base font-semibold">{{ selectedPlaylist.name }}</span>
       </div>
 
       <!-- Main content -->
-      <div v-if="currentView === 'main'" class="space-y-4">
+      <div v-if="currentView === 'main'" class="space-y-2">
         <button
             class="w-full py-4 bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 transition-colors"
             @click="showFriendsView"
