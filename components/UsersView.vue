@@ -20,10 +20,14 @@ const props = defineProps({
   actionLabel: {
     type: String,
     required: false
+  },
+  startGame: {
+    type: Boolean,
+    default: false
   }
 });
 
-const emit = defineEmits(['refresh']);
+const emit = defineEmits(['refresh', 'chose_friend']);
 
 const friendshipId = ref(0);
 const friendshipStatus = ref(FriendshipStatus.ACCEPTED);
@@ -32,7 +36,7 @@ const default_avatar = ref('https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970
 
 // Computed Classes
 const containerClasses = computed(() => {
-  const baseClasses = 'w-full bg-gray-200 px-3 pb-1 mt-auto rounded-3xl mb-3';
+  const baseClasses = 'w-full bg-gray-200 px-3 mt-auto rounded-3xl mb-3';
   if (props.viewType === UserViewType.USERTURN) return `${baseClasses} h-full overflow-y-hidden overflow-x-hidden flex-grow-0`;
   else return `${baseClasses} overflow-y-hidden`;
 });
@@ -67,6 +71,10 @@ const mappedUsers: Array<GetUserResponse> = computed(() => {
     return {};
   });
 });
+
+function handleChoseFriend(friendId: string) {
+  emit('chose_friend', friendId)
+}
 </script>
 
 <template>
@@ -127,6 +135,8 @@ const mappedUsers: Array<GetUserResponse> = computed(() => {
           :friends-status="friendshipStatus"
           :friend-id="user.id"
           :view-type="props.viewType"
+          :start-game="props.startGame"
+          @chose_friend="handleChoseFriend"
           @refresh="emit('refresh');"
       />
       <!-- Placeholder for scrolling -->

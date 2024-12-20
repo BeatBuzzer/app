@@ -6,7 +6,7 @@ import { UserViewType } from '@/types/components/users.view';
 const props = defineProps({
   profilePicture: {
     type: String,
-    default: 'https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg'
+    default: "https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg"
   },
   name: {
     type: String,
@@ -34,13 +34,17 @@ const props = defineProps({
   },
   viewType: {
     type: Number,
-    required: true,
+    required: false,
   },
+  startGame: {
+    type: Boolean,
+    default: false
+  }
 });
 
-const emit = defineEmits(['refresh','play']);
+const emit = defineEmits(['refresh', 'play', 'chose_friend']);
 
-const showModal = ref(false);
+const showUserModal = ref(false);
 
 </script>
 
@@ -53,7 +57,7 @@ const showModal = ref(false);
         ? 'flex items-center'
         : 'flex flex-col items-center justify-center mb-3 py-2'
       ]"
-      @click="showModal = true">
+      @click="props.startGame ? emit('chose_friend', friendId) : showUserModal = true">
       <!-- Profile Picture -->
       <NuxtImg 
         :class="[
@@ -74,8 +78,8 @@ const showModal = ref(false);
     </div>
     <ProfileUserModal
       v-if="viewType === UserViewType.FRIENDS || viewType === UserViewType.REQUESTS || viewType === UserViewType.SENTREQUESTS"
-      v-show="showModal" :profile-picture="props.profilePicture" :name="props.name" :friendship-id="props.friendshipId"
+      v-show="showUserModal" :profile-picture="props.profilePicture" :name="props.name" :friendship-id="props.friendshipId"
       :friends-status="props.friendsStatus" :friend-id="props.friendId" :view-type="props.viewType"
-      @close-modal="showModal = false" @refresh="emit('refresh')" />
+      @close-modal="showUserModal = false" @refresh="emit('refresh')" />
   </div>
 </template>

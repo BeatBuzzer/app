@@ -1,8 +1,15 @@
 <script setup lang="ts">
 import type { GetPlaylistResponse } from "@/types/api/playlists";
 
+const props = defineProps({
+  startGame: {
+    type: Boolean,
+    default: false
+  }
+})
+
 const playlists = ref<GetPlaylistResponse[]>([]);
-const categories = ref<{ category: string; ids: number[] }[]>([]);
+const categories = ref<{ category: string; ids: string[] }[]>([]);
 
 const session = useSupabaseSession();
 
@@ -12,10 +19,12 @@ onMounted(async () => {
   }
 });
 
+const emit = defineEmits(['chose-playlist'])
+
 /* Get all available playlists and get every category with corresponding playlist IDs*/
 async function getPlaylists() {
   try {
-    const data = await $fetch<GetPlaylistResponse[]>('http://localhost:3000/api/v1/playlist');
+    const data = await $fetch<GetPlaylistResponse[]>('/api/v1/playlist');
     playlists.value = [...data];
 
     playlists.value.forEach(playlist => {
@@ -41,12 +50,16 @@ async function getPlaylists() {
     console.error("Failed to fetch playlists:", error);
   }
 }
+
+function handleChosePlaylist(playlist: GetPlaylistResponse) {
+    emit('chose-playlist', playlist)
+}
 </script>
 
 <template>
   <div class="flex flex-col">
-    <div class="overflow-y-auto" style="max-height: 85vh;">
-      <PlaylistsPlaylistContainer v-for="categoryEl in categories" :key="categoryEl.category" :genre="categoryEl.category" :playlist-ids="categoryEl.ids" :playlists="playlists" :categories="categories"/>
+    <div class="overflow-y-auto">
+      <PlaylistsPlaylistContainer v-for="categoryEl in categories" :key="categoryEl.category" :genre="categoryEl.category" :playlist-ids="categoryEl.ids" :playlists="playlists" :categories="categories" :start-game="props.startGame" @chose-playlist="handleChosePlaylist"/>
     </div>
   </div>
 </template>
