@@ -40,7 +40,7 @@ const playWithRandom = () => {
   if (selectedPlaylist.value) {
     emit('friend-playlist-chosen', '', selectedPlaylist.value.id)
     emit('close-modal')
-  }
+  } else showPlaylistsView();
 }
 
 const selectPlaylist = (playlist: GetPlaylistResponse) => {
