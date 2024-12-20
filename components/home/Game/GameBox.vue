@@ -39,8 +39,9 @@ const game_creator: GetUserResponse | null = props.game.players.find(player => p
     <div class="flex flex-col min-w-0">
       <!-- User Name -->
       <div class="flex items-center">
-        <p class="text-white text-lg font-medium truncate"
-           v-text="game_creator?.username || 'Custom game'"/>
+        <p 
+          class="text-white text-lg font-medium truncate"
+          v-text="game_creator?.username || 'Custom game'"/>
       </div>
 
       <!-- Playlist Name -->

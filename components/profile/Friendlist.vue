@@ -37,12 +37,15 @@ function handleChoseFriend(friendId: string) {
 
     <!-- Responsive Size Content Section -->
     <div class="overflow-y-auto" style="max-height: 43vh;">
-      <UsersView v-if="friends.length > 0" :view-type="UserViewType.FRIENDS" :users="friends"
-        action-label="Add Friend" :on-action="() => {showModal = true}" :start-game="props.startGame" @refresh="fetchFriends" @chose_friend="handleChoseFriend" />
-      <UsersView v-if="requests.length > 0 && !props.startGame" :view-type="UserViewType.REQUESTS" :users="requests"
-        @refresh="fetchFriends" />
-      <UsersView v-if="sentRequests.length > 0 && !props.startGame" :view-type="UserViewType.SENTREQUESTS" :users="sentRequests"
-        @refresh="fetchFriends" />
+      <UsersView 
+        v-if="friends.length > 0" :view-type="UserViewType.FRIENDS" :users="friends"
+        action-label="Add Friend" :on-action="() => {showModal = true}" @refresh="getFriendships" />
+      <UsersView 
+        v-if="requests.length > 0" :view-type="UserViewType.REQUESTS" :users="requests"
+        @refresh="getFriendships" />
+      <UsersView 
+        v-if="sentRequests.length > 0" :view-type="UserViewType.SENTREQUESTS" :users="sentRequests"
+        @refresh="getFriendships" />
     </div>
   </div>
 </template>

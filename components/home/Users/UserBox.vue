@@ -61,11 +61,11 @@ const showUserModal = ref(false);
       <!-- Profile Picture -->
       <NuxtImg 
         :class="[
-        'rounded-full',
-        'w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14',
-        props.userTurn ? 'mr-3' : 'mb-0'
-        ]"
-        :src="props.profilePicture" />
+          'rounded-full',
+          'w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14',
+          props.userTurn ? 'mr-3' : 'mb-0'
+        ]" 
+        :src="props.profilePicture.toString()" :alt="props.name" />
 
       <!-- User Name -->
       <p class="text-white text-sm sm:text-base md:text-lg" v-text="props.name" />
