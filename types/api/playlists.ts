@@ -1,6 +1,6 @@
 export interface GetPlaylistResponse {
     id: string,
-    spotifyId: string,
+    spotify_id: string,
     name: string,
     cover: string | null,
     enabled: boolean,

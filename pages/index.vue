@@ -7,7 +7,7 @@ import VerticalGameList from "@/components/home/Game/VerticalGameList.vue";
 import RegistrationView from "@/components/login/RegistrationModal.vue";
 import StartGameModal from "@/components/home/StartGameModal.vue";
 
-const {fetchUser, user, error:userError} = useUser()
+const {fetchUser, user, error: userError} = useUser()
 
 const {games, fetchGames} = useGame();
 
@@ -28,13 +28,24 @@ function setLevelbar(newValue: number) {
   }
 };
 
-const newGame = async (friendId: string, playlistId: string) => {
+const newGame = async (opponent_id?: string, playlist_id?: string) => {
+  let gameType = undefined;
+
+  if (!playlist_id && !opponent_id) {
+    gameType = 'quickplay';
+  } else if (!opponent_id) {
+    gameType = 'rdm_opponent';
+  }
+
   const data = await $fetch<ActiveGame>('/api/v1/game', {
     method: 'POST',
     body: JSON.stringify({
-      playlist_id: playlistId,
-      opponent_id: friendId,
+      playlist_id: playlist_id,
+      opponent_id: opponent_id,
     }),
+    query: {
+      type: gameType
+    }
   });
 
   curr_game.value = data;
@@ -82,7 +93,7 @@ const newGame = async (friendId: string, playlistId: string) => {
             <HomeControlsGameButtons
                 class="h-full"
                 @start-game="showModal = true"
-                @quick-game="()=>newGame('9da97502-5363-4964-ae80-c242a053e810','4zfjCJLxd7kB0gnNhKurNn')"
+                @quick-game="()=>newGame()"
             />
           </div>
         </div>

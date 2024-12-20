@@ -2,6 +2,7 @@
 import {ref} from 'vue'
 import type {GetPlaylistResponse} from "@/types/api/playlists";
 import {useFriends} from "@/composables/useFriends";
+import type {ActiveGamePlaylist} from "@/types/api/game";
 
 const emit = defineEmits<{
   'close-modal': []
@@ -9,7 +10,7 @@ const emit = defineEmits<{
 }>()
 
 const currentView = ref<'main' | 'friends' | 'playlists'>('main')
-const selectedPlaylist = useState<GetPlaylistResponse | null>('selected_playlist', () => null)
+const selectedPlaylist = useState<GetPlaylistResponse | ActiveGamePlaylist | null>('selected_playlist', () => null)
 const selectedFriend = ref<string | null>(null)
 
 const {fetchFriends, friends} = useFriends();
@@ -91,13 +92,14 @@ onMounted(async () => {
           <NuxtImg
               :src="selectedPlaylist?.cover || '/icons/default_cover.jpg'"
               :alt="selectedPlaylist?.name || ''"
-              class="md:w-24 w-20 rounded"
+              class="md:w-28 w-24 rounded"
           />
           <div class="absolute inset-0 bg-black bg-opacity-50 rounded opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
             <Icon name="mdi:pencil" class="text-white text-lg"/>
           </div>
         </div>
         <span class="text-sm md:text-base font-semibold">{{ selectedPlaylist.name }}</span>
+        <span class="text-xs font-extralight -mt-1 text-gray-500">Click here to change</span>
       </div>
 
       <!-- Main content -->

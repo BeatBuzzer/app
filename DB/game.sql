@@ -369,5 +369,80 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-SELECT *
-FROM get_player_games('d2e6a9a3-a0be-45ce-ae39-676c6a88c53a');
+-- Get a random opponent with recent activity
+CREATE OR REPLACE FUNCTION get_random_opponent(requesting_user_id UUID)
+    RETURNS UUID
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    found_user_id UUID;
+BEGIN
+    -- Try last 24 hours
+    WITH distinct_users AS (
+        SELECT DISTINCT gp.user_id
+        FROM games g
+                 INNER JOIN game_player_song_stats gp ON g.game_id = gp.game_id
+        WHERE g.created_at > now() - INTERVAL '1 day'
+          AND gp.user_id != '00000000-0000-0000-0000-000000000000'
+          AND gp.user_id != requesting_user_id
+    )
+    SELECT user_id INTO found_user_id
+    FROM distinct_users
+    ORDER BY random()
+    LIMIT 1;
+
+    -- If not found, try last week
+    IF found_user_id IS NULL THEN
+        WITH distinct_users AS (
+            SELECT DISTINCT gp.user_id
+            FROM games g
+                     INNER JOIN game_player_song_stats gp ON g.game_id = gp.game_id
+            WHERE g.created_at > now() - INTERVAL '7 days'
+              AND gp.user_id != '00000000-0000-0000-0000-000000000000'
+              AND gp.user_id != requesting_user_id
+        )
+        SELECT user_id INTO found_user_id
+        FROM distinct_users
+        ORDER BY random()
+        LIMIT 1;
+    END IF;
+
+    -- If still not found, try last month
+    IF found_user_id IS NULL THEN
+        WITH distinct_users AS (
+            SELECT DISTINCT gp.user_id
+            FROM games g
+                     INNER JOIN game_player_song_stats gp ON g.game_id = gp.game_id
+            WHERE g.created_at > now() - INTERVAL '30 days'
+              AND gp.user_id != '00000000-0000-0000-0000-000000000000'
+              AND gp.user_id != requesting_user_id
+        )
+        SELECT user_id INTO found_user_id
+        FROM distinct_users
+        ORDER BY random()
+        LIMIT 1;
+    END IF;
+
+    -- If still not found, try all time
+    IF found_user_id IS NULL THEN
+        WITH distinct_users AS (
+            SELECT DISTINCT gp.user_id
+            FROM games g
+                     INNER JOIN game_player_song_stats gp ON g.game_id = gp.game_id
+            WHERE gp.user_id != '00000000-0000-0000-0000-000000000000'
+              AND gp.user_id != requesting_user_id
+        )
+        SELECT user_id INTO found_user_id
+        FROM distinct_users
+        ORDER BY random()
+        LIMIT 1;
+    END IF;
+
+    -- If still no user found, raise exception
+    IF found_user_id IS NULL THEN
+        RAISE EXCEPTION 'No active users found';
+    END IF;
+
+    RETURN found_user_id;
+END;
+$$;
