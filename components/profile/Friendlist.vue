@@ -1,30 +1,26 @@
 <script setup lang="ts">
-import { FriendshipStatus, FriendshipType, type GetFriendsResponse } from "@/types/api/user.friends";
 import { UserViewType } from "@/types/components/users.view";
 import {useFriends} from "@/composables/useFriends";
-
-const props = defineProps({
-  startGame: {
-    type: Boolean,
-    default: false
-  }
-})
 
 const session = useSupabaseSession();
 const {sentRequests, friends, requests,fetchFriends} = useFriends();
 
 const showModal = ref(false);
 
+const intervalId = ref();
+
 onMounted(async () => {
   if (session.value) {
     await fetchFriends();
+    intervalId.value = await setInterval(() => {
+    fetchFriends()
+  }, 5000); // 5 seconds
   }
 })
-const emit = defineEmits(['chose_friend'])
 
-function handleChoseFriend(friendId: string) {
-  emit('chose_friend', friendId)
-}
+onBeforeUnmount(() => {
+  clearInterval(intervalId.value);
+});
 </script>
 
 <template>
@@ -39,13 +35,13 @@ function handleChoseFriend(friendId: string) {
     <div class="overflow-y-auto" style="max-height: 43vh;">
       <UsersView 
         v-if="friends.length > 0" :view-type="UserViewType.FRIENDS" :users="friends"
-        action-label="Add Friend" :on-action="() => {showModal = true}" @refresh="getFriendships" />
+        action-label="Add Friend" :on-action="() => {showModal = true}" @refresh="fetchFriends" />
       <UsersView 
         v-if="requests.length > 0" :view-type="UserViewType.REQUESTS" :users="requests"
-        @refresh="getFriendships" />
+        @refresh="fetchFriends" />
       <UsersView 
         v-if="sentRequests.length > 0" :view-type="UserViewType.SENTREQUESTS" :users="sentRequests"
-        @refresh="getFriendships" />
+        @refresh="fetchFriends" />
     </div>
   </div>
 </template>

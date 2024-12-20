@@ -14,10 +14,19 @@ const curr_game = useState<ActiveGame | null>('current_game', () => null);
 
 const showModal = ref(false);
 
+const intervalId = ref();
+
 onMounted(async () => {
   setLevelbar(70);
   await fetchUser();
   await fetchGames();
+  intervalId.value = await setInterval(() => {
+    fetchGames()
+  }, 15000); // 15 seconds
+});
+
+onBeforeUnmount(() => {
+  clearInterval(intervalId.value);
 });
 
 function setLevelbar(newValue: number) {
