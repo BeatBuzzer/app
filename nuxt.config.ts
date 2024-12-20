@@ -23,5 +23,10 @@ export default defineNuxtConfig({
     devServer: {
         host: '0.0.0.0'
     },
+    nitro: {
+        experimental: {
+            openAPI: true
+        },
+    },
     ssr: false
 })
