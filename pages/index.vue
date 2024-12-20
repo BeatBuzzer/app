@@ -4,11 +4,10 @@ import {UserViewType} from "@/types/components/users.view"
 import {useGame} from "@/composables/useGames";
 import type {ActiveGame} from "@/types/api/game";
 import VerticalGameList from "@/components/home/Game/VerticalGameList.vue";
-import RegistrationView from "@/components/login/RegistrationModal.vue";
 import StartGameModal from "@/components/home/StartGameModal.vue";
+import RegistrationModal from "@/components/login/RegistrationModal.vue";
 
-const {fetchUser, user, error: userError} = useUser()
-
+const {fetchUser, user, error:userError} = useUser()
 const {games, fetchGames} = useGame();
 
 const curr_game = useState<ActiveGame | null>('current_game', () => null);
@@ -56,7 +55,7 @@ const newGame = async (opponent_id?: string, playlist_id?: string) => {
 <template>
   <div class="bg-gradient-to-b from-indigo-500 to-purple-500">
 
-    <RegistrationView v-if="userError" :on-register="async ()=> {await fetchUser();}"/>
+    <RegistrationModal v-if="userError" :on-register="async ()=> { userError = null; await fetchUser(); }"/>
 
     <StartGameModal v-show="showModal" @close-modal="showModal = false" @friend-playlist-chosen="newGame"/>
 
