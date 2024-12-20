@@ -94,19 +94,21 @@ export default function useSpotify(playlistId: string) {
 
             const data = await res.json();
 
-            console.log(data)
-
-            data.items.forEach(item => {
-                if (!userPlaylists.value.some(playlist => playlist.id === item.id)) {
-                    userPlaylists.value.push({ 
-                        id: item.id, 
-                        spotifyId: item.id, 
-                        cover: item.images[0].url, 
-                        enabled: true, 
-                        name: item.name
-                    } as Playlist);
+            for (const item of data.items) {
+                const itemCount = await getPlaylistItems(item.id);
+                if (itemCount >= 8) {
+                    const exists = userPlaylists.value.some(playlist => playlist.id === item.id);
+                    if (!exists) {
+                        userPlaylists.value.push({
+                            id: item.id,
+                            spotifyId: item.id,
+                            cover: item.images[0].url,
+                            enabled: true,
+                            name: item.name,
+                        } as Playlist);
+                    }
                 }
-            });
+            }
             
             return userPlaylists.value;
         } catch (error) {
@@ -115,11 +117,35 @@ export default function useSpotify(playlistId: string) {
         }
     }
 
+    async function getPlaylistItems(playlistId: string): Promise<number> {
+        try {
+            const res = await fetch(`https://api.spotify.com/v1/playlists/${ playlistId }/tracks`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token.value}`,
+                },
+            });
+
+            if (!res.ok) {
+                console.error(`Error: ${res.status} - ${res.statusText}`);
+                return 0;
+            }
+
+            const data = await res.json();
+            
+            return data.items.length;
+        } catch (error) {
+            console.error('Failed to get playlists:', error);
+            return 0;
+        }
+    }
+
     return {
         playlistStatus,
         getPlaylistStatus,
         followPlaylist,
         unfollowPlaylist,
-        getUserPlaylists
+        getUserPlaylists,
+        getPlaylistItems
     };
 }
