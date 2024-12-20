@@ -16,8 +16,14 @@ const props = defineProps({
   controlElement: {
     type: String,
     default: null
-  }
+  },
+    startGame: {
+        type: Boolean,
+        default: false
+    }
 });
+
+const emit = defineEmits(['chose-playlist'])
 
 const showModal = ref(false);
 </script>
@@ -25,9 +31,9 @@ const showModal = ref(false);
 <template>
   <div 
     :class="[
-      'bg-blue-600 rounded-3xl p-3 mb-3 inline-block w-24 md:w-28'
+      'bg-blue-600 rounded-3xl p-3 mb-3 inline-block w-24 md:w-28 hover:bg-sky-700'
     ]" 
-    @click="showModal = true">
+    @click="props.startGame ? emit('chose-playlist', props.playlistId) : showModal = true">
     <!-- Playlist cover, when none is given a default image is used -->
     <div class="flex flex-col items-center justify-center">
       <NuxtImg 

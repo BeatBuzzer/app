@@ -1,29 +1,29 @@
 <script setup lang="ts">
 import { FriendshipStatus, FriendshipType, type GetFriendsResponse } from "@/types/api/user.friends";
 import { UserViewType } from "@/types/components/users.view";
+import {useFriends} from "@/composables/useFriends";
 
-const requests: Ref<GetFriendsResponse[]> = useState("incoming_friendships", () => [])
-const friends: Ref<GetFriendsResponse[]> = useState("accepted_friendships", () => [])
-const sentRequests: Ref<GetFriendsResponse[]> = useState("outgoing_friendships", () => [])
+const props = defineProps({
+  startGame: {
+    type: Boolean,
+    default: false
+  }
+})
 
-const session = useSupabaseSession()
+const session = useSupabaseSession();
+const {sentRequests, friends, requests,fetchFriends} = useFriends();
 
 const showModal = ref(false);
 
 onMounted(async () => {
   if (session.value) {
-    await getFriendships()
-    //  friends.value.push() // unexpected behavior on initial page load
+    await fetchFriends();
   }
 })
+const emit = defineEmits(['chose_friend'])
 
-async function getFriendships() {
-  $fetch<GetFriendsResponse[]>('/api/v1/user/friends')
-    .then((data) => {
-      requests.value = data.filter((item) => item.request_type == FriendshipType.INCOMING && item.status === FriendshipStatus.PENDING)
-      friends.value = data.filter((item) => item.status === FriendshipStatus.ACCEPTED)
-      sentRequests.value = data.filter((item) => item.request_type == FriendshipType.OUTGOING && item.status === FriendshipStatus.PENDING)
-    });
+function handleChoseFriend(friendId: string) {
+  emit('chose_friend', friendId)
 }
 </script>
 
@@ -32,7 +32,7 @@ async function getFriendships() {
     <!-- Buttons Section -->
     <div class="flex justify-center mb-3">
       <button v-if="friends.length < 1" class="p-2 bg-blue-500 text-white rounded-3xl ml-2" @click="showModal = true">Add new friend</button>
-      <ProfileFriendRequestModal v-show="showModal" @close-modal="showModal = false" @refresh="getFriendships" />
+      <ProfileFriendRequestModal v-show="showModal" @close-modal="showModal = false" @refresh="fetchFriends" />
     </div>
 
     <!-- Responsive Size Content Section -->

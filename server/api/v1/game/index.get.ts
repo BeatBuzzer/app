@@ -52,7 +52,9 @@ export default defineEventHandler(async (event) => {
 
     const response: GetGameResponse = {
         active: activeGames,
-        waiting: games.filter(game => game.status === GameStatus.PLAYING && game.creator_id === user.id),
+        waiting: games.filter(game => game.status === GameStatus.PLAYING && game.creator_id === user.id)
+            // dont show games where the user is waiting for a deleted player
+            .filter((g)=>!g.players.some((p)=>p.id === '00000000-0000-0000-0000-000000000000')),
         past: games.filter(game => game.status === GameStatus.FINISHED)
     };
 
