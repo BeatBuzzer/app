@@ -17,10 +17,19 @@ const session = useSupabaseSession();
 
 const showModal = ref(false);
 
+const intervalId = ref();
+
 onMounted(async () => {
   if (session.value) {
     await getPlaylists();
+    intervalId.value = await setInterval(() => {
+    getPlaylists()
+  }, 5000); // 5 seconds
   }
+});
+
+onBeforeUnmount(() => {
+  clearInterval(intervalId.value);
 });
 
 const emit = defineEmits(['chose-playlist'])
