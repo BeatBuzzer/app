@@ -14,7 +14,7 @@ const playlistError = ref('')
             <p class="text-3xl font-bold my-3">Your Playlists</p>
             <UserSpotifyPlaylistsView @refresh="emit('refresh')"/>
             <p v-if="playlistError" class="error-message">{{ playlistError }}</p>
-            <p class="px-8">If you can't see your playlist here, make sure to add it to your Spotify profile.</p>
+            <p class="px-8">If you can't see your playlist here, make sure to add it to your Spotify profile and has more than 8 songs.</p>
             <button class="bg-indigo-600 hover:bg-indigo-800 my-5 text-white mx-auto block" @click="emit('close-modal')">Close</button>
         </div>
     </div>

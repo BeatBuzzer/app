@@ -6,9 +6,18 @@ const { getUserPlaylists } = useSpotify("");
 
 const userPlaylists = ref<Playlist[] | null>([]);
 
+const intervalId = ref();
+
 onMounted(async () => {
-    userPlaylists.value = await getUserPlaylists();;
-})
+    userPlaylists.value = await getUserPlaylists();
+    intervalId.value = await setInterval(() => {
+        getUserPlaylists();
+  }, 5000); // 5 seconds
+});
+
+onBeforeUnmount(() => {
+  clearInterval(intervalId.value);
+});
 
 const emit = defineEmits(['refresh']);
 
