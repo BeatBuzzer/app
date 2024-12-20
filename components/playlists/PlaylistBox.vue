@@ -13,17 +13,17 @@ const props = defineProps({
     default: 'Playlist',
     required: true
   },
-  controlElement: {
-    type: String,
-    default: null
+  userPlaylist : {
+    type: Boolean,
+    default: false
   },
-    startGame: {
-        type: Boolean,
-        default: false
-    }
+  startGame: {
+    type: Boolean,
+    default: false
+  }
 });
 
-const emit = defineEmits(['chose-playlist'])
+const emit = defineEmits(['chose-playlist','refresh'])
 
 const showModal = ref(false);
 </script>
@@ -54,7 +54,7 @@ const showModal = ref(false);
   <!-- Modal for (un)following playlists -->
   <PlaylistsPlaylistModal 
     v-show="showModal" :playlist-id="props.playlistId" :playlist-name="props.name"
-    :playlist-cover="props.cover" @close-modal="showModal = false" />
+    :playlist-cover="props.cover" :user-playlist="props.userPlaylist" @close-modal="showModal = false" @refresh="emit('refresh')"/>
 </template>
 
 <style scoped>

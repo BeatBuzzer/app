@@ -14,24 +14,57 @@ const props = defineProps({
     playlistCover: {
         type: String,
         required: true
+    },
+    userPlaylist: {
+        type: Boolean,
+        default: false
     }
 });
 
-onUpdated(async () => { playlistStatus.value = await getPlaylistStatus()});
+onUpdated(async () => { playlistStatus.value = await getPlaylistStatus() });
 
-const emit = defineEmits(['close-modal']);
+const emit = defineEmits(['close-modal', 'refresh']);
 
 const { playlistStatus, getPlaylistStatus, followPlaylist, unfollowPlaylist } = useSpotify(props.playlistId);
+
+async function addPlaylist() {
+    emit('close-modal')
+    await $fetch('/api/v1/playlist', {
+    method: 'POST',
+    body: {
+      id: props.playlistId,
+      name: props.playlistName,
+      spotifyId: props.playlistId,
+      categories: ["User created"],
+      enabled: true
+    }   
+  })
+  emit('refresh')
+}
 </script>
 
 <template>
     <div class="fixed top-0 bottom-0 left-0 right-0 flex justify-center bg-black bg-opacity-85 z-50">
-        <div class="mt-[10%] w-5/6 md:w-1/6 h-5/6 md:h-3/6 rounded-3xl flex flex-col items-center justify-center text-center bg-white">
-            <p class="text-xl mb-2">{{  playlistName }}</p>
+        <div
+            class="mt-[10%] md:mt-[5%] w-full md:w-1/6 max-h-[80vh] md:max-h-[50vh] m-5 rounded-3xl flex flex-col items-center justify-center text-center bg-white">
+            <p class="text-xl font-bold mb-10 w-2/3">{{ playlistName }}</p>
             <NuxtImg :src="playlistCover" class="rounded-2xl h-40 w-40 mb-6" />
-            <button v-if="!playlistStatus" class="bg-yellow-500 hover:bg-yellow-600 text-red-600" @click="followPlaylist">Follow Playlist</button>
-            <button v-else class="bg-yellow-500 hover:bg-yellow-600 text-red-600" @click="unfollowPlaylist">Unfollow Playlist</button>
-            <button class="bg-indigo-600 hover:bg-indigo-800 my-5 text-white" @click="emit('close-modal')">Close</button>
+            <div v-if="!props.userPlaylist">
+                <button 
+                    v-if="!playlistStatus" class="bg-yellow-500 hover:bg-yellow-600 text-red-600"
+                    @click="followPlaylist">Follow Playlist</button>
+                <button 
+                    v-else class="bg-yellow-500 hover:bg-yellow-600 text-red-600" @click="unfollowPlaylist">Unfollow
+                    Playlist</button>
+            </div>
+            <div v-else>
+                <button 
+                    class="bg-yellow-500 hover:bg-yellow-600 text-red-600"
+                    @click="addPlaylist">Add Playlist</button>
+            </div>
+            <button 
+                class="bg-indigo-600 hover:bg-indigo-800 my-5 text-white"
+                @click="emit('close-modal')">Close</button>
         </div>
     </div>
 </template>
