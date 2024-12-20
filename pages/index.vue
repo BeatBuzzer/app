@@ -43,7 +43,7 @@ const newGame = async () => {
 <template>
   <div class="bg-gradient-to-b from-indigo-500 to-purple-500">
 
-    <RegistrationModal v-if="userError" :on-register="async ()=> { await fetchUser(); userError = null; }"/>
+    <RegistrationModal v-if="userError" :on-register="async ()=> { userError = null; await fetchUser(); }"/>
 
     <HeaderFooterView v-if="user">
       <template #header>
