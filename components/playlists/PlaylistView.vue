@@ -24,7 +24,7 @@ const emit = defineEmits(['chose-playlist'])
 /* Get all available playlists and get every category with corresponding playlist IDs*/
 async function getPlaylists() {
   try {
-    const data = await $fetch<GetPlaylistResponse[]>('http://localhost:3000/api/v1/playlist');
+    const data = await $fetch<GetPlaylistResponse[]>('/api/v1/playlist');
     playlists.value = [...data];
 
     playlists.value.forEach(playlist => {
