@@ -155,6 +155,22 @@ export default defineEventHandler(async (event) => {
                 }))
         }));
 
+        // fetch player data
+        const {data: playerData, error: playerDataError}:{
+            data: GetUserResponse[] | null,
+            error: PostgrestError | null
+        } = await client.from('users').select().in('id', [user.id, opponent_id!]);
+
+        if (playerDataError) {
+            setResponseStatus(event, 500);
+            return {error: playerDataError.message};
+        }
+
+        if(!playerData || playerData?.length < 2) {
+            setResponseStatus(event, 500);
+            return {error: 'Failed to fetch player data'};
+        }
+
         const game: ActiveGame = {
             game_id: initData!.game_id,
             status: GameStatus.PLAYING,
@@ -164,10 +180,7 @@ export default defineEventHandler(async (event) => {
                 name: playlist.name,
                 cover: playlist.cover
             },
-            players: [
-                {id: user.id} as GetUserResponse,
-                {id: opponent_id!} as GetUserResponse
-            ], // TODO: Fetch opponent data and fix this
+            players: playerData,
             rounds: mappedGameRounds
         }
 
