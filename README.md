@@ -15,6 +15,7 @@ Run in **production mode** instead:
 ```bash
 npm install && npm start
 ```
+Not tested as the project is still in development.
 
 ## TSDocs
 

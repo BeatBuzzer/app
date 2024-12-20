@@ -14,20 +14,30 @@ const props = defineProps({
         type: Array,
         required: true
     },
+    startGame: {
+        type: Boolean,
+        default: false
+    },
     onAction: {
-        type: Function as PropType<() => void>,
-        default: () => {}
+      type: Function as PropType<() => void>,
+      default: () => {}
     },
     actionLabel: {
-        type: String,
-        default: ''
+      type: String,
+      default: ''
     }
 });
 
+const emit = defineEmits(['chose-playlist'])
+
 /* Filter the playlists array for playlits where the ID exists in the genre. */
-const filteredPlaylists = computed(() => 
+const filteredPlaylists = computed(() =>
     props.playlists.filter((item) => props.playlistIds.includes(item.spotifyId))
 );
+
+function handleChosePlaylist(playlist: GetPlaylistResponse) {
+    emit('chose-playlist', playlist)
+}
 </script>
 
 <template>
@@ -43,11 +53,13 @@ const filteredPlaylists = computed(() =>
 
         <!-- Boxes with the name and cover of the playlist in the genre -->
         <div class="flex flex-row flex-nowrap overflow-x-auto gap-2">
-            <PlaylistsPlaylistBox 
-                v-for="item in filteredPlaylists" 
-                :key="item.id" 
+            <PlaylistsPlaylistBox
+                v-for="item in filteredPlaylists"
+                :key="item.id"
                 :playlist-id="item.spotifyId"
-                :name="item.name" 
+                :name="item.name"
+                :start-game="props.startGame"
+                @chose-playlist="handleChosePlaylist(item)"
                 v-bind="item.cover ? { cover: item.cover.toString() } : {}" class="flex-grow-0 flex-shrink-0" />
         </div>
     </div>

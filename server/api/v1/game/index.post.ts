@@ -8,10 +8,16 @@ import type {SupabaseClient} from "@supabase/supabase-js";
 import type {Playlist} from "~/types/api/playlist";
 import type {PostgrestError} from "@supabase/postgrest-js";
 import type {GetUserResponse} from "~/types/api/users";
+import type {GetPlaylistDBResponse} from "~/types/api/playlists";
+import type {EventHandlerRequest, H3Event} from "h3";
 
 const GameInitSchema = z.object({
     playlist_id: z.string().regex(spotifyIDRegex, {message: 'Invalid Spotify ID'}),
     opponent_id: z.string().uuid()
+}).readonly()
+
+const GameInitRdmSchema = z.object({
+    playlist_id: z.string().regex(spotifyIDRegex, {message: 'Invalid Spotify ID'}),
 }).readonly()
 
 /**
@@ -25,13 +31,6 @@ const GameInitSchema = z.object({
  * @returns {ActiveGame} Newly created game with randomized rounds and song options
  */
 export default defineEventHandler(async (event) => {
-    // validate post-request body
-    const result = await readValidatedBody(event, body => GameInitSchema.safeParse(body))
-    if (!result.success) {
-        setResponseStatus(event, 400);
-        return {error: result.error.issues};
-    }
-
     // Require user to be authenticated
     const user = await serverSupabaseUser(event);
     if (!user?.id) {
@@ -39,7 +38,43 @@ export default defineEventHandler(async (event) => {
         return {error: 'unauthenticated'};
     }
 
-    if (result.data.opponent_id === user.id) {
+    const query = getQuery(event);
+
+    let playlist_id: string;
+    let opponent_id: string;
+
+    switch (query.type) {
+        case 'rdm_opponent': {
+            // validate post-request body
+            const result = await readValidatedBody(event, body => GameInitRdmSchema.safeParse(body))
+            if (!result.success) {
+                setResponseStatus(event, 400);
+                return {error: result.error.issues};
+            }
+            playlist_id = result.data.playlist_id;
+            opponent_id = await selectRandomOpponentId(event, user.id);
+            break;
+        }
+        case 'quickplay': {
+            playlist_id = await selectRandomPlaylistId(event);
+            opponent_id = await selectRandomOpponentId(event, user.id);
+            break;
+        }
+        default: {
+            console.debug('No recognized query type. Assuming opponent and playlist are provided');
+            // validate post-request body
+            const result = await readValidatedBody(event, body => GameInitSchema.safeParse(body))
+            if (!result.success) {
+                setResponseStatus(event, 400);
+                return {error: result.error.issues};
+            }
+            playlist_id = result.data.playlist_id;
+            opponent_id = result.data.opponent_id;
+            break
+        }
+    }
+
+    if (opponent_id! === user.id) {
         setResponseStatus(event, 400);
         return {error: 'You cannot play against yourself'};
     }
@@ -48,7 +83,7 @@ export default defineEventHandler(async (event) => {
     const {data: playlist, error: playlistError}: {
         data: Playlist | null,
         error: PostgrestError | null
-    } = await client.from('playlists').select().eq('id', result.data.playlist_id).single();
+    } = await client.from('playlists').select().eq('id', playlist_id!).single();
 
     if (playlistError) {
         setResponseStatus(event, 500);
@@ -67,7 +102,7 @@ export default defineEventHandler(async (event) => {
 
     // Determine songs
     const token = await getSpotifyToken();
-    const spotifySongs = await getSongsFromPlaylist(token, result.data.playlist_id);
+    const spotifySongs = await getSongsFromPlaylist(token, playlist_id!);
 
     if (!spotifySongs) {
         setResponseStatus(event, 500);
@@ -86,9 +121,9 @@ export default defineEventHandler(async (event) => {
         const gameRounds = await createGameRounds(songs);
 
         const init_game_params = {
-            playlist_id_input: result.data.playlist_id,
-            player_ids: [user.id, result.data.opponent_id],
-            song_data: gameRounds.sort((gr)=> gr.round).map(round => ({
+            playlist_id_input: playlist_id!,
+            player_ids: [user.id, opponent_id!],
+            song_data: gameRounds.sort((gr) => gr.round).map(round => ({
                 spotify_song_id: round.correct_song.id,
                 wrong_option_1: round.wrong_songs[0].id,
                 wrong_option_2: round.wrong_songs[1].id,
@@ -125,13 +160,13 @@ export default defineEventHandler(async (event) => {
             status: GameStatus.PLAYING,
             creator_id: user.id,
             playlist: {
-                id: result.data.playlist_id,
+                id: playlist_id!,
                 name: playlist.name,
                 cover: playlist.cover
             },
             players: [
                 {id: user.id} as GetUserResponse,
-                {id: result.data.opponent_id} as GetUserResponse
+                {id: opponent_id!} as GetUserResponse
             ], // TODO: Fetch opponent data and fix this
             rounds: mappedGameRounds
         }
@@ -187,4 +222,31 @@ async function createGameRounds(songs: Song[], rounds_to_play: number = 5): Prom
     }
 
     return gameRounds;
+}
+
+async function selectRandomPlaylistId(event: H3Event<EventHandlerRequest>): Promise<string> {
+    const client = serverSupabaseServiceRole(event);
+    const {data}: {
+        data: GetPlaylistDBResponse | null
+    } = await client.from('playlists').select(`*`).limit(1).single();
+
+    if (data) return data.id;
+
+    throw new Error('No playlists found');
+}
+
+async function selectRandomOpponentId(event: H3Event<EventHandlerRequest>, user_id: string): Promise<string> {
+    const client = serverSupabaseServiceRole(event);
+
+    const {data} = await client
+        .rpc('get_random_opponent', {
+            requesting_user_id: user_id
+        } as never)
+        .single();
+
+    if (!data) {
+        throw new Error('No active users found');
+    }
+
+    return data;
 }
