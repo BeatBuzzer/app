@@ -1,8 +1,9 @@
 <script setup lang="ts">
 
-import type {ActiveGame, ActiveGamePlaylist, Game} from "@/types/api/game";
+import type {ActiveGame, ActiveGamePlaylist, Game, GameStats} from "@/types/api/game";
 import type {Scoreboard} from "@/pages/play/index.vue";
 import FooterView from "@/layouts/FooterView.vue";
+import ScoreboardUserBox from "@/components/game/ScoreboardUserBox.vue";
 
 
 // composables
@@ -18,6 +19,14 @@ const game = computed<Game | null>(() => computeGame(activeGame?.value));
 const stats = computed(() => game.value?.stats?.find(stat => stat.user_id === user.value?.id));
 const opStats = computed(() => game.value?.stats?.find(stat => stat.user_id !== user.value?.id));
 const playlist = computed<ActiveGamePlaylist | null>(() => game.value ? game.value.playlist : null);
+
+const statsMap = computed(() => {
+  if (!game.value) return {};
+  return game.value.stats?.reduce((acc, stat) => {
+    acc[stat.user_id] = stat;
+    return acc;
+  }, {} as Record<string,GameStats>);
+});
 
 const computeGame = (activeGame?: ActiveGame): Game | null => {
   if (!activeGame) return null;
@@ -54,14 +63,18 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div>
+  <div class="bg-gradient-to-b from-indigo-500 to-purple-500">
     <FooterView>
       <template #content>
-        <div class="h-full flex flex-col">
+        <div class="h-full flex flex-col ">
           <!-- Text content fixed at top -->
-          <div class="text-center p-20">
-            Lots of content..
-          </div>
+            <div class="flex justify-center pt-[5%] pb-[5%]">
+              <GamePlaylistBox v-if="playlist" :playlist="playlist"/>
+            </div>
+
+            <div class="flex justify-between ">
+              <ScoreboardUserBox v-for="(player) in game?.players" :key="player.id" :user="player" :scoreboard="{score: statsMap![player.id].score, change: 0}"/>
+            </div>
 
           <!-- Spacer to push game rounds to bottom -->
           <div class="flex-grow"></div>
@@ -77,7 +90,7 @@ onUnmounted(() => {
                 <div class="inline-flex flex-col">
                   <Icon v-if="stats!.guesses[idx].correct_guess" name="mdi:checkbox-marked" class="text-green-500 text-4xl"/>
                   <Icon v-else name="mdi:close-box" class="text-red-500 text-4xl"/>
-                  <div class="text-sm max-w-9 font-thin text-center" v-text="stats?.guesses[idx].time_to_guess + 's'"/>
+                  <div class="text-sm max-w-9 font-thin text-center" v-text="statsMap![user!.id]?.guesses[idx].time_to_guess + 's'"/>
                 </div>
                 <NuxtImg
                     :src="defaultImg"
