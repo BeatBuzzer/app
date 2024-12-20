@@ -2,6 +2,7 @@
 
 import type {ActiveGame, ActiveGameRound, PlayGameResponse, Song} from "@/types/api/game";
 import GameSelectLayout from "@/layouts/Game/GameSelectLayout.vue";
+import type {GetPlaylistResponse} from "@/types/api/playlists";
 
 export interface Scoreboard {
   score: number;
@@ -13,6 +14,8 @@ const game = useState<ActiveGame | null>('current_game', () => null);
 const round = computed<ActiveGameRound | null>(() => game.value ? game.value.rounds[roundIdx.value - 1] : null);
 const roundIdx = ref<number>(1); // current round number
 const scoreboard = useState<Scoreboard>('current_game_score', () => ({score: 0, change: 0}));
+
+const selectedPlaylist = useState<GetPlaylistResponse | null>('selected_playlist', () => null)
 
 const error = useState<string | null>('game_error', () => null); // possible error message
 
@@ -54,6 +57,8 @@ const startGame = () => {
   // Reset game state
   roundIdx.value = 1;
   scoreboard.value = {score: 0, change: 0};
+
+  selectedPlaylist.value = game.value.playlist;
   // Start first round
   playRound();
 };

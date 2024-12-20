@@ -1,6 +1,6 @@
 export interface GetPlaylistResponse {
-    id: number,
-    spotifyId: string,
+    id: string,
+    spotify_id: string,
     name: string,
     cover: string | null,
     enabled: boolean,
@@ -13,7 +13,7 @@ export interface GetCategoryResponse {
 }
 
 export interface GetPlaylistDBResponse {
-    id: number,
+    id: string,
     spotify_id: string,
     name: string,
     cover: string | null,

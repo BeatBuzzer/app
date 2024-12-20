@@ -45,7 +45,8 @@ export default defineEventHandler(async (event) => {
         id: user.id,
         username: body.data.username,
         spotify_id: user.user_metadata.provider_id,
-        spotify_visibility: body.data.spotify_visibility
+        spotify_visibility: body.data.spotify_visibility,
+        avatar_url: user.user_metadata.avatar_url,
     } as never).single();
 
     if (error) {
