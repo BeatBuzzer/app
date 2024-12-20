@@ -17,9 +17,9 @@ const roundIdx = ref<number>(1); // current round number
 const scoreboard = useState<Scoreboard>('current_game_score', () => ({score: 0, change: 0}));
 const user = useSupabaseSession();
 
-const scoreboardMap = computed<Map<string,Scoreboard>>(() => {
+const scoreboardMap = computed<Map<string, Scoreboard>>(() => {
   if (!game || !game.value?.players) return new Map();
-  const map = new Map<string,Scoreboard>();
+  const map = new Map<string, Scoreboard>();
   game.value.players.forEach(player => {
     if (player.id === user.value?.user.id) map.set(player.id, scoreboard.value);
     else map.set(player.id, {score: 0, change: 0});
@@ -65,8 +65,11 @@ onMounted(async () => {
   startGame();
 });
 
-onUnmounted(() => {
+onUnmounted(async () => {
   if (audio.value) audio.value.pause();
+
+  // send all required guesses so game is not stuck
+  await abortGame();
 });
 
 onBeforeMount(() => {
@@ -116,7 +119,7 @@ const selectOption = async (option: Song) => {
   if (!round.value) return;
   if (!option) {
     error.value = 'Unknown Error occurred: Option couldn\'t be handled';
-    abortGame();
+    await abortGame();
     return;
   }
 
@@ -144,7 +147,7 @@ const selectOption = async (option: Song) => {
   lastServerResponse.value = await serverResponse;
   if (!lastServerResponse.value) {
     error.value = 'Server didnt respond to guess';
-    abortGame();
+    await abortGame();
     return;
   }
 
@@ -187,7 +190,22 @@ const endGame = () => {
   navigateTo('/play/end');
 }
 
-const abortGame = () => {
+const abortGame = async () => {
+
+  for (const round of game.value?.rounds || []) {
+    if (roundIdx.value <= round.round) {
+      await $fetch<PlayGameResponse>(`/api/v1/game/${game.value!.game_id}/play`, {
+        method: 'POST',
+        body: {
+          "round": round.round,
+          "guess": 'wrong', // dummy guess
+          "time": 30,
+        }
+      });
+      console.log('Sent guess for round', round.round);
+    }
+  }
+
   game.value = null;
   roundIdx.value = 1;
   audio.value!.src = '';
@@ -209,7 +227,8 @@ const abortGame = () => {
         </div>
 
         <div class="flex justify-around ">
-          <ScoreboardUserBox v-for="(player) in sortedPlayers" :key="player.id" :user="player" :scoreboard="scoreboardMap.get(player.id)!"/>
+          <ScoreboardUserBox v-for="(player) in sortedPlayers" :key="player.id" :user="player"
+                             :scoreboard="scoreboardMap.get(player.id)!"/>
         </div>
       </template>
       <template #round-indicator>
