@@ -17,6 +17,16 @@ const roundIdx = ref<number>(1); // current round number
 const scoreboard = useState<Scoreboard>('current_game_score', () => ({score: 0, change: 0}));
 const user = useSupabaseSession();
 
+const scoreboardMap = computed<Map<string,Scoreboard>>(() => {
+  if (!game || !game.value?.players) return new Map();
+  const map = new Map<string,Scoreboard>();
+  game.value.players.forEach(player => {
+    if (player.id === user.value?.user.id) map.set(player.id, scoreboard.value);
+    else map.set(player.id, {score: 0, change: 0});
+  });
+  return map;
+})
+
 const selectedPlaylist = useState<GetPlaylistResponse | null>('selected_playlist', () => null)
 
 const sortedPlayers = computed(() => {
@@ -195,11 +205,11 @@ const abortGame = () => {
     <GameSelectLayout>
       <template #scoreboard>
         <div class="flex justify-center pt-[5%] pb-[5%]">
-            <GamePlaylistBox v-if="game" :playlist="game.playlist"/>
+          <GamePlaylistBox v-if="game" :playlist="game.playlist"/>
         </div>
 
         <div class="flex justify-around ">
-          <ScoreboardUserBox v-for="(player) in sortedPlayers" :key="player.id" :user="player" :scoreboard="scoreboard"/>
+          <ScoreboardUserBox v-for="(player) in sortedPlayers" :key="player.id" :user="player" :scoreboard="scoreboardMap.get(player.id)!"/>
         </div>
       </template>
       <template #round-indicator>
