@@ -3,6 +3,7 @@
 import type {ActiveGame, ActiveGameRound, PlayGameResponse, Song} from "@/types/api/game";
 import GameSelectLayout from "@/layouts/Game/GameSelectLayout.vue";
 import type {GetPlaylistResponse} from "@/types/api/playlists";
+import ScoreboardUserBox from "@/components/game/ScoreboardUserBox.vue";
 
 export interface Scoreboard {
   score: number;
@@ -14,8 +15,29 @@ const game = useState<ActiveGame | null>('current_game', () => null);
 const round = computed<ActiveGameRound | null>(() => game.value ? game.value.rounds[roundIdx.value - 1] : null);
 const roundIdx = ref<number>(1); // current round number
 const scoreboard = useState<Scoreboard>('current_game_score', () => ({score: 0, change: 0}));
+const user = useSupabaseSession();
+
+const scoreboardMap = computed<Map<string,Scoreboard>>(() => {
+  if (!game || !game.value?.players) return new Map();
+  const map = new Map<string,Scoreboard>();
+  game.value.players.forEach(player => {
+    if (player.id === user.value?.user.id) map.set(player.id, scoreboard.value);
+    else map.set(player.id, {score: 0, change: 0});
+  });
+  return map;
+})
 
 const selectedPlaylist = useState<GetPlaylistResponse | null>('selected_playlist', () => null)
+
+const sortedPlayers = computed(() => {
+  if (!game || !game.value?.players) return [];
+
+  return [...game.value.players].sort((a, b) => {
+    if (a.id === user.value?.user.id) return -1;
+    if (b.id === user.value?.user.id) return 1;
+    return 0;
+  });
+});
 
 const error = useState<string | null>('game_error', () => null); // possible error message
 
@@ -73,7 +95,7 @@ const playRound = () => {
   audio.value.load();
 
   // Wait for audio to load
-  audio.value.oncanplaythrough = async() => {
+  audio.value.oncanplaythrough = async () => {
     if (!audio.value) return;
     audio.value.play(); // start audio playback
     await nextTick();
@@ -182,9 +204,12 @@ const abortGame = () => {
   <div class="bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500">
     <GameSelectLayout>
       <template #scoreboard>
-        <div class="flex justify-center gap-4 p-4">
-          <span class="text-2xl font-semibold">Score: {{ scoreboard.score }}</span>
-          <span class="text-2xl font-semibold">Change: {{ scoreboard.change }}</span>
+        <div class="flex justify-center pt-[5%] pb-[5%]">
+          <GamePlaylistBox v-if="game" :playlist="game.playlist"/>
+        </div>
+
+        <div class="flex justify-around ">
+          <ScoreboardUserBox v-for="(player) in sortedPlayers" :key="player.id" :user="player" :scoreboard="scoreboardMap.get(player.id)!"/>
         </div>
       </template>
       <template #round-indicator>
