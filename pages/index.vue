@@ -13,6 +13,7 @@ const {games, fetchGames} = useGame();
 const curr_game = useState<ActiveGame | null>('current_game', () => null);
 
 const showModal = ref(false);
+const showLoading = ref(false);
 
 const intervalId = ref();
 
@@ -37,6 +38,7 @@ function setLevelbar(newValue: number) {
 };
 
 const newGame = async (opponent_id?: string, playlist_id?: string) => {
+  showLoading.value = true;
   let gameType = undefined;
 
   if (!playlist_id && !opponent_id) {
@@ -56,6 +58,7 @@ const newGame = async (opponent_id?: string, playlist_id?: string) => {
     }
   });
 
+  showLoading.value = false;
   curr_game.value = data;
   navigateTo('/play');
 };
@@ -63,6 +66,8 @@ const newGame = async (opponent_id?: string, playlist_id?: string) => {
 
 <template>
   <div class="bg-gradient-to-b from-indigo-500 to-purple-500">
+
+    <HomeLoader v-show="showLoading"/>
 
     <RegistrationModal v-if="userError" :on-register="async ()=> { userError = null; await fetchUser(); }"/>
 
