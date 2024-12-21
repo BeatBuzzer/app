@@ -67,7 +67,7 @@ async function handleFriendship(action: FriendshipAction) {
 };
 
 async function getFriendInformation() {
-    return await $fetch<GetUserResponse>('http://localhost:3000/api/v1/user/' + props.friendId)
+    return await $fetch<GetUserResponse>('/api/v1/user/' + props.friendId)
 }
 
 </script>
