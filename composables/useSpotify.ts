@@ -1,5 +1,6 @@
 /* Communicate with Spotify API */
-import type { Playlist } from "@/types/api/playlist"
+import type { Playlist } from "@/types/api/playlist";
+import { Buffer } from 'buffer';
 
 export default function useSpotify(playlistId: string) {
     const playlistStatus = ref<boolean | null>(null);
@@ -7,9 +8,49 @@ export default function useSpotify(playlistId: string) {
 
     const session = useSupabaseSession();
     const token = ref('');
+    const refresh_token = ref('')
 
     if (session.value) {
         token.value = session.value.provider_token ?? '';
+        refresh_token.value = session.value.provider_refresh_token ?? ''
+        localStorage.setItem('access_token', token.value);
+        localStorage.setItem('refresh_token', refresh_token.value);
+    }
+
+    const getRefreshToken = async () => {
+        const url = "https://accounts.spotify.com/api/token";
+        const clientId = 'a986eacb383b4bcc9448f05c099ec209';
+        const clientSecret = '9678c22b670c4fcc86778ef954171823';
+
+        /*const auth = Buffer
+        .from(`${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`)
+        .toString('base64')*/
+
+        const auth = Buffer
+        .from(`${clientId}:${clientSecret}`)
+        .toString('base64')
+    
+         const payload = {
+           method: 'POST',
+           headers: {
+             'Content-Type': 'application/x-www-form-urlencoded',
+             'Authorization': 'Basic ' + auth
+           },
+           body: new URLSearchParams({
+             grant_type: 'refresh_token',
+             refresh_token: refresh_token.value,
+           }),
+         }
+
+         const body = await fetch(url, payload);
+         const response = await body.json();
+     
+         localStorage.setItem('access_token', response.access_token);
+         token.value = localStorage.getItem('access_token') ?? '';
+         if (response.refreshToken) {
+           localStorage.setItem('refresh_token', response.refreshToken);
+           refresh_token.value = localStorage.getItem('refresh_token') ?? '';
+         }    
     }
 
     async function getPlaylistStatus(): Promise<boolean | null> {
@@ -23,6 +64,7 @@ export default function useSpotify(playlistId: string) {
 
             if (!res.ok) {
                 console.error(`Error: ${res.status} - ${res.statusText}`);
+                getRefreshToken();
                 return null;
             }
 
@@ -50,6 +92,7 @@ export default function useSpotify(playlistId: string) {
                 await getPlaylistStatus();
             } else {
                 const errorData = await res.json();
+                getRefreshToken();
                 console.error('Failed to follow playlist:', errorData);
             }
         } catch (error) {
@@ -71,6 +114,7 @@ export default function useSpotify(playlistId: string) {
                 await getPlaylistStatus();
             } else {
                 const errorData = await res.json();
+                getRefreshToken();
                 console.error('Failed to unfollow playlist:', errorData);
             }
         } catch (error) {
@@ -80,6 +124,7 @@ export default function useSpotify(playlistId: string) {
 
     async function getUserPlaylists(): Promise<Playlist[] | null> {
         try {
+            console.log(token.value)
             const res = await fetch(`https://api.spotify.com/v1/users/${session.value?.user.user_metadata.provider_id}/playlists`, {
                 method: 'GET',
                 headers: {
@@ -89,6 +134,7 @@ export default function useSpotify(playlistId: string) {
 
             if (!res.ok) {
                 console.error(`Error: ${res.status} - ${res.statusText}`);
+                getRefreshToken();
                 return null;
             }
 
