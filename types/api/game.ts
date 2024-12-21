@@ -19,6 +19,7 @@ interface SongArtist {
 export interface GameRound {
     round: number;
     correct_song: Song;
+    correct_song_cover: string;
     wrong_songs: Song[];
 }
 

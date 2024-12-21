@@ -4,11 +4,13 @@ import type {ActiveGame, ActiveGamePlaylist, Game, GameStats} from "@/types/api/
 import type {Scoreboard} from "@/pages/play/index.vue";
 import FooterView from "@/layouts/FooterView.vue";
 import ScoreboardUserBox from "@/components/game/ScoreboardUserBox.vue";
+import useSpotify from '@/composables/useSpotify';
 
 
 // composables
 const {games, fetchGames} = useGame();
-const {user, fetchUser} = useUser()
+const {user, fetchUser} = useUser();
+const {getTrackCover} = useSpotify("");
 
 // states from parent
 const scoreboard = useState<Scoreboard>('current_game_score', () => ({score: 0, change: 0}));
@@ -42,12 +44,26 @@ const computeGame = (activeGame?: ActiveGame): Game | null => {
 
   if (!foundGame) return null;
 
+  const defaultCover = 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/eb777e7a-7d3c-487e-865a-fc83920564a1/d7kpm65-437b2b46-06cd-4a86-9041-cc8c3737c6f0.jpg/v1/fit/w_800,h_800,q_70,strp/no_album_art__no_cover___placeholder_picture_by_cmdrobot_d7kpm65-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9ODAwIiwicGF0aCI6IlwvZlwvZWI3NzdlN2EtN2QzYy00ODdlLTg2NWEtZmM4MzkyMDU2NGExXC9kN2twbTY1LTQzN2IyYjQ2LTA2Y2QtNGE4Ni05MDQxLWNjOGMzNzM3YzZmMC5qcGciLCJ3aWR0aCI6Ijw9ODAwIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.8yjX5CrFjxVH06LB59TpJLu6doZb0wz8fGQq4tM64mg';
+
+  foundGame.rounds.forEach(round => {
+    round.correct_song_cover = defaultCover;
+
+    getCover(round.correct_song.id).then(cover => {
+      round.correct_song_cover = cover;
+    }).catch(error => {
+      console.error('Failed to fetch cover:', error);
+    });
+  });
+
   return {
     ...foundGame
   }
 };
 
-const defaultImg = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/eb777e7a-7d3c-487e-865a-fc83920564a1/d7kpm65-437b2b46-06cd-4a86-9041-cc8c3737c6f0.jpg/v1/fit/w_800,h_800,q_70,strp/no_album_art__no_cover___placeholder_picture_by_cmdrobot_d7kpm65-414w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9ODAwIiwicGF0aCI6IlwvZlwvZWI3NzdlN2EtN2QzYy00ODdlLTg2NWEtZmM4MzkyMDU2NGExXC9kN2twbTY1LTQzN2IyYjQ2LTA2Y2QtNGE4Ni05MDQxLWNjOGMzNzM3YzZmMC5qcGciLCJ3aWR0aCI6Ijw9ODAwIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.8yjX5CrFjxVH06LB59TpJLu6doZb0wz8fGQq4tM64mg"
+async function getCover(id: string) {
+  return await getTrackCover(id)
+}
 
 // Hooks
 onMounted(async () => {
@@ -93,7 +109,7 @@ onUnmounted(() => {
                   <div class="text-sm max-w-9 font-thin text-center" v-text="statsMap![user!.id]?.guesses[idx].time_to_guess + 's'"/>
                 </div>
                 <NuxtImg
-                    :src="defaultImg"
+                    :src="gameRound.correct_song_cover"
                     width="55" height="auto"
                 />
                 <div v-if="opStats?.guesses && opStats.guesses.length > 1" class="inline-flex flex-col">
@@ -108,6 +124,7 @@ onUnmounted(() => {
                 </div>
               </div>
               <div class="tracking-tight font-semibold mt-1 mb-2 text-sm">{{ gameRound.correct_song.name }}</div>
+              <div>{{ gameRound.round }}</div>
             </div>
           </div>
         </div>
