@@ -34,7 +34,7 @@ const props = defineProps({
   },
   viewType: {
     type: Number,
-    required: false,
+    default: 0
   },
   startGame: {
     type: Boolean,

@@ -59,8 +59,9 @@ function handleChosePlaylist(playlist: GetPlaylistResponse) {
                 :playlist-id="item.spotifyId"
                 :name="item.name"
                 :start-game="props.startGame"
-                @chose-playlist="handleChosePlaylist(item)"
-                v-bind="item.cover ? { cover: item.cover.toString() } : {}" class="flex-grow-0 flex-shrink-0" />
+                class="flex-grow-0 flex-shrink-0"
+                v-bind="item.cover ? { cover: item.cover.toString() } : {}"
+                @chose-playlist="handleChosePlaylist(item)" />
         </div>
     </div>
 </template>

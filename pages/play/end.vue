@@ -7,7 +7,7 @@ import ScoreboardUserBox from "@/components/game/ScoreboardUserBox.vue";
 
 
 // composables
-const {loading, error, games, fetchGames} = useGame();
+const {games, fetchGames} = useGame();
 const {user, fetchUser} = useUser()
 
 // states from parent
@@ -77,7 +77,7 @@ onUnmounted(() => {
             </div>
 
           <!-- Spacer to push game rounds to bottom -->
-          <div class="flex-grow"></div>
+          <div class="flex-grow" />
 
           <!-- Game rounds container aligned to bottom -->
           <div class="w-full pb-5">

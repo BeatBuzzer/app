@@ -142,8 +142,9 @@ onMounted(async () => {
 
       <div v-else-if="currentView === 'playlists'">
         <p class="text-3xl font-bold pb-2 text-center">Choose your Playlist</p>
-        <PlaylistsPlaylistView :start-game="true" class="overflow-y-auto max-h-[60vh] mb-5"
-                               @chose-playlist="selectPlaylist"/>
+        <PlaylistsPlaylistView 
+          :start-game="true" class="overflow-y-auto max-h-[60vh] mb-5"
+          @chose-playlist="selectPlaylist"/>
       </div>
 
     </div>

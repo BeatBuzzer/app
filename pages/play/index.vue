@@ -227,8 +227,9 @@ const abortGame = async () => {
         </div>
 
         <div class="flex justify-around ">
-          <ScoreboardUserBox v-for="(player) in sortedPlayers" :key="player.id" :user="player"
-                             :scoreboard="scoreboardMap.get(player.id)!"/>
+          <ScoreboardUserBox 
+            v-for="(player) in sortedPlayers" :key="player.id" :user="player"
+            :scoreboard="scoreboardMap.get(player.id)!"/>
         </div>
       </template>
       <template #round-indicator>
