@@ -38,7 +38,8 @@ const formatDate = (dateString: string) => {
 
       <div class="grid grid-cols-2 gap-2">
         <div class="bg-gray-200 h-8 rounded-3xl bg-yellow-500 px-2 flex items-center">
-          {{ totalGames }}
+          <Icon name="mdi:controller" class="text-2xl mr-2 text-red-600" />
+          {{ totalGames }} Games
         </div>
         <div class="bg-gray-200 h-8 rounded-3xl bg-yellow-500 px-2 flex items-center">
           <Icon name="mdi:fire" class="text-2xl mr-2 text-red-600" />
