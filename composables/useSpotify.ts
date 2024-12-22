@@ -19,8 +19,8 @@ export default function useSpotify(playlistId: string) {
 
     const getRefreshToken = async () => {
         const url = "https://accounts.spotify.com/api/token";
-        const clientId = 'a986eacb383b4bcc9448f05c099ec209';
-        const clientSecret = '9678c22b670c4fcc86778ef954171823';
+        const clientId = '';
+        const clientSecret = '';
 
         /*const auth = Buffer
         .from(`${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`)
