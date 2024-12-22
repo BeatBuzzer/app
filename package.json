@@ -7,23 +7,33 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "start": "nuxt build && nuxt start",
     "postinstall": "nuxt prepare",
+    "docs": "typedoc",
+    "docs:serve": "typedoc && npx serve docs"
     "test": "vitest"
   },
   "dependencies": {
     "@hebilicious/authjs-nuxt": "^0.3.5",
+    "@nuxt/icon": "^1.9.0",
     "@nuxt/image": "^1.8.1",
     "@nuxtjs/supabase": "v1.2.2",
     "@nuxtjs/tailwindcss": "^6.12.1",
+    "jsonpath": "^1.1.1",
     "nuxt": "^3.13.0",
     "vue": "latest",
-    "vue-router": "latest"
+    "vue-router": "latest",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@iconify-json/mdi": "^1.2.1",
     "@nuxt/eslint": "^0.5.7",
+    "@types/jsonpath": "^0.2.4",
+    "@types/node": "^22.8.5",
+    "eslint": "^9.11.1",
+    "typedoc": "^0.26.10"
     "@nuxt/test-utils": "^3.14.4",
     "@vue/test-utils": "^2.4.6",
-    "eslint": "^9.11.1",
     "happy-dom": "^15.7.4",
     "nitro-test-utils": "^0.9.0",
     "playwright-core": "^1.48.1",

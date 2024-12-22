@@ -1,60 +1,57 @@
-# Nuxt 3 Minimal Starter
-
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+# BeatBuzzer Music Game
 
 ## Setup
 
-Make sure to install the dependencies:
+Execute the following commands to run the project locally in development mode:
 
 ```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
+npm install && npm run dev
 ```
 
-## Development Server
+The server will be available at `http://localhost:3000`.
 
-Start the development server on `http://localhost:3000`:
+Run in **production mode** instead:
 
 ```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
+npm install && npm start
 ```
+Not tested as the project is still in development.
 
-## Production
+## TSDocs
 
-Build the application for production:
+To generate the TSDoc documentation, run the following command:
 
 ```bash
-# npm
-npm run build
+npm run docs:serve
 ```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
 
 ## Required Environment Variables
-Check `.env.demo` for the required environment variables.
+
+Check `.env.example` for the required environment variables.
+
+Utilize ur systems capabilities to set the environment variables or create a `.env` file in the root of the project and
+set the variables there. Latter is suggested.
+
+> [!WARNING] Careful
+> Make sure to never commit the `.env` file to the repository.  
+> Check the `.gitignore` file to see the `.env` file is ignored.
+
+## Project Structure
+
+We are using the following project structure:
+
+```
+.
+├── pages                   # For Vue pages
+├── components              # For Vue components
+├── composables             # For composables (Vue composition API)
+├── DB                      # All DDLs for the database
+├── layouts                 # For Vue layouts
+├── types                   # For TypeScript types
+└── server                  # For the Nitro server
+    ├── api                 # All API routes (route automatically defined as folder/file)
+        └── health.get.ts   # eg, GET /api/health  
+    └── utils               # For server utilities
+```
+
+Please see the [Nuxt Documentation](https://nuxt.com/docs/guide/directory-structure/app) for more detailed information.

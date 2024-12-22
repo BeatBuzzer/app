@@ -1,5 +1,26 @@
 <script setup lang="ts">
 import SplitView from "~/layouts/SplitView.vue";
+import type {LoginError} from "@/pages/confirm.vue";
+
+useSeoMeta({
+  title: "BeatBuzzer",
+  description: "A fun music quiz game",
+  viewport: "width=device-width, initial-scale=1.0",
+})
+
+const loginError = useState<LoginError>('login_error', () => ({error: null, error_code: null, msg: null}));
+
+onMounted(() => {
+  if(loginError.value.error){
+    throw createError({
+      fatal: true,
+      statusCode: 401,
+      statusMessage: 'Unauthorized',
+      message: loginError.value.msg || 'Login error',
+    })
+
+  }
+})
 </script>
 
 <template>
@@ -9,11 +30,13 @@ import SplitView from "~/layouts/SplitView.vue";
     <SplitView>
       <template #header/>
       <template #content>
-        <NuxtImg src="icons/logo-alpha.png" alt="BeatBuzzer"/>
+        <div class="flex justify-center overflow-hidden">
+          <NuxtImg src="icons/logo-alpha.png" alt="BeatBuzzer" sizes="100vw md:70vw lg:60vw xl:50vw 2xl:25vw"/>
+        </div>
       </template>
 
       <template #bottom>
-        <div class="w-3/4">
+        <div class="w-3/4 xl:w-1/2 2xl:w-1/4">
           <div class="mb-4">
             <LoginProviderButton provider="spotify" name="Spotify" class="w-full animate-bounce"/> <!-- class="mb-2" for consecutive providers -->
           </div>
