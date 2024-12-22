@@ -10,6 +10,4 @@ describe('ProviderButton', () => {
         const wrapper = await mountSuspended(ProviderButton,{props: {provider: provider.id, name: provider.name}});
         expect(wrapper.text()).toContain('Sign in with ' + provider.name);
     });
-
-
 });
