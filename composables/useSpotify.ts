@@ -14,7 +14,11 @@ export default function useSpotify(playlistId: string) {
         token.value = session.value.provider_token ?? '';
         refresh_token.value = session.value.provider_refresh_token ?? ''
         localStorage.setItem('access_token', token.value);
-        localStorage.setItem('refresh_token', refresh_token.value);
+        if (refresh_token.value) {
+            localStorage.setItem('refresh_token', refresh_token.value);
+        } else {
+            refresh_token.value = localStorage.getItem('refresh_token') ?? ''
+        }
     }
 
     const getRefreshToken = async () => {
@@ -124,7 +128,6 @@ export default function useSpotify(playlistId: string) {
 
     async function getUserPlaylists(): Promise<Playlist[] | null> {
         try {
-            console.log(token.value)
             const res = await fetch(`https://api.spotify.com/v1/users/${session.value?.user.user_metadata.provider_id}/playlists`, {
                 method: 'GET',
                 headers: {
@@ -141,7 +144,7 @@ export default function useSpotify(playlistId: string) {
             const data = await res.json();
 
             for (const item of data.items) {
-                const itemCount = await getPlaylistItems(item.id);
+                const itemCount = item.tracks.total
                 if (itemCount >= 8) {
                     const exists = userPlaylists.value.some(playlist => playlist.id === item.id);
                     if (!exists) {
@@ -160,29 +163,6 @@ export default function useSpotify(playlistId: string) {
         } catch (error) {
             console.error('Failed to get playlists:', error);
             return null;
-        }
-    }
-
-    async function getPlaylistItems(playlistId: string): Promise<number> {
-        try {
-            const res = await fetch(`https://api.spotify.com/v1/playlists/${ playlistId }/tracks`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token.value}`,
-                },
-            });
-
-            if (!res.ok) {
-                console.error(`Error: ${res.status} - ${res.statusText}`);
-                return 0;
-            }
-
-            const data = await res.json();
-            
-            return data.items.length;
-        } catch (error) {
-            console.error('Failed to get playlists:', error);
-            return 0;
         }
     }
 
@@ -215,7 +195,6 @@ export default function useSpotify(playlistId: string) {
         followPlaylist,
         unfollowPlaylist,
         getUserPlaylists,
-        getPlaylistItems,
         getTrackCover
     };
 }

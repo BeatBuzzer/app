@@ -24,7 +24,7 @@ onMounted(async () => {
     await getPlaylists();
     intervalId.value = await setInterval(() => {
     getPlaylists()
-  }, 5000); // 5 seconds
+  }, 10000); // 10 seconds
   }
 });
 
