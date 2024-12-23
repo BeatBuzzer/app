@@ -241,7 +241,7 @@ async function selectRandomPlaylistId(event: H3Event<EventHandlerRequest>): Prom
     const client = serverSupabaseServiceRole(event);
     const {data}: {
         data: GetPlaylistDBResponse | null
-    } = await client.from('playlists').select(`*`).limit(1).single();
+    } = await client.rpc('get_random_playlist').single();
 
     if (data) return data.id;
 

@@ -15,3 +15,25 @@ create table categories
     "playlistId" text not null references playlists (id) on delete cascade,
     primary key (name, "playlistId")
 );
+
+-- Get random playlist
+CREATE OR REPLACE FUNCTION get_random_playlist()
+    RETURNS TABLE (
+                      id text,
+                      "spotifyId" text,
+                      name text,
+                      cover text
+                  ) AS $$
+BEGIN
+    RETURN QUERY
+        SELECT
+            p.id,
+            p."spotifyId",
+            p.name,
+            p.cover
+        FROM playlists p
+        WHERE p.enabled = true
+        ORDER BY random()
+        LIMIT 1;
+END;
+$$ LANGUAGE plpgsql;
