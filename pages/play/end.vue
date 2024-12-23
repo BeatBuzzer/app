@@ -67,6 +67,10 @@ async function getCover(id: string) {
 
 // Hooks
 onMounted(async () => {
+  if(!activeGame.value) {
+    navigateTo('/');
+    return;
+  }
   await fetchUser();
   await fetchGames();
 });
