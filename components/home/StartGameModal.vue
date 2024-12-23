@@ -86,7 +86,7 @@ onMounted(async () => {
       </div>
 
       <!-- Display playlist from last game or previous selection -->
-      <div v-if="selectedPlaylist" class="relative group mb-4 flex flex-col items-center rounded-lg cursor-pointer" @click="showPlaylistsView">
+      <div v-if="selectedPlaylist && currentView !== 'playlists'" class="relative group mb-4 flex flex-col items-center rounded-lg cursor-pointer" @click="showPlaylistsView">
         <span class="text-sm font-light mb-1">Playing: </span>
         <div class="relative">
           <NuxtImg
