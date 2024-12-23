@@ -131,7 +131,6 @@ onUnmounted(() => {
                 </div>
               </div>
               <div class="tracking-tight font-semibold mt-1 mb-2 text-sm">{{ gameRound.correct_song.name }}</div>
-              <div>{{ gameRound.round }}</div>
             </div>
           </div>
         </div>

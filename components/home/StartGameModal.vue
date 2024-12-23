@@ -9,14 +9,17 @@ const emit = defineEmits<{
   'friend-playlist-chosen': [friendId: string, playlistId: string]
 }>()
 
+const defaultPlaylist:ActiveGamePlaylist = ({
+  id: '4DZ79IJM4IlYBI8dpWZZO2',
+  name: 'Beats to Buzz To',
+  cover: 'https://mosaic.scdn.co/640/ab67616d0000b2730102924a57d952089d6a5199ab67616d0000b2730ae4f4d42e4a09f3a29f64adab67616d0000b273192221f838b7b6b9cb4629bfab67616d0000b273d09f96d82310d4d77c14c108'
+});
+
 const currentView = ref<'main' | 'friends' | 'playlists'>('main')
-const selectedPlaylist = useState<GetPlaylistResponse | ActiveGamePlaylist | null>('selected_playlist', () => null)
+const selectedPlaylist = useState<GetPlaylistResponse | ActiveGamePlaylist | null>('selected_playlist', () => defaultPlaylist);
 const selectedFriend = ref<string | null>(null)
 
 const {fetchFriends, friends} = useFriends();
-
-const showModal = ref(false);
-
 const showFriendsView = () => {
   currentView.value = 'friends'
 }
