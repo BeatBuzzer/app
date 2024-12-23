@@ -1,0 +1,1695 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Nitro Server Routes",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local Development Server",
+      "variables": {}
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "FriendActionRequest": {
+        "type": "object",
+        "properties": {
+          "friendship_id": {
+            "type": "integer",
+            "description": "ID of the friendship to act upon"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "ACCEPT",
+              "DECLINE",
+              "REMOVE"
+            ],
+            "description": "Action to perform on the friendship request"
+          }
+        },
+        "example": {
+          "friendship_id": 123,
+          "action": "ACCEPT"
+        }
+      },
+      "SendFriendRequestBody": {
+        "type": "object",
+        "properties": {
+          "receiver_name": {
+            "type": "string",
+            "description": "Username of the friend request recipient"
+          }
+        },
+        "example": {
+          "receiver_name": "friend_username"
+        }
+      },
+      "GetFriendResponse": {
+        "type": "object",
+        "properties": {
+          "friendship_id": {
+            "type": "number",
+            "description": "The unique ID of the friendship"
+          },
+          "friend_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The unique ID of the friend"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamp when the friendship was created"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamp when the friendship was last updated"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "accepted",
+              "declined"
+            ],
+            "description": "The current status of the friendship"
+          },
+          "request_type": {
+            "type": "string",
+            "enum": [
+              "outgoing",
+              "incoming"
+            ],
+            "description": "The type of the friend request"
+          },
+          "user": {
+            "$ref": "#/components/schemas/GetUserResponse"
+          }
+        },
+        "example": {
+          "friendship_id": 123,
+          "friend_id": "123e4567-e89b-12d3-a456-426614174000",
+          "created_at": "2024-01-01T12:00:00Z",
+          "updated_at": "2024-01-02T12:00:00Z",
+          "status": "accepted",
+          "request_type": "outgoing",
+          "user": {
+            "id": "123e4567-e89b-12d3-a456-426614174000",
+            "avatar_url": "https://example.com/avatar.jpg",
+            "username": "friend_example",
+            "spotify_id": "spotify_friend_id_example",
+            "spotify_visibility": true,
+            "daily_streak": 5,
+            "daily_streak_updated_at": "2024-01-01T12:00:00Z"
+          }
+        }
+      },
+      "GetUserResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The unique identifier of the user"
+          },
+          "username": {
+            "type": "string",
+            "description": "The username of the user"
+          },
+          "spotify_id": {
+            "type": "string",
+            "description": "The user's Spotify ID, only visible if the user has chosen to make it public"
+          },
+          "spotify_visibility": {
+            "type": "boolean",
+            "description": "Whether the user's Spotify profile information is visible to others"
+          },
+          "avatar_url": {
+            "type": "string",
+            "description": "The URL of the user's avatar image"
+          },
+          "daily_streak": {
+            "type": "integer",
+            "description": "The user's current daily streak"
+          },
+          "daily_streak_updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The last time the daily streak was updated"
+          }
+        },
+        "example": {
+          "id": "123e4567-e89b-12d3-a456-426614174000",
+          "username": "user_example",
+          "spotify_id": "spotify_user_id_example",
+          "spotify_visibility": true,
+          "avatar_url": "https://example.com/avatar.jpg",
+          "daily_streak": 5,
+          "daily_streak_updated_at": "2024-01-01T12:00:00Z"
+        }
+      },
+      "RegisterUserRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "The username of the user. Must be 4+ characters and alphanumeric with underscores only.",
+            "minLength": 4,
+            "pattern": "^[a-zA-Z0-9_]+$"
+          },
+          "spotify_visibility": {
+            "type": "boolean",
+            "description": "Whether the user's Spotify profile information is visible to others."
+          }
+        },
+        "required": [
+          "username",
+          "spotify_visibility"
+        ],
+        "example": {
+          "username": "new_user_123",
+          "spotify_visibility": true
+        }
+      },
+      "CreatePlaylistResponse": {
+        "type": "object",
+        "properties": {
+          "playlist": {
+            "$ref": "#/components/schemas/GetPlaylistResponse"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CreatePlaylistRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Spotify playlist ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the playlist"
+          },
+          "spotifyId": {
+            "type": "string",
+            "description": "Spotify playlist ID"
+          },
+          "categories": {
+            "type": "array",
+            "description": "List of categories associated with the playlist",
+            "items": {
+              "type": "string"
+            }
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Indicates if the playlist is enabled",
+            "default": true
+          }
+        },
+        "example": {
+          "id": "37i9dQZF1DXcBWIGoYBM5M",
+          "name": "Top Hits",
+          "spotifyId": "37i9dQZF1DXcBWIGoYBM5M",
+          "categories": [
+            "Pop",
+            "Top Charts"
+          ],
+          "enabled": true
+        }
+      },
+      "GetPlaylistResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "playlist ID"
+          },
+          "spotify_id": {
+            "type": "string",
+            "description": "Spotify playlist ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the playlist"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the playlist"
+          },
+          "cover": {
+            "type": "string",
+            "description": "URL of the playlist cover image"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Indicates if the playlist is enabled"
+          },
+          "categories": {
+            "type": "array",
+            "description": "List of associated categories",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "example": {
+          "id": "37i9dQZF1DXcBWIGoYBM5M",
+          "name": "Top Hits",
+          "description": "A collection of top hit songs",
+          "cover": "https://example.com/playlist-cover.jpg",
+          "enabled": true,
+          "categories": [
+            "Pop",
+            "Top Charts"
+          ]
+        }
+      },
+      "Game": {
+        "type": "object",
+        "properties": {
+          "game_id": {
+            "type": "number",
+            "description": "The unique identifier of the game"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "playing",
+              "finished"
+            ],
+            "description": "The status of the game"
+          },
+          "creator_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Who created the game and thus already played its turn"
+          },
+          "playlist": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Spotify playlist ID"
+              },
+              "name": {
+                "type": "string",
+                "description": "Name of the playlist"
+              },
+              "cover": {
+                "type": "string",
+                "description": "URL of the playlist cover image"
+              }
+            }
+          },
+          "players": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GetUserResponse"
+            }
+          },
+          "rounds": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "round": {
+                  "type": "number",
+                  "description": "The round number"
+                },
+                "correct_song": {
+                  "$ref": "#/components/schemas/Song"
+                },
+                "correct_song_cover": {
+                  "type": "string",
+                  "description": "Cover art URL for the correct song"
+                },
+                "wrong_songs": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Song"
+                  }
+                }
+              }
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the game was created"
+          },
+          "stats": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "score": {
+                  "type": "number"
+                },
+                "guesses": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "round_number": {
+                        "type": "number"
+                      },
+                      "song": {
+                        "$ref": "#/components/schemas/Song"
+                      },
+                      "time_to_guess": {
+                        "type": "number"
+                      },
+                      "correct_guess": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ActiveGame": {
+        "type": "object",
+        "properties": {
+          "game_id": {
+            "type": "number",
+            "description": "The unique identifier of the game"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "playing"
+            ],
+            "description": "The status of the active game"
+          },
+          "creator_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Who created the game and thus already played its turn"
+          },
+          "playlist": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Spotify playlist ID"
+              },
+              "name": {
+                "type": "string",
+                "description": "Name of the playlist"
+              },
+              "cover": {
+                "type": "string",
+                "description": "URL of the playlist cover image"
+              }
+            }
+          },
+          "players": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GetUserResponse"
+            }
+          },
+          "rounds": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "round": {
+                  "type": "number",
+                  "description": "The round number"
+                },
+                "preview_url": {
+                  "type": "string",
+                  "description": "Preview URL for the song"
+                },
+                "options": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Song"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Song": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique Spotify ID of the song"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the song"
+          },
+          "artists": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SongArtist"
+            }
+          },
+          "preview_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "The preview URL for the song"
+          },
+          "is_playable": {
+            "type": "boolean",
+            "description": "Whether the song is playable"
+          }
+        },
+        "example": {
+          "id": "5PjdY0CKGZdEuoNab3yDmX",
+          "name": "Example Song",
+          "artists": [
+            {
+              "name": "Example Artist"
+            }
+          ],
+          "preview_url": "https://p.scdn.co/mp3-preview/example",
+          "is_playable": true
+        }
+      },
+      "SongArtist": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the artist"
+          }
+        }
+      },
+      "SpotifySong": {
+        "type": "object",
+        "properties": {
+          "track": {
+            "$ref": "#/components/schemas/Song"
+          }
+        },
+        "example": {
+          "track": {
+            "id": "5PjdY0CKGZdEuoNab3yDmX",
+            "name": "Example Song",
+            "artists": [
+              {
+                "name": "Example Artist"
+              }
+            ],
+            "preview_url": "https://p.scdn.co/mp3-preview/example",
+            "is_playable": true
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/v1/game/{uid}/play": {
+      "post": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "Submit a guess for a specific round in a game",
+        "description": "This endpoint allows an authenticated user to submit a guess for a specific round in an ongoing game. The user must provide the round number, their guess, and the time taken to make the guess. Scores are calculated based on the time taken, and the game status is updated accordingly.",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the game",
+            "schema": {
+              "type": "string",
+              "example": "game123"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "round": {
+                    "type": "number",
+                    "description": "The round number",
+                    "example": 1
+                  },
+                  "guess": {
+                    "type": "string",
+                    "description": "The Spotify ID of the guessed song",
+                    "example": "spotify123"
+                  },
+                  "time": {
+                    "type": "number",
+                    "description": "The time taken to make the guess in seconds",
+                    "example": 12.5
+                  }
+                },
+                "required": [
+                  "round",
+                  "guess",
+                  "time"
+                ]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with round results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "correct_guess": {
+                      "type": "boolean",
+                      "description": "Indicates if the guess was correct",
+                      "example": true
+                    },
+                    "score": {
+                      "type": "number",
+                      "description": "The user's total score after this round",
+                      "example": 450
+                    },
+                    "was_last_round": {
+                      "type": "boolean",
+                      "description": "Indicates if this was the last round of the game",
+                      "example": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid game ID, round number, or player not in game",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message",
+                      "example": "Invalid game id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated - User is not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message",
+                      "example": "unauthenticated"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Game not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message",
+                      "example": "Game not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - Database or server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/game": {
+      "get": {
+        "tags": ["Game"],
+        "summary": "Retrieve games categorized by status",
+        "description": "This endpoint retrieves all games for the authenticated user, categorized into active, waiting, and past games. Active games are where it's the user's turn, waiting games are those where the user is waiting for an opponent, and past games are completed ones.",
+        "parameters": [],
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Successful response with categorized games",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "active": {
+                      "type": "array",
+                      "description": "Games where it's the user's turn to play",
+                      "items": {
+                        "$ref": "#/components/schemas/ActiveGame"
+                      }
+                    },
+                    "waiting": {
+                      "type": "array",
+                      "description": "Games where the user is waiting for an opponent",
+                      "items": {
+                        "$ref": "#/components/schemas/Game"
+                      }
+                    },
+                    "past": {
+                      "type": "array",
+                      "description": "Completed games",
+                      "items": {
+                        "$ref": "#/components/schemas/Game"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "active": [{
+                    "game_id": 123,
+                    "status": "playing",
+                    "creator_id": "123e4567-e89b-12d3-a456-426614174000",
+                    "playlist": {
+                      "id": "37i9dQZF1DXcBWIGoYBM5M",
+                      "name": "Top Hits",
+                      "cover": "https://example.com/playlist-cover.jpg"
+                    },
+                    "players": [{
+                      "id": "123e4567-e89b-12d3-a456-426614174000",
+                      "username": "player_one",
+                      "spotify_id": "spotify_user_id_1",
+                      "spotify_visibility": true,
+                      "avatar_url": "https://example.com/avatar1.jpg",
+                      "daily_streak": 5,
+                      "daily_streak_updated_at": "2024-01-01T12:00:00Z"
+                    }],
+                    "rounds": [{
+                      "round": 1,
+                      "preview_url": "https://p.scdn.co/mp3-preview/example",
+                      "options": [{
+                        "id": "5PjdY0CKGZdEuoNab3yDmX",
+                        "name": "Song Option 1",
+                        "artists": [{"name": "Artist 1"}],
+                        "preview_url": "https://p.scdn.co/mp3-preview/example1",
+                        "is_playable": true
+                      }]
+                    }]
+                  }],
+                  "waiting": [{
+                    "game_id": 124,
+                    "status": "playing",
+                    "creator_id": "123e4567-e89b-12d3-a456-426614174000",
+                    "playlist": {
+                      "id": "37i9dQZF1DXcBWIGoYBM5M",
+                      "name": "Top Hits",
+                      "cover": "https://example.com/playlist-cover.jpg"
+                    },
+                    "players": [{
+                      "id": "123e4567-e89b-12d3-a456-426614174000",
+                      "username": "player_one",
+                      "spotify_id": "spotify_user_id_1",
+                      "spotify_visibility": true,
+                      "avatar_url": "https://example.com/avatar1.jpg",
+                      "daily_streak": 5,
+                      "daily_streak_updated_at": "2024-01-01T12:00:00Z"
+                    }],
+                    "rounds": [{
+                      "round": 1,
+                      "correct_song": {
+                        "id": "5PjdY0CKGZdEuoNab3yDmX",
+                        "name": "Correct Song",
+                        "artists": [{"name": "Artist 1"}],
+                        "preview_url": "https://p.scdn.co/mp3-preview/example",
+                        "is_playable": true
+                      },
+                      "correct_song_cover": "https://example.com/song-cover.jpg",
+                      "wrong_songs": [{
+                        "id": "6PjdY0CKGZdEuoNab3yDmX",
+                        "name": "Wrong Song",
+                        "artists": [{"name": "Artist 2"}],
+                        "preview_url": "https://p.scdn.co/mp3-preview/example2",
+                        "is_playable": true
+                      }]
+                    }],
+                    "created_at": "2024-01-01T12:00:00Z",
+                    "stats": []
+                  }],
+                  "past": [{
+                    "game_id": 122,
+                    "status": "finished",
+                    "creator_id": "123e4567-e89b-12d3-a456-426614174000",
+                    "playlist": {
+                      "id": "37i9dQZF1DXcBWIGoYBM5M",
+                      "name": "Top Hits",
+                      "cover": "https://example.com/playlist-cover.jpg"
+                    },
+                    "players": [{
+                      "id": "123e4567-e89b-12d3-a456-426614174000",
+                      "username": "player_one",
+                      "spotify_id": "spotify_user_id_1",
+                      "spotify_visibility": true,
+                      "avatar_url": "https://example.com/avatar1.jpg",
+                      "daily_streak": 5,
+                      "daily_streak_updated_at": "2024-01-01T12:00:00Z"
+                    }],
+                    "rounds": [{
+                      "round": 1,
+                      "correct_song": {
+                        "id": "5PjdY0CKGZdEuoNab3yDmX",
+                        "name": "Correct Song",
+                        "artists": [{"name": "Artist 1"}],
+                        "preview_url": "https://p.scdn.co/mp3-preview/example",
+                        "is_playable": true
+                      },
+                      "correct_song_cover": "https://example.com/song-cover.jpg",
+                      "wrong_songs": [{
+                        "id": "6PjdY0CKGZdEuoNab3yDmX",
+                        "name": "Wrong Song",
+                        "artists": [{"name": "Artist 2"}],
+                        "preview_url": "https://p.scdn.co/mp3-preview/example2",
+                        "is_playable": true
+                      }]
+                    }],
+                    "created_at": "2024-01-01T12:00:00Z",
+                    "stats": [{
+                      "user_id": "123e4567-e89b-12d3-a456-426614174000",
+                      "score": 450,
+                      "guesses": [{
+                        "round_number": 1,
+                        "song": {
+                          "id": "5PjdY0CKGZdEuoNab3yDmX",
+                          "name": "Guessed Song",
+                          "artists": [{"name": "Artist 1"}],
+                          "preview_url": "https://p.scdn.co/mp3-preview/example",
+                          "is_playable": true
+                        },
+                        "time_to_guess": 5.5,
+                        "correct_guess": true
+                      }]
+                    }]
+                  }]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated - User is not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message",
+                      "example": "unauthenticated"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - Database or server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Game"],
+        "summary": "Initialize a new game",
+        "description": "This endpoint initializes a new game between two players using a specified playlist or random configuration. It returns the created game's details, including rounds and song options.",
+        "requestBody": {
+          "description": "Request body for initializing a game",
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "playlist_id": {
+                        "type": "string",
+                        "pattern": "^[a-zA-Z0-9]{22}$",
+                        "description": "Spotify ID of the playlist to use"
+                      },
+                      "opponent_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "UUID of the opponent to play against"
+                      }
+                    },
+                    "required": ["playlist_id", "opponent_id"]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "playlist_id": {
+                        "type": "string",
+                        "pattern": "^[a-zA-Z0-9]{22}$",
+                        "description": "Spotify ID of the playlist to use"
+                      }
+                    },
+                    "required": ["playlist_id"]
+                  }
+                ]
+              },
+              "examples": {
+                "specific_opponent": {
+                  "value": {
+                    "playlist_id": "37i9dQZF1DXcBWIGoYBM5M",
+                    "opponent_id": "123e4567-e89b-12d3-a456-426614174000"
+                  }
+                },
+                "random_opponent": {
+                  "value": {
+                    "playlist_id": "37i9dQZF1DXcBWIGoYBM5M"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [{
+          "name": "type",
+          "in": "query",
+          "description": "The type of game initialization. Options: 'rdm_opponent' for random opponent, 'quickplay' for random playlist and opponent, or default for manual selection.",
+          "schema": {
+            "type": "string",
+            "enum": ["rdm_opponent", "quickplay"]
+          }
+        }],
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "201": {
+            "description": "Game successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActiveGame"
+                },
+                "example": {
+                  "game_id": 123,
+                  "status": "playing",
+                  "creator_id": "123e4567-e89b-12d3-a456-426614174000",
+                  "playlist": {
+                    "id": "37i9dQZF1DXcBWIGoYBM5M",
+                    "name": "Top Hits",
+                    "cover": "https://example.com/playlist-cover.jpg"
+                  },
+                  "players": [{
+                    "id": "123e4567-e89b-12d3-a456-426614174000",
+                    "username": "player_one",
+                    "spotify_id": "spotify_user_id_1",
+                    "spotify_visibility": true,
+                    "avatar_url": "https://example.com/avatar1.jpg",
+                    "daily_streak": 5,
+                    "daily_streak_updated_at": "2024-01-01T12:00:00Z"
+                  }],
+                  "rounds": [{
+                    "round": 1,
+                    "preview_url": "https://p.scdn.co/mp3-preview/example",
+                    "options": [{
+                      "id": "5PjdY0CKGZdEuoNab3yDmX",
+                      "name": "Song Option 1",
+                      "artists": [{"name": "Artist 1"}],
+                      "preview_url": "https://p.scdn.co/mp3-preview/example1",
+                      "is_playable": true
+                    }]
+                  }]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid input or conditions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated - User is not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - Server, database, or Spotify API issue",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/playlist/{uid}": {
+      "get": {
+        "tags": [
+          "Playlist"
+        ],
+        "summary": "Retrieve playlist details",
+        "description": "Fetches detailed information about a specific playlist, including associated categories.",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "description": "Spotify playlist ID",
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9]{22}$"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Playlist details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetPlaylistResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid Spotify playlist ID format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated - User is not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Playlist not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - Database or server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/playlist/": {
+      "get": {
+        "tags": [
+          "Playlist"
+        ],
+        "summary": "Retrieve all playlists",
+        "description": "Fetches all available playlists, including their associated categories.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of playlists with their categories retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetPlaylistResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated - User is not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - Database or server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Playlist"
+        ],
+        "summary": "Create a new playlist",
+        "description": "Creates a new playlist along with associated categories.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePlaylistRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Playlist created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatePlaylistResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid request body format or duplicate playlist ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - Database, Spotify API, or server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/user/register": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Register a new user profile",
+        "description": "Registers a new user profile with a username and Spotify visibility settings. User must be authenticated.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully registered the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid username format or missing required fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated - User is not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - Username already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - Database or server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/user/{uid}": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Retrieve a specific user's profile information",
+        "description": "Retrieves the profile information of a user by their UUID. User must be authenticated.",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "The UUID of the user whose profile is to be retrieved."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the user's profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetUserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid UUID format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated - User is not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - User profile does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - Database or server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/user/friends": {
+      "get": {
+        "tags": [
+          "Friends"
+        ],
+        "summary": "Retrieve all friendships and friend requests for the authenticated user",
+        "description": "Retrieves all friendships and pending friend requests for the authenticated user. Requires the user to be logged in.",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved friends and friend requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetFriendResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated - User is not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - Database or server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Friends"
+        ],
+        "summary": "Send a friend request to a user by their username",
+        "description": "Sends a friend request to a user specified by their username. Requires the user to be logged in.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendFriendRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Friend request successfully sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Friend request sent"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid request body format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated - User is not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - Database or server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/user/friends/action": {
+      "post": {
+        "tags": [
+          "Friends"
+        ],
+        "summary": "Handle friend request actions (accept, decline, remove)",
+        "description": "This endpoint allows the user to perform actions on a friend request, such as accepting, declining, or removing a friend. The user must be authenticated, and the friendship action must be valid.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FriendActionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Friend request action successfully performed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Friend request action performed"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid request body or invalid friendship state for action",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated - User is not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - Database or server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

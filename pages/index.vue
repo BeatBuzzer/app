@@ -21,14 +21,36 @@ onMounted(async () => {
   setLevelbar(70);
   await fetchUser();
   await fetchGames();
+  checkToken();
+
   intervalId.value = await setInterval(() => {
-    fetchGames()
+    fetchGames();
+    checkToken();
   }, 15000); // 15 seconds
 });
 
 onBeforeUnmount(() => {
   clearInterval(intervalId.value);
 });
+
+async function checkToken() {
+  try {
+    const res = await fetch(`https://api.spotify.com/v1/me`, {
+      method: 'GET',
+      headers: {
+          'Authorization': `Bearer ${useCookie('sb-provider-token').value}`,
+      },
+    });
+
+    if (!res.ok) {
+      console.error(`Error: ${res.status} - ${res.statusText}`);
+      navigateTo('/login');
+    }
+  } catch (error) {
+    console.error('Failed to validate token:', error);
+    navigateTo('/login');
+  }
+}
 
 function setLevelbar(newValue: number) {
   const levelbar = document.getElementById('levelbar')

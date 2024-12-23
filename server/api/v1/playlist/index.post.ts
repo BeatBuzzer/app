@@ -77,5 +77,5 @@ export default defineEventHandler(async (event) => {
     }
 
     setResponseStatus(event, 201);
-    return {playlist: playlistData, categories: categoriesData?.map((cat) => cat.name)};
+    return [...playlistData, categoriesData?.map((cat) => cat.name)];
 })
