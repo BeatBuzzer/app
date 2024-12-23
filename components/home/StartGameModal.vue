@@ -15,6 +15,8 @@ const selectedFriend = ref<string | null>(null)
 
 const {fetchFriends, friends} = useFriends();
 
+const showModal = ref(false);
+
 const showFriendsView = () => {
   currentView.value = 'friends'
 }
@@ -127,7 +129,7 @@ onMounted(async () => {
           <h2 class="text-lg font-semibold">Select a Friend</h2>
         </div>
 
-        <div class="space-y-2">
+        <div v-if="friends.length > 0" class="space-y-2">
           <HomeUsersUserBox
               v-for="friend in friends"
               :key="friend.user.id"
@@ -137,6 +139,14 @@ onMounted(async () => {
               :friend-id="friend.user.id"
               @click="selectFriend(friend.user.id)"
           />
+        </div>
+        <div v-else class="space-y-2">
+          <p class="text-center text-gray-500">No friends available :c</p>
+          <NuxtLink to="/profile" class="text-center text-indigo-500">Go add a friend</NuxtLink>
+<!--          <div class="flex justify-center mb-3">-->
+<!--            <button class="p-2 bg-blue-500 text-white rounded-3xl ml-2" @click="showModal = true">Add new friend</button>-->
+<!--            <ProfileFriendRequestModal v-show="showModal" @close-modal="showModal = false" @refresh="fetchFriends" />-->
+<!--          </div>-->
         </div>
       </div>
 
