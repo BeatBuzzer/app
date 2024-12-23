@@ -27,7 +27,7 @@ const statsMap = computed(() => {
   return game.value.stats?.reduce((acc, stat) => {
     acc[stat.user_id] = stat;
     return acc;
-  }, {} as Record<string,GameStats>);
+  }, {} as Record<string, GameStats>);
 });
 
 const computeGame = (activeGame?: ActiveGame): Game | null => {
@@ -84,16 +84,19 @@ onUnmounted(() => {
       <template #content>
         <div class="h-full flex flex-col ">
           <!-- Text content fixed at top -->
-            <div class="flex justify-center pt-[5%] pb-[5%]">
-              <GamePlaylistBox v-if="playlist" :playlist="playlist"/>
-            </div>
+          <div class="flex justify-center pt-[5%] pb-[5%]">
+            <GamePlaylistBox v-if="playlist" :playlist="playlist"/>
+          </div>
 
-            <div class="flex justify-between ">
-              <ScoreboardUserBox v-for="(player) in game?.players" :key="player.id" :user="player" :scoreboard="{score: statsMap![player.id].score, change: 0}"/>
-            </div>
+          <div class="flex justify-between ">
+            <!-- Stupid fix but it works. We didnt implement a win screen for more than 2 players but didnt want to ditch our approach to theoretically handling larger games. -->
+
+            <ScoreboardUserBox v-for="(player) in game?.players.filter((p)=>p.id === user?.id)" :key="player.id" :user="player" :scoreboard="{score: statsMap![player.id].score, change: 0}"/>
+            <ScoreboardUserBox v-for="(player) in game?.players.filter((p)=>p.id !== user?.id)" :key="player.id" :user="player" :scoreboard="{score: statsMap![player.id].score, change: 0}"/>
+          </div>
 
           <!-- Spacer to push game rounds to bottom -->
-          <div class="flex-grow" />
+          <div class="flex-grow"/>
 
           <!-- Game rounds container aligned to bottom -->
           <div class="w-full pb-5">
