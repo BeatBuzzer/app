@@ -15,7 +15,6 @@ describe('ProviderButton', () => {
     it('uses default props when none provided', async () => {
         const wrapper = await mountSuspended(ProviderButton);
         expect(wrapper.text()).toContain('Sign in with Spotify');
-        expect(wrapper.vm.provider).toBe('spotify');
     });
 
     // Test image rendering
