@@ -35,7 +35,7 @@ onBeforeUnmount(() => {
 
 async function checkToken() {
   try {
-    const res = await fetch(`https://api.spotify.com/v1/me`, {
+    const res = await fetch(`https://api.spotify.com/v1/me?nocache=${Date.now()}`, {
       method: 'GET',
       headers: {
           'Authorization': `Bearer ${useCookie('sb-provider-token').value}`,
