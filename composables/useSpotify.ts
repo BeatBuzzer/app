@@ -11,20 +11,24 @@ export default function useSpotify(playlistId: string) {
     const refresh_token = ref('')
 
     if (session.value) {
-        token.value = session.value.provider_token ?? '';
+        token.value = localStorage.getItem('access_token') ?? ''
+        if (!token.value) {
+            token.value = session.value.provider_token ?? '';    
+        }
         refresh_token.value = session.value.provider_refresh_token ?? ''
         localStorage.setItem('access_token', token.value);
         if (refresh_token.value) {
             localStorage.setItem('refresh_token', refresh_token.value);
         } else {
             refresh_token.value = localStorage.getItem('refresh_token') ?? ''
+            token.value = localStorage.getItem('access_token') ?? ''
         }
     }
 
     const getRefreshToken = async () => {
         const url = "https://accounts.spotify.com/api/token";
-        const clientId = '';
-        const clientSecret = '';
+        const clientId = 'a986eacb383b4bcc9448f05c099ec209';
+        const clientSecret = '9678c22b670c4fcc86778ef954171823';
 
         /*const auth = Buffer
         .from(`${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`)
@@ -137,6 +141,7 @@ export default function useSpotify(playlistId: string) {
 
             if (!res.ok) {
                 console.error(`Error: ${res.status} - ${res.statusText}`);
+                console.log(token.value)
                 getRefreshToken();
                 return null;
             }
