@@ -118,7 +118,6 @@ export default function useSpotify(playlistId: string) {
         }
     }
 
-
     async function getTrackCover(trackId: string): Promise<string> {
         try {
             const res = await fetch(`https://api.spotify.com/v1/tracks/${trackId}`, {
