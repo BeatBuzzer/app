@@ -59,6 +59,7 @@ onMounted(async () => {
   // Handle audio end / guess time limit reached
   audio.value.onended = async () => {
     // Automatically select first option if time runs out
+    if(lastServerResponse.value?.was_last_round) return;
     await selectOption(round.value!.options[0]);
   }
 
