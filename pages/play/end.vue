@@ -109,7 +109,7 @@ onUnmounted(() => {
                 <div class="inline-flex flex-col">
                   <Icon v-if="stats!.guesses[idx].correct_guess" name="mdi:checkbox-marked" class="text-green-500 text-4xl"/>
                   <Icon v-else name="mdi:close-box" class="text-red-500 text-4xl"/>
-                  <div class="text-sm max-w-9 font-thin text-center" v-text="statsMap![user!.id]?.guesses[idx].time_to_guess + 's'"/>
+                  <div class="text-sm max-w-9 font-thin text-center" v-text="statsMap![user!.id]?.guesses[idx].time_to_guess.toFixed(2) + 's'"/>
                 </div>
                 <NuxtImg
                     :src="gameRound.correct_song_cover"
@@ -118,7 +118,7 @@ onUnmounted(() => {
                 <div v-if="opStats?.guesses && opStats.guesses.length > 1" class="inline-flex flex-col">
                   <Icon v-if="opStats?.guesses[idx].correct_guess" name="mdi:checkbox-marked" class="text-green-500 text-4xl"/>
                   <Icon v-else name="mdi:close-box" class="text-red-500 text-4xl"/>
-                  <div class="text-sm font-thin text-center " v-text="opStats?.guesses[idx].time_to_guess + 's'"/>
+                  <div class="text-sm font-thin text-center " v-text="opStats?.guesses[idx].time_to_guess.toFixed(2) + 's'"/>
                 </div>
                 <div v-else class="inline-flex flex-col">
                   <!-- Invisible to not break layout -->
