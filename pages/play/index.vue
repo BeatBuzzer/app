@@ -92,6 +92,8 @@ const playRound = () => {
   if (!round.value) return;
   if (!audio.value) return;
 
+  console.debug('Playing round', JSON.stringify(round.value));
+
   // Load audio
   audio.value.src = round.value.preview_url;
   audio.value.volume = volume;
