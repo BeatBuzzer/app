@@ -30,10 +30,10 @@ export default defineNuxtConfig({
     },
     ssr: false,
     runtimeConfig: {
-        supabaseUrl: process.env.SUPABASE_URL,
-        supabaseKey: process.env.SUPABASE_KEY,
-        supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY,
-        spotifyClientId: process.env.SPOTIFY_CLIENT_ID,
-        spotifyClientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+        supabaseUrl: '',
+        supabaseKey: '',
+        supabaseServiceKey: '',
+        spotifyClientId: '',
+        spotifyClientSecret: '',
     }
 })
