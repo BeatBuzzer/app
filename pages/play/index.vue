@@ -69,6 +69,7 @@ onUnmounted(async () => {
   if (audio.value) audio.value.pause();
 
   // send all required guesses so game is not stuck
+  if(lastServerResponse.value?.was_last_round) return;
   await abortGame();
 });
 
@@ -187,6 +188,7 @@ const pauseAudio = () => {
 };
 
 const endGame = () => {
+  pauseAudio();
   audio.value!.src = '';
   audio.value?.load();
   navigateTo('/play/end');
