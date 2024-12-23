@@ -10,7 +10,7 @@ RUN apk add --no-cache python3 make g++
 COPY package.json package-lock.json ./
 
 # Install dependencies (this layer will be cached if package files don't change)
-RUN npm ci
+RUN npm i
 
 # Copy all source files
 COPY . .
@@ -33,6 +33,9 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOST=0.0.0.0
 ENV NODE_ENV=production
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=15s --retries=3 \
+  CMD curl -f http://localhost:3000/api/v1/health || exit 1
 
 # Start the application
 CMD ["node", ".output/server/index.mjs"]

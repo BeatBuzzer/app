@@ -41,7 +41,7 @@ components:
       type: object
       properties:
         friendship_id:
-          type: string
+          type: number
           description: The unique ID of the friendship
         friend_id:
           type: string
@@ -60,83 +60,71 @@ components:
           enum:
             - pending
             - accepted
-            - rejected
+            - declined
           description: The current status of the friendship
         request_type:
           type: string
           enum:
-            - sent
-            - received
+            - outgoing
+            - incoming
           description: The type of the friend request
         user:
-          type: object
-          properties:
-            id:
-              type: string
-              format: uuid
-              description: The unique ID of the user
-            avatar_url:
-              type: string
-              description: URL to the user's avatar
-            username:
-              type: string
-              description: The username of the friend
-            spotify_id:
-              type: string
-              description: >-
-                The friend's Spotify ID, visible only if the friend has chosen
-                to make it public
-            spotify_visibility:
-              type: boolean
-              description: Whether the friend's Spotify ID is visible to the user
+          $ref: '#/components/schemas/GetUserResponse'
       example:
-        friendship_id: abc123
+        friendship_id: 123
         friend_id: 123e4567-e89b-12d3-a456-426614174000
         created_at: '2024-01-01T12:00:00Z'
         updated_at: '2024-01-02T12:00:00Z'
         status: accepted
-        request_type: sent
+        request_type: outgoing
         user:
           id: 123e4567-e89b-12d3-a456-426614174000
           avatar_url: https://example.com/avatar.jpg
           username: friend_example
           spotify_id: spotify_friend_id_example
           spotify_visibility: true
+          daily_streak: 5
+          daily_streak_updated_at: '2024-01-01T12:00:00Z'
     GetUserResponse:
       type: object
       properties:
         id:
           type: string
           format: uuid
-          description: The unique identifier of the user.
+          description: The unique identifier of the user
         username:
           type: string
-          description: The username of the user.
+          description: The username of the user
         spotify_id:
           type: string
-          description: >-
-            The user's Spotify ID, only visible if the user has chosen to make
-            it public.
+          description: The user's Spotify ID, only visible if the user has chosen to make it public
         spotify_visibility:
           type: boolean
-          description: Whether the user's Spotify profile information is visible to others.
+          description: Whether the user's Spotify profile information is visible to others
         avatar_url:
           type: string
-          description: The URL of the user's avatar image.
+          description: The URL of the user's avatar image
+        daily_streak:
+          type: integer
+          description: The user's current daily streak
+        daily_streak_updated_at:
+          type: string
+          format: date-time
+          description: The last time the daily streak was updated
       example:
         id: 123e4567-e89b-12d3-a456-426614174000
         username: user_example
         spotify_id: spotify_user_id_example
         spotify_visibility: true
         avatar_url: https://example.com/avatar.jpg
+        daily_streak: 5
+        daily_streak_updated_at: '2024-01-01T12:00:00Z'
     RegisterUserRequest:
       type: object
       properties:
         username:
           type: string
-          description: >-
-            The username of the user. Must be 4+ characters and alphanumeric
-            with underscores only.
+          description: The username of the user. Must be 4+ characters and alphanumeric with underscores only.
           minLength: 4
           pattern: ^[a-zA-Z0-9_]+$
         spotify_visibility:
@@ -152,7 +140,7 @@ components:
       type: object
       properties:
         playlist:
-          $ref: '#/components/schemas/Playlist'
+          $ref: '#/components/schemas/GetPlaylistResponse'
         categories:
           type: array
           items:
@@ -186,28 +174,13 @@ components:
           - Pop
           - Top Charts
         enabled: true
-    Playlist:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Spotify playlist ID
-        name:
-          type: string
-          description: Name of the playlist
-        spotifyId:
-          type: string
-          description: Spotify playlist ID
-        cover:
-          type: string
-          description: URL of the playlist cover image
-        enabled:
-          type: boolean
-          description: Indicates if the playlist is enabled
     GetPlaylistResponse:
       type: object
       properties:
         id:
+          type: string
+          description: playlist ID
+        spotify_id:
           type: string
           description: Spotify playlist ID
         name:
@@ -239,67 +212,19 @@ components:
     Game:
       type: object
       properties:
-        id:
-          type: string
-          description: The unique identifier of the game
-          example: game123
-        status:
-          type: string
-          description: The status of the game
-          example: PLAYING
-        creator_id:
-          type: string
-          description: The user ID of the game creator
-          example: user123
-        rounds:
-          type: array
-          description: Details of each round in the game
-          items:
-            type: object
-            properties:
-              round_number:
-                type: number
-                description: The round number
-                example: 1
-              correct_song:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: Spotify song ID
-                    example: spotify123
-                  preview_url:
-                    type: string
-                    description: Preview URL for the song
-                    example: https://p.scdn.co/mp3-preview/song123
-        players:
-          type: array
-          description: List of players in the game
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-                description: Player ID
-                example: player123
-              score:
-                type: number
-                description: Player's score
-                example: 1000
-    ActiveGame:
-      type: object
-      properties:
         game_id:
-          type: string
-          description: Unique identifier for the game
+          type: number
+          description: The unique identifier of the game
         status:
           type: string
           enum:
-            - PLAYING
-          description: Status of the game
+            - playing
+            - finished
+          description: The status of the game
         creator_id:
           type: string
-          description: ID of the user who created the game
+          format: uuid
+          description: Who created the game and thus already played its turn
         playlist:
           type: object
           properties:
@@ -308,22 +233,157 @@ components:
               description: Spotify playlist ID
             name:
               type: string
-              description: Playlist name
+              description: Name of the playlist
             cover:
               type: string
-              description: URL of the playlist's cover image
+              description: URL of the playlist cover image
+        players:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetUserResponse'
+        rounds:
+          type: array
+          items:
+            type: object
+            properties:
+              round:
+                type: number
+                description: The round number
+              correct_song:
+                $ref: '#/components/schemas/Song'
+              correct_song_cover:
+                type: string
+                description: Cover art URL for the correct song
+              wrong_songs:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Song'
+        created_at:
+          type: string
+          format: date-time
+          description: When the game was created
+        stats:
+          type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                type: string
+                format: uuid
+              score:
+                type: number
+              guesses:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    round_number:
+                      type: number
+                    song:
+                      $ref: '#/components/schemas/Song'
+                    time_to_guess:
+                      type: number
+                    correct_guess:
+                      type: boolean
+    ActiveGame:
+      type: object
+      properties:
+        game_id:
+          type: number
+          description: The unique identifier of the game
+        status:
+          type: string
+          enum:
+            - playing
+          description: The status of the active game
+        creator_id:
+          type: string
+          format: uuid
+          description: Who created the game and thus already played its turn
+        playlist:
+          type: object
+          properties:
+            id:
+              type: string
+              description: Spotify playlist ID
+            name:
+              type: string
+              description: Name of the playlist
+            cover:
+              type: string
+              description: URL of the playlist cover image
+        players:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetUserResponse'
+        rounds:
+          type: array
+          items:
+            type: object
+            properties:
+              round:
+                type: number
+                description: The round number
+              preview_url:
+                type: string
+                description: Preview URL for the song
+              options:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Song'
+    Song:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique Spotify ID of the song
+        name:
+          type: string
+          description: The name of the song
+        artists:
+          type: array
+          items:
+            $ref: '#/components/schemas/SongArtist'
+        preview_url:
+          type: string
+          nullable: true
+          description: The preview URL for the song
+        is_playable:
+          type: boolean
+          description: Whether the song is playable
+      example:
+        id: 5PjdY0CKGZdEuoNab3yDmX
+        name: Example Song
+        artists:
+          - name: Example Artist
+        preview_url: https://p.scdn.co/mp3-preview/example
+        is_playable: true
+    SongArtist:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the artist
+    SpotifySong:
+      type: object
+      properties:
+        track:
+          $ref: '#/components/schemas/Song'
+      example:
+        track:
+          id: 5PjdY0CKGZdEuoNab3yDmX
+          name: Example Song
+          artists:
+            - name: Example Artist
+          preview_url: https://p.scdn.co/mp3-preview/example
+          is_playable: true
 paths:
   /api/v1/game/{uid}/play:
     post:
       tags:
         - Game
       summary: Submit a guess for a specific round in a game
-      description: >-
-        This endpoint allows an authenticated user to submit a guess for a
-        specific round in an ongoing game. The user must provide the round
-        number, their guess, and the time taken to make the guess. Scores are
-        calculated based on the time taken, and the game status is updated
-        accordingly.
+      description: This endpoint allows an authenticated user to submit a guess for a specific round in an ongoing game. The user must provide the round number, their guess, and the time taken to make the guess. Scores are calculated based on the time taken, and the game status is updated accordingly.
       parameters:
         - name: uid
           in: path
@@ -426,11 +486,7 @@ paths:
       tags:
         - Game
       summary: Retrieve games categorized by status
-      description: >-
-        This endpoint retrieves all games for the authenticated user,
-        categorized into active, waiting, and past games. Active games are where
-        it's the user's turn, waiting games are those where the user is waiting
-        for an opponent, and past games are completed ones.
+      description: This endpoint retrieves all games for the authenticated user, categorized into active, waiting, and past games. Active games are where it's the user's turn, waiting games are those where the user is waiting for an opponent, and past games are completed ones.
       parameters: []
       security:
         - bearerAuth: []
@@ -446,7 +502,7 @@ paths:
                     type: array
                     description: Games where it's the user's turn to play
                     items:
-                      $ref: '#/components/schemas/Game'
+                      $ref: '#/components/schemas/ActiveGame'
                   waiting:
                     type: array
                     description: Games where the user is waiting for an opponent
@@ -457,6 +513,116 @@ paths:
                     description: Completed games
                     items:
                       $ref: '#/components/schemas/Game'
+              example:
+                active:
+                  - game_id: 123
+                    status: playing
+                    creator_id: 123e4567-e89b-12d3-a456-426614174000
+                    playlist:
+                      id: 37i9dQZF1DXcBWIGoYBM5M
+                      name: Top Hits
+                      cover: https://example.com/playlist-cover.jpg
+                    players:
+                      - id: 123e4567-e89b-12d3-a456-426614174000
+                        username: player_one
+                        spotify_id: spotify_user_id_1
+                        spotify_visibility: true
+                        avatar_url: https://example.com/avatar1.jpg
+                        daily_streak: 5
+                        daily_streak_updated_at: '2024-01-01T12:00:00Z'
+                    rounds:
+                      - round: 1
+                        preview_url: https://p.scdn.co/mp3-preview/example
+                        options:
+                          - id: 5PjdY0CKGZdEuoNab3yDmX
+                            name: Song Option 1
+                            artists:
+                              - name: Artist 1
+                            preview_url: https://p.scdn.co/mp3-preview/example1
+                            is_playable: true
+                waiting:
+                  - game_id: 124
+                    status: playing
+                    creator_id: 123e4567-e89b-12d3-a456-426614174000
+                    playlist:
+                      id: 37i9dQZF1DXcBWIGoYBM5M
+                      name: Top Hits
+                      cover: https://example.com/playlist-cover.jpg
+                    players:
+                      - id: 123e4567-e89b-12d3-a456-426614174000
+                        username: player_one
+                        spotify_id: spotify_user_id_1
+                        spotify_visibility: true
+                        avatar_url: https://example.com/avatar1.jpg
+                        daily_streak: 5
+                        daily_streak_updated_at: '2024-01-01T12:00:00Z'
+                    rounds:
+                      - round: 1
+                        correct_song:
+                          id: 5PjdY0CKGZdEuoNab3yDmX
+                          name: Correct Song
+                          artists:
+                            - name: Artist 1
+                          preview_url: https://p.scdn.co/mp3-preview/example
+                          is_playable: true
+                        correct_song_cover: https://example.com/song-cover.jpg
+                        wrong_songs:
+                          - id: 6PjdY0CKGZdEuoNab3yDmX
+                            name: Wrong Song
+                            artists:
+                              - name: Artist 2
+                            preview_url: https://p.scdn.co/mp3-preview/example2
+                            is_playable: true
+                    created_at: '2024-01-01T12:00:00Z'
+                    stats: []
+                past:
+                  - game_id: 122
+                    status: finished
+                    creator_id: 123e4567-e89b-12d3-a456-426614174000
+                    playlist:
+                      id: 37i9dQZF1DXcBWIGoYBM5M
+                      name: Top Hits
+                      cover: https://example.com/playlist-cover.jpg
+                    players:
+                      - id: 123e4567-e89b-12d3-a456-426614174000
+                        username: player_one
+                        spotify_id: spotify_user_id_1
+                        spotify_visibility: true
+                        avatar_url: https://example.com/avatar1.jpg
+                        daily_streak: 5
+                        daily_streak_updated_at: '2024-01-01T12:00:00Z'
+                    rounds:
+                      - round: 1
+                        correct_song:
+                          id: 5PjdY0CKGZdEuoNab3yDmX
+                          name: Correct Song
+                          artists:
+                            - name: Artist 1
+                          preview_url: https://p.scdn.co/mp3-preview/example
+                          is_playable: true
+                        correct_song_cover: https://example.com/song-cover.jpg
+                        wrong_songs:
+                          - id: 6PjdY0CKGZdEuoNab3yDmX
+                            name: Wrong Song
+                            artists:
+                              - name: Artist 2
+                            preview_url: https://p.scdn.co/mp3-preview/example2
+                            is_playable: true
+                    created_at: '2024-01-01T12:00:00Z'
+                    stats:
+                      - user_id: 123e4567-e89b-12d3-a456-426614174000
+                        score: 450
+                        guesses:
+                          - round_number: 1
+                            song:
+                              id: 5PjdY0CKGZdEuoNab3yDmX
+                              name: Guessed Song
+                              artists:
+                                - name: Artist 1
+                              preview_url: https://p.scdn.co/mp3-preview/example
+                              is_playable: true
+                            time_to_guess: 5.5
+                            correct_guess: true
         '401':
           description: Unauthenticated - User is not logged in
           content:
@@ -483,10 +649,7 @@ paths:
       tags:
         - Game
       summary: Initialize a new game
-      description: >-
-        This endpoint initializes a new game between two players using a
-        specified playlist or random configuration. It returns the created
-        game's details, including rounds and song options.
+      description: This endpoint initializes a new game between two players using a specified playlist or random configuration. It returns the created game's details, including rounds and song options.
       requestBody:
         description: Request body for initializing a game
         content:
@@ -525,10 +688,7 @@ paths:
       parameters:
         - name: type
           in: query
-          description: >-
-            The type of game initialization. Options: 'rdm_opponent' for random
-            opponent, 'quickplay' for random playlist and opponent, or default
-            for manual selection.
+          description: 'The type of game initialization. Options: ''rdm_opponent'' for random opponent, ''quickplay'' for random playlist and opponent, or default for manual selection.'
           schema:
             type: string
             enum:
@@ -543,6 +703,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ActiveGame'
+              example:
+                game_id: 123
+                status: playing
+                creator_id: 123e4567-e89b-12d3-a456-426614174000
+                playlist:
+                  id: 37i9dQZF1DXcBWIGoYBM5M
+                  name: Top Hits
+                  cover: https://example.com/playlist-cover.jpg
+                players:
+                  - id: 123e4567-e89b-12d3-a456-426614174000
+                    username: player_one
+                    spotify_id: spotify_user_id_1
+                    spotify_visibility: true
+                    avatar_url: https://example.com/avatar1.jpg
+                    daily_streak: 5
+                    daily_streak_updated_at: '2024-01-01T12:00:00Z'
+                rounds:
+                  - round: 1
+                    preview_url: https://p.scdn.co/mp3-preview/example
+                    options:
+                      - id: 5PjdY0CKGZdEuoNab3yDmX
+                        name: Song Option 1
+                        artists:
+                          - name: Artist 1
+                        preview_url: https://p.scdn.co/mp3-preview/example1
+                        is_playable: true
         '400':
           description: Bad Request - Invalid input or conditions
           content:
@@ -578,9 +764,7 @@ paths:
       tags:
         - Playlist
       summary: Retrieve playlist details
-      description: >-
-        Fetches detailed information about a specific playlist, including
-        associated categories.
+      description: Fetches detailed information about a specific playlist, including associated categories.
       parameters:
         - name: uid
           in: path
@@ -713,87 +897,12 @@ paths:
                   error:
                     type: string
                     description: Error message
-  /api/v1/user:
-    get:
-      tags:
-        - User
-      summary: Retrieve user data
-      description: >-
-        This endpoint retrieves user data for the currently authenticated user.
-        The user must be authenticated via Supabase authentication. If the user
-        is not found or not authenticated, appropriate error responses are
-        returned.
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Successful response with user data
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: Unique identifier of the user
-                    example: user123
-                  username:
-                    type: string
-                    description: Username of the user
-                    example: johndoe
-                  email:
-                    type: string
-                    description: Email address of the user
-                    example: johndoe@example.com
-                  spotify_id:
-                    type: string
-                    description: Spotify account ID (if visible)
-                    example: spotify123
-                  spotify_visibility:
-                    type: boolean
-                    description: Indicates if Spotify ID is visible
-                    example: true
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: Error message
-                    example: unauthenticated
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: Error message
-                    example: User not found
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: Error message
-                    example: Database query failed
   /api/v1/user/register:
     post:
       tags:
         - User
       summary: Register a new user profile
-      description: >-
-        Registers a new user profile with a username and Spotify visibility
-        settings. User must be authenticated.
+      description: Registers a new user profile with a username and Spotify visibility settings. User must be authenticated.
       requestBody:
         required: true
         content:
@@ -853,9 +962,7 @@ paths:
       tags:
         - User
       summary: Retrieve a specific user's profile information
-      description: >-
-        Retrieves the profile information of a user by their UUID. User must be
-        authenticated.
+      description: Retrieves the profile information of a user by their UUID. User must be authenticated.
       parameters:
         - name: uid
           in: path
@@ -916,9 +1023,7 @@ paths:
       tags:
         - Friends
       summary: Retrieve all friendships and friend requests for the authenticated user
-      description: >-
-        Retrieves all friendships and pending friend requests for the
-        authenticated user. Requires the user to be logged in.
+      description: Retrieves all friendships and pending friend requests for the authenticated user. Requires the user to be logged in.
       responses:
         '200':
           description: Successfully retrieved friends and friend requests
@@ -952,9 +1057,7 @@ paths:
       tags:
         - Friends
       summary: Send a friend request to a user by their username
-      description: >-
-        Sends a friend request to a user specified by their username. Requires
-        the user to be logged in.
+      description: Sends a friend request to a user specified by their username. Requires the user to be logged in.
       requestBody:
         required: true
         content:
@@ -1009,10 +1112,7 @@ paths:
       tags:
         - Friends
       summary: Handle friend request actions (accept, decline, remove)
-      description: >-
-        This endpoint allows the user to perform actions on a friend request,
-        such as accepting, declining, or removing a friend. The user must be
-        authenticated, and the friendship action must be valid.
+      description: This endpoint allows the user to perform actions on a friend request, such as accepting, declining, or removing a friend. The user must be authenticated, and the friendship action must be valid.
       requestBody:
         required: true
         content:
@@ -1033,9 +1133,7 @@ paths:
               example:
                 message: Friend request action performed
         '400':
-          description: >-
-            Bad Request - Invalid request body or invalid friendship state for
-            action
+          description: Bad Request - Invalid request body or invalid friendship state for action
           content:
             application/json:
               schema:
